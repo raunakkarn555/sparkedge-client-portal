@@ -225,6 +225,29 @@ function renderDashboard(client) {
 
         <div class="section-sub-label">Payment Stages</div>
         <div class="stages-list">${stagesHTML}</div>
+
+        ${pendingAmt > 0 ? `
+        <div class="pay-now-block">
+          <div class="pay-now-meta">
+            <div class="pay-now-label">Amount Due Now</div>
+            <div class="pay-now-amt">${fmt(pendingAmt)}</div>
+          </div>
+          <button class="btn-pay-now" onclick="document.getElementById('payModal').classList.add('open')">
+            💳 Pay Now
+          </button>
+          <div class="pay-methods-row">
+            <span class="pay-method-chip">GPay</span>
+            <span class="pay-method-chip">PhonePe</span>
+            <span class="pay-method-chip">Paytm</span>
+            <span class="pay-method-chip">UPI</span>
+            <span class="pay-method-chip">Bank Transfer</span>
+          </div>
+        </div>` : `
+        <div class="all-paid-badge">
+          <span>✅</span>
+          <span>All payments received — Thank you!</span>
+        </div>`}
+
       </div>
 
       <!-- ══ FREE SERVICES & FREEBIES ══ -->

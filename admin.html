@@ -400,16 +400,44 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 /* ═══════════════════════════════════════════════
    MULTI-USER AUTH SYSTEM
    Owner: RAUNAK@1 (full access)
-   Members: stored in localStorage, set by owner
+   Members: stored in localStorage + bootstrapped from SE_TEAM_BOOTSTRAP
    Settings unlock: separate password (owner only)
+
+   ⚠️ TEAM ACCESS ACROSS DEVICES:
+   Members are stored in localStorage of THIS browser/device.
+   To let teammates login from Delhi/another device, the owner must:
+   1. Go to Team page → click "Export Team Config"
+   2. Copy the generated <script> block
+   3. Paste it right below this comment block in admin.html (replace the placeholder below)
+   4. Re-share that updated admin.html with team members
+   OR use the Import feature to sync data.
 ═══════════════════════════════════════════════ */
 const AUTH_KEY = 'se_members';
 const SETTINGS_AUTH_KEY = 'se_settings_pwd';
 
+// ── PASTE EXPORTED TEAM CONFIG HERE (between the markers) ──
+// ── START TEAM CONFIG ──
+// window.SE_TEAM_BOOTSTRAP = []; // Replace this line with exported config
+// ── END TEAM CONFIG ──
+
 function getMembers(){
-  try{ return JSON.parse(localStorage.getItem(AUTH_KEY))||[]; }catch{ return []; }
+  try{
+    const stored = JSON.parse(localStorage.getItem(AUTH_KEY))||[];
+    // Merge bootstrap members (from embedded config) with locally stored ones
+    // Bootstrap acts as a fallback for devices that don't have localStorage populated
+    const bootstrap = (window.SE_TEAM_BOOTSTRAP && Array.isArray(window.SE_TEAM_BOOTSTRAP)) ? window.SE_TEAM_BOOTSTRAP : [];
+    if(!bootstrap.length) return stored;
+    // Merge: stored takes priority (owner may have updated locally), bootstrap fills gaps
+    const merged = [...stored];
+    bootstrap.forEach(bm => {
+      if(!merged.find(m => m.id === bm.id)) merged.push(bm);
+    });
+    return merged;
+  }catch{ return []; }
 }
-function saveMembers(m){ localStorage.setItem(AUTH_KEY, JSON.stringify(m)); }
+function saveMembers(m){
+  localStorage.setItem(AUTH_KEY, JSON.stringify(m));
+}
 function getSettingsPwd(){
   return localStorage.getItem(SETTINGS_AUTH_KEY)||'Settings@1';
 }
@@ -1054,7 +1082,8 @@ function toggleSidebar(){
         <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;">Team & Access Management</div>
         <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">Owner-only: Add members, set passwords and permissions.</div>
       </div>
-      <div id="addMemberBtnWrap">
+      <div id="addMemberBtnWrap" style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-secondary btn-sm" onclick="exportTeamConfig()" title="Export member config to embed in admin.html for cross-device login">📤 Export Team Config</button>
         <button class="btn btn-primary" onclick="openAddMemberModal()">+ Invite Member</button>
       </div>
     </div>
@@ -1072,7 +1101,21 @@ function toggleSidebar(){
     </div>
 
     <div id="teamMemberList"></div>
-  </div>
+
+    <!-- Cross-device access info -->
+    <div id="crossDeviceInfo" style="display:none;margin-top:20px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.25);border-radius:var(--radius);padding:16px 20px;">
+      <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#F59E0B;margin-bottom:8px;">⚠️ Cross-Device Login Problem? Read This</div>
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.8;">
+        <strong style="color:var(--text);">Why team member passwords fail on other devices:</strong> Member data is stored in your browser's localStorage — it only exists on YOUR device. When a team member opens admin.html on their laptop/phone in another city, that device has empty localStorage, so no members are found.<br><br>
+        <strong style="color:var(--text);">Fix (30 seconds):</strong><br>
+        1. Click <strong style="color:#F59E0B;">"Export Team Config"</strong> above → copies a script snippet.<br>
+        2. Open <code style="background:var(--bg-raised);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:11px;color:var(--accent);">admin.html</code> in any text editor (Notepad, VS Code).<br>
+        3. Find the line: <code style="background:var(--bg-raised);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:11px;color:var(--accent);">// PASTE EXPORTED TEAM CONFIG HERE</code><br>
+        4. Paste the copied snippet right there (replace the placeholder line).<br>
+        5. Save & re-share the updated admin.html with team members.<br>
+        6. Member passwords will now work on ANY device worldwide. ✅
+      </div>
+    </div>
 
   <!-- ════ PAGE: WORKFLOW ════ -->
   <div class="page-view" id="page-workflow" style="padding:28px;">
@@ -1198,7 +1241,128 @@ function toggleSidebar(){
         <span style="color:var(--accent);font-weight:700;">4th</span><span style="color:var(--text);">Welcome Packet</span><span style="color:var(--text-muted);">On kickoff day — with portal link</span>
       </div>
     </div>
-  </div>
+
+    <!-- ══ TEAM, EXPORT/IMPORT, ROLES GUIDE ══ -->
+    <div style="margin-top:32px;margin-bottom:12px;">
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;">🧑‍💻 Team, Export / Import & Role Guide</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">How to manage your team across devices, sync data, and control what each person can do.</div>
+    </div>
+
+    <!-- HOW EXPORT WORKS -->
+    <div class="workflow-step">
+      <div class="wf-num" style="background:linear-gradient(135deg,#22C55E,#3B82F6);">⬇</div>
+      <div>
+        <div class="wf-title">📤 How Export Works</div>
+        <div class="wf-desc">
+          Export saves ALL your admin data — tickets, payment stages, team members, vouchers, and settings — into a single <strong style="color:var(--text);">.json file</strong> on your device.<br><br>
+          <strong style="color:var(--text);">When to export:</strong><br>
+          • Before switching devices (laptop → desktop, home → office)<br>
+          • Before sharing data with a team member who needs to work on it<br>
+          • As a regular backup (weekly is recommended)<br>
+          • When handing off work to another person<br><br>
+          <strong style="color:var(--text);">Steps:</strong><br>
+          1. Click the <strong style="color:var(--green);">⬇ Export</strong> button in the top toolbar.<br>
+          2. A file named <code style="color:var(--accent);background:var(--bg-raised);border:1px solid var(--border);border-radius:4px;padding:1px 6px;">sparkedge-admin-YYYY-MM-DD.json</code> downloads automatically.<br>
+          3. Save it to Google Drive, WhatsApp Yourself, or email it — so you can access it on the other device.<br><br>
+          ⚠️ Export does NOT include the admin.html file itself. Just the data.
+        </div>
+        <div class="wf-timing">⏱ Any time — takes 2 seconds</div>
+      </div>
+    </div>
+
+    <!-- HOW IMPORT WORKS -->
+    <div class="workflow-step">
+      <div class="wf-num" style="background:linear-gradient(135deg,#3B82F6,#7B5EA7);">⬆</div>
+      <div>
+        <div class="wf-title">📥 How Import Works</div>
+        <div class="wf-desc">
+          Import merges data from a JSON file into your current admin panel. It does <strong style="color:var(--text);">not delete existing data</strong> — it only adds new items and updates existing ones with the same Ticket ID.<br><br>
+          <strong style="color:var(--text);">When to import:</strong><br>
+          • Opening admin.html on a new device for the first time<br>
+          • Receiving updated data from a team member<br>
+          • Restoring from a backup after data loss<br><br>
+          <strong style="color:var(--text);">Steps:</strong><br>
+          1. Click the <strong style="color:#3B82F6;">⬆ Import</strong> button in the top toolbar.<br>
+          2. Open your exported .json file in Notepad / any text editor.<br>
+          3. Select All (Ctrl+A) → Copy (Ctrl+C).<br>
+          4. Paste into the Import modal's text area → Click <strong style="color:var(--text);">Import & Merge</strong>.<br>
+          5. Done — your tickets, vouchers, and settings are now on this device too.<br><br>
+          <strong style="color:var(--accent);">Note:</strong> Team member passwords are NOT imported here — use the Team Config export for that (explained below).
+        </div>
+        <div class="wf-timing">⏱ 1-2 minutes on any device</div>
+      </div>
+    </div>
+
+    <!-- HOW TO SHARE ADMIN.HTML WITH TEAM -->
+    <div class="workflow-step">
+      <div class="wf-num" style="background:linear-gradient(135deg,#FF6B35,#FFB347);">👥</div>
+      <div>
+        <div class="wf-title">🤝 How to Add a Team Member & Give Them Access</div>
+        <div class="wf-desc">
+          <strong style="color:var(--text);">Complete step-by-step:</strong><br><br>
+          <strong style="color:var(--accent);">Step 1 — Add Member:</strong> Go to <strong style="color:var(--text);">Team</strong> → Click <strong style="color:var(--text);">Invite Member</strong> → Fill in their name, role, email, and a unique password (min 6 chars, not the same as owner password). Set permissions. Click Save.<br><br>
+          <strong style="color:var(--accent);">Step 2 — Export Team Config:</strong> Click <strong style="color:var(--text);">Export Team Config</strong> on the Team page. This copies a small code snippet that contains ALL member passwords embedded in it.<br><br>
+          <strong style="color:var(--accent);">Step 3 — Update admin.html:</strong> Open admin.html in VS Code or Notepad. Find the line that says <code style="color:var(--accent);background:var(--bg-raised);border:1px solid var(--border);border-radius:4px;padding:1px 6px;">// PASTE EXPORTED TEAM CONFIG HERE</code>. Paste the snippet right there, replacing the placeholder line. Save the file.<br><br>
+          <strong style="color:var(--accent);">Step 4 — Share the file:</strong> Send this updated admin.html to your team member via WhatsApp, email, or Google Drive.<br><br>
+          <strong style="color:var(--accent);">Step 5 — Team member opens it:</strong> They open admin.html in any browser (Chrome recommended). They type their password. It works on ANY device worldwide. ✅<br><br>
+          <strong style="color:var(--accent);">Step 6 — Sync data:</strong> You (owner) export data and share the .json file with them. They import it. Now you're both on the same data.
+        </div>
+        <div class="wf-timing">⏱ One-time setup — 5-10 minutes</div>
+      </div>
+    </div>
+
+    <!-- ROLES & PERMISSIONS -->
+    <div class="workflow-step">
+      <div class="wf-num" style="background:linear-gradient(135deg,#7B5EA7,#FF3CAC);">🔐</div>
+      <div>
+        <div class="wf-title">🛡️ Roles & Permissions — Who Can Do What</div>
+        <div class="wf-desc">
+          There are two roles: <strong style="color:var(--text);">Owner</strong> (you) and <strong style="color:var(--text);">Member</strong> (team). You control exactly what each member can access.<br><br>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0;">
+            <div style="background:rgba(255,107,53,.06);border:1px solid rgba(255,107,53,.2);border-radius:8px;padding:12px;">
+              <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px;">👑 Owner (RAUNAK@1)</div>
+              <div style="font-size:11px;color:var(--text-muted);line-height:1.8;">Full access to everything. Can add/remove team members. Can change passwords. Can access Settings. Export, import, create, delete tickets.</div>
+            </div>
+            <div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:8px;padding:12px;">
+              <div style="font-size:12px;font-weight:700;color:#3B82F6;margin-bottom:6px;">🧑‍💻 Member (Custom)</div>
+              <div style="font-size:11px;color:var(--text-muted);line-height:1.8;">Access only what owner grants. You pick from: View Tickets, Edit Tickets, Create Tickets, Delete Tickets, View Finance, View Clients, Export/Import.</div>
+            </div>
+          </div>
+          <strong style="color:var(--text);">Permission Presets:</strong><br>
+          • <strong style="color:var(--text);">Full Member</strong> — all permissions (for a trusted co-founder / partner)<br>
+          • <strong style="color:var(--text);">Basic Member</strong> — view + edit + view clients (for designers / developers)<br>
+          • <strong style="color:var(--text);">View Only</strong> — read-only (for interns, clients checking progress internally)<br>
+          • <strong style="color:var(--text);">Custom</strong> — tick exactly what you want<br><br>
+          <strong style="color:var(--accent);">Recommended setup for a typical team:</strong><br>
+          Designer → Basic Member (view + edit tickets, view clients)<br>
+          Project Manager → Full Member (all permissions)<br>
+          Intern → View Only<br>
+          Partner → Full Member
+        </div>
+        <div class="wf-timing">⏱ Set once per member — can be changed anytime</div>
+      </div>
+    </div>
+
+    <!-- DATA SYNC BEST PRACTICES -->
+    <div class="workflow-step">
+      <div class="wf-num" style="background:linear-gradient(135deg,#22C55E,#FFB347);">🔄</div>
+      <div>
+        <div class="wf-title">🔄 Team Data Sync — Best Practices</div>
+        <div class="wf-desc">
+          Since admin.html uses localStorage (no cloud), you need a simple habit to keep everyone in sync.<br><br>
+          <strong style="color:var(--text);">Recommended workflow for a 2-person team:</strong><br>
+          1. <strong style="color:var(--text);">Owner is the single source of truth.</strong> Only the owner makes structural changes (creating/deleting tickets, changing payment totals).<br>
+          2. <strong style="color:var(--text);">Members make progress updates</strong> (timeline entries, deliverable toggles, stage status changes).<br>
+          3. <strong style="color:var(--text);">At end of day:</strong> Member exports their data → sends the .json to owner on WhatsApp → owner imports it to merge changes.<br>
+          4. <strong style="color:var(--text);">Owner exports</strong> updated master data → shares back with team member → they import.<br>
+          5. Done — everyone is in sync every day.<br><br>
+          <strong style="color:var(--accent);">Conflict rule:</strong> If both of you edited the same ticket, the LAST import wins for that ticket. So always communicate before both editing the same client at the same time.
+        </div>
+        <div class="wf-timing">⏱ 2 minutes daily — keeps team perfectly in sync</div>
+      </div>
+    </div>
+
+  </div><!-- end page-workflow -->
 
   <!-- ════ PAGE: SYSTEM GUIDE ════ -->
   <div class="page-view" id="page-guide" style="padding:28px;">
@@ -1981,52 +2145,49 @@ function generateAndDownload() {
    (matches your existing portal format exactly)
 ══════════════════════ */
 function buildClientHTML(t) {
-  // Check if referral discount applied to this ticket
-  const refDiscount = t.referralDiscount ? `
-  <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
-    <span style="font-size:20px;">🎟</span>
-    <div>
-      <div style="font-size:13px;font-weight:700;color:#22C55E;">Referral Discount Applied!</div>
-      <div style="font-size:12px;color:#7A7A9A;margin-top:2px;">Code <strong style="color:#F0F0FA;">${t.referralDiscount.code}</strong> — You saved <strong style="color:#22C55E;">₹${(t.referralDiscount.discount||0).toLocaleString('en-IN')}</strong> · Applied ${t.referralDiscount.appliedAt}</div>
-    </div>
-  </div>` : '';
+  // ── Normalize discount for portal.js format ──
+  // portal.js expects: payment.originalTotal, payment.discount = {amount, reason}
+  // admin stores:       discount = {type, value, reason} separately from payment.total
+  const rawTotal = t.payment?.total || 0;
+  let discAmtNorm = 0;
+  let discObjForPortal = null;
 
-  // Referral rewards section (for the referrer)
-  const refRewards = (t.referralRewards && t.referralRewards.length) ? `
-  <div style="background:rgba(255,179,71,.06);border:1px solid rgba(255,179,71,.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;">
-    <div style="font-size:12px;font-weight:700;color:#FFB347;margin-bottom:10px;">🎁 Your Referral Rewards</div>
-    ${t.referralRewards.map(r=>`<div style="font-size:12px;color:#7A7A9A;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);">Code <strong style="color:#F0F0FA;">${r.code}</strong> used by client ${r.usedBy} on ${r.date} — Reward: <strong style="color:#FFB347;">${r.reward||'—'}</strong></div>`).join('')}
-  </div>` : '';
-
-  // Situational discount banner
-  const sitDiscount = (t.discount && t.discount.type && t.discount.type !== 'none' && t.discount.value) ? (() => {
-    const total = t.payment?.total || 0;
-    const discAmt = t.discount.type === 'flat' ? t.discount.value : Math.round(total * t.discount.value / 100);
-    const finalAmt = total - discAmt;
-    return `
-  <div style="background:rgba(255,179,71,.07);border:1px solid rgba(255,179,71,.25);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
-    <span style="font-size:20px;">🏷️</span>
-    <div>
-      <div style="font-size:13px;font-weight:700;color:#FFB347;">Special Discount Applied!</div>
-      <div style="font-size:12px;color:#7A7A9A;margin-top:2px;">${t.discount.reason ? t.discount.reason + ' — ' : ''}You save <strong style="color:#FFB347;">₹${discAmt.toLocaleString('en-IN')}</strong>. Final amount: <strong style="color:#F0F0FA;">₹${finalAmt.toLocaleString('en-IN')}</strong></div>
-    </div>
-  </div>`;
-  })() : '';
+  if (t.discount && t.discount.type && t.discount.type !== 'none' && t.discount.value) {
+    discAmtNorm = t.discount.type === 'flat'
+      ? t.discount.value
+      : Math.round(rawTotal * t.discount.value / 100);
+    discObjForPortal = {
+      amount: discAmtNorm,
+      reason: t.discount.reason || 'Special Discount'
+    };
+  }
+  if (t.referralDiscount && t.referralDiscount.discount) {
+    const refAmt = t.referralDiscount.discount;
+    discAmtNorm += refAmt;
+    discObjForPortal = discObjForPortal
+      ? { amount: discObjForPortal.amount + refAmt, reason: discObjForPortal.reason + ' + Referral Code ' + t.referralDiscount.code }
+      : { amount: refAmt, reason: 'Referral Code ' + t.referralDiscount.code };
+  }
+  const finalTotalNorm = rawTotal - discAmtNorm;
 
   const clientDataJS = JSON.stringify({
-    ticketId: t.ticketId,
-    clientName: t.clientName,
+    ticketId:    t.ticketId,
+    clientName:  t.clientName,
     projectName: t.projectName,
-    startDate: t.startDate,
-    deadline: t.deadline,
-    status: t.status,
-    progress: t.progress,
-    payment: t.payment,
-    discount: t.discount || null,
-    files: t.files,
-    deliverables: t.deliverables,
-    timeline: t.timeline,
-    managerNote: t.managerNote || null
+    startDate:   t.startDate,
+    deadline:    t.deadline,
+    status:      t.status,
+    progress:    t.progress,
+    payment: {
+      originalTotal: discAmtNorm > 0 ? rawTotal : undefined,
+      total:    discAmtNorm > 0 ? finalTotalNorm : rawTotal,
+      discount: discObjForPortal,
+      stages:   t.payment?.stages || []
+    },
+    files:         t.files,
+    deliverables:  t.deliverables,
+    timeline:      t.timeline,
+    managerNote:   t.managerNote || null
   }, null, 2);
 
   return `<!DOCTYPE html>
@@ -2092,28 +2253,6 @@ function buildClientHTML(t) {
   <script>
     /* Generated by SparkEdge Admin Panel — ${new Date().toLocaleString()} */
     const clientData = ${clientDataJS};
-
-    // Inject referral banners after render
-    const _origRender = window.renderDashboard;
-    window.renderDashboard = function(d) {
-      if(_origRender) _origRender(d);
-      setTimeout(()=>{
-        const container = document.querySelector('.payment-section, .pay-section, [data-section="payment"], .card-body') || document.querySelector('#app');
-        if(container) {
-          const banner = document.createElement('div');
-          banner.innerHTML = \`${sitDiscount}${refDiscount}${refRewards}\`;
-          container.prepend(banner);
-        }
-        // Patch pay button
-        document.querySelectorAll('button, a').forEach(el=>{
-          const t = (el.textContent||'').toLowerCase();
-          if(t.includes('pay online')||t.includes('pay now')) {
-            el.addEventListener('click', e=>{ e.preventDefault(); e.stopPropagation(); document.getElementById('payModal').classList.add('open'); });
-          }
-        });
-      }, 400);
-    };
-
     renderDashboard(clientData);
 
     function doUpiPay() {
@@ -2846,6 +2985,9 @@ window.showPage = function(page){
   }
   if(page === 'team'){
     renderTeamPage();
+    // Show cross-device info for owner
+    const cdi = document.getElementById('crossDeviceInfo');
+    if(cdi) cdi.style.display = isOwner() ? 'block' : 'none';
   }
 };
 
@@ -3011,6 +3153,27 @@ function deleteMember(idx){
 
 function closeMemberModal(){
   document.getElementById('memberModal').classList.remove('open');
+}
+
+/* ── Export Team Config for cross-device access ── */
+function exportTeamConfig(){
+  if(!isOwner()){ showToast('⛔ Only owner can export team config.'); return; }
+  const members = getMembers();
+  if(!members.length){ showToast('No members to export. Add members first.'); return; }
+  const json = JSON.stringify(members, null, 2);
+  const snippet = `<script>\n// SparkEdge Team Config — paste inside admin.html auth section\n// Generated: ${new Date().toLocaleString()}\nwindow.SE_TEAM_BOOTSTRAP = ${json};\n<\/script>`;
+  // Copy to clipboard
+  navigator.clipboard.writeText(snippet).then(()=>{
+    alert('✅ Team config copied to clipboard!\n\nSteps:\n1. Open admin.html in a text editor\n2. Find the comment "PASTE EXPORTED TEAM CONFIG HERE"\n3. Replace the placeholder window.SE_TEAM_BOOTSTRAP line with the copied <script> block\n4. Save admin.html and share it with team members\n\nTeam members can now login from ANY device with their password.');
+  }).catch(()=>{
+    // Fallback: download as file
+    const blob = new Blob([snippet], {type:'text/javascript'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'team-config-' + new Date().toISOString().slice(0,10) + '.txt'; a.click();
+    URL.revokeObjectURL(url);
+    alert('Team config downloaded as .txt file.\n\nOpen it, copy the contents, and paste into admin.html inside the auth section (find: "PASTE EXPORTED TEAM CONFIG HERE").');
+  });
 }
 
 /* ══════════════════════════════════════════════════════
