@@ -423,8 +423,6 @@ const SETTINGS_AUTH_KEY = 'se_settings_pwd';
 // Format: {id, name, role, email, password, status, permissions:[]}
 // ▼▼▼ PASTE MEMBER CONFIG(s) HERE — between the [ ] brackets ▼▼▼
 const HARDCODED_MEMBERS = [
-  // Paste member config .txt content here, one object per member.
-  // Example: { "id":"mem_001", "name":"Priya", "role":"Designer", "password":"Priya@2025", "status":"active", "permissions":["view_tickets","edit_tickets"] }
   {
     "id": "mem_1778838014185",
     "name": "Pinkesh Kr Prabhakar",
@@ -433,15 +431,14 @@ const HARDCODED_MEMBERS = [
     "wa": "96937 17475",
     "password": "Pinkesh@1",
     "permissions": [
-        "view_tickets",
-        "edit_tickets",
-        "view_clients",
-        "export"
+      "view_tickets",
+      "edit_tickets",
+      "view_clients",
+      "export"
     ],
     "status": "active",
     "addedAt": "15/5/2026"
-}
-
+  }
 ];
 // ▲▲▲ END OF MEMBER CONFIG — save file and git push ▲▲▲
 
@@ -3139,6 +3136,7 @@ function renderTeamPage(){
         <button class="btn btn-secondary btn-sm" onclick="openEditMemberModal(${i})">✏️ Edit</button>
         <button class="btn btn-sm" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#EF4444;" onclick="toggleMemberStatus(${i})">${m.status==='active'?'⛔ Suspend':'✅ Activate'}</button>
         <button class="btn btn-sm" style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);color:#22C55E;font-size:10px;" onclick="downloadMemberConfig(${i})">⬇ Config</button>
+        <button class="btn btn-sm" style="background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);color:#8B5CF6;font-size:10px;" onclick="downloadWelcomeNote(${i})">📩 Welcome</button>
         <button class="btn btn-sm" style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);color:#EF4444;font-size:10px;" onclick="deleteMember(${i})">🗑 Remove</button>
       </div>`:''}
     </div>`;
@@ -3312,6 +3310,197 @@ ${memberJSON}
   a.click();
   URL.revokeObjectURL(url);
   showToast('✅ Config for ' + m.name + ' downloaded! Open the .txt file for instructions.');
+}
+
+function downloadWelcomeNote(idx){
+  if(!isOwner()){ showToast('⛔ Only owner can download welcome note.'); return; }
+  const members = getMembers();
+  const m = members[idx];
+  if(!m){ showToast('Member not found.'); return; }
+
+  const permLabels = {
+    'view_tickets':   '👁 View Tickets — Can see all client tickets',
+    'edit_tickets':   '✏️ Edit Tickets — Can update ticket details, progress & timeline',
+    'create_tickets': '➕ Create Tickets — Can onboard new clients',
+    'delete_tickets': '🗑 Delete Tickets — Can permanently delete tickets',
+    'view_finance':   '💰 View Finance — Can access the Finance page',
+    'view_clients':   '👥 View Clients — Can access the Clients overview',
+    'export':         '⬇ Export / Import — Can export and import data'
+  };
+
+  const permList = (m.permissions||[]).map(p =>
+    `<li style="margin-bottom:6px;">${permLabels[p]||p}</li>`
+  ).join('');
+
+  const generatedOn = new Date().toLocaleString('en-IN', {dateStyle:'long', timeStyle:'short'});
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Welcome to SparkEdge — ${m.name}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:#0A0A14;color:#E0E0F0;font-family:'DM Sans',sans-serif;min-height:100vh;padding:40px 20px;}
+    .wrap{max-width:640px;margin:0 auto;}
+    .header{text-align:center;margin-bottom:36px;}
+    .logo-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px;}
+    .logo-icon{width:44px;height:44px;background:linear-gradient(135deg,#FF6B35,#FF3CAC);border-radius:12px;display:flex;align-items:center;justify-content:center;}
+    .logo-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;background:linear-gradient(135deg,#FF6B35,#FF3CAC);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .welcome-badge{display:inline-block;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.35);border-radius:20px;padding:5px 16px;font-size:12px;font-weight:600;color:#A78BFA;letter-spacing:.5px;margin-bottom:16px;}
+    .headline{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;line-height:1.2;margin-bottom:10px;}
+    .subline{font-size:14px;color:#7A7A9A;line-height:1.6;}
+    .card{background:#0E0E1A;border:1px solid #1E1E30;border-radius:16px;padding:24px;margin-bottom:20px;}
+    .card-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#7A7A9A;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+    .field-row{display:grid;grid-template-columns:140px 1fr;gap:8px;padding:10px 0;border-bottom:1px solid #141422;align-items:start;}
+    .field-row:last-child{border-bottom:none;}
+    .field-label{font-size:12px;color:#3A3A5A;font-weight:600;}
+    .field-value{font-size:13px;color:#E0E0F0;font-weight:500;}
+    .secret-box{background:linear-gradient(135deg,rgba(255,107,53,.08),rgba(255,60,172,.08));border:1px solid rgba(255,107,53,.3);border-radius:12px;padding:20px;margin-bottom:20px;}
+    .secret-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#FF6B35;margin-bottom:4px;}
+    .secret-sub{font-size:11px;color:#7A7A9A;margin-bottom:14px;}
+    .password-display{background:#080810;border:1px dashed rgba(255,107,53,.4);border-radius:10px;padding:14px 20px;font-family:monospace;font-size:22px;font-weight:700;color:#FF6B35;letter-spacing:3px;text-align:center;}
+    .perm-list{list-style:none;display:flex;flex-direction:column;gap:4px;}
+    .perm-list li{font-size:12px;color:#A0A0C0;padding:7px 12px;background:#141422;border-radius:8px;border-left:3px solid rgba(139,92,246,.5);}
+    .steps{counter-reset:step;display:flex;flex-direction:column;gap:12px;}
+    .step{display:grid;grid-template-columns:32px 1fr;gap:12px;align-items:start;}
+    .step-num{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#FF6B35,#FF3CAC);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;}
+    .step-body{padding-top:5px;}
+    .step-title{font-size:13px;font-weight:700;color:#E0E0F0;margin-bottom:3px;}
+    .step-desc{font-size:12px;color:#7A7A9A;line-height:1.6;}
+    code{background:#141422;border:1px solid #1E1E30;border-radius:4px;padding:1px 6px;font-family:monospace;font-size:12px;color:#FF6B35;}
+    .warning{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:14px 16px;margin-bottom:20px;font-size:12px;color:#FCA5A5;line-height:1.7;}
+    .footer{text-align:center;margin-top:32px;padding-top:24px;border-top:1px solid #1E1E30;font-size:12px;color:#3A3A5A;}
+    .footer a{color:#FF6B35;text-decoration:none;}
+    @media print{body{background:#fff;color:#111;padding:20px;}
+      .card{background:#f9f9f9;border-color:#ddd;}
+      .secret-box{background:#fff8f5;border-color:#FF6B35;}
+      .password-display{background:#fff;border-color:#FF6B35;color:#FF6B35;}
+      .perm-list li{background:#f0f0f0;}
+      .step-num{print-color-adjust:exact;-webkit-print-color-adjust:exact;}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <div class="header">
+      <div class="logo-row">
+        <div class="logo-icon">
+          <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+            <polygon points="14,2 26,20 2,20" fill="url(#lg)"/>
+            <defs><linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#FF6B35"/><stop offset="100%" style="stop-color:#FF3CAC"/>
+            </linearGradient></defs>
+          </svg>
+        </div>
+        <span class="logo-name">SparkEdge</span>
+      </div>
+      <div class="welcome-badge">Team Member Welcome Note</div>
+      <div class="headline">Welcome aboard,<br>${m.name}! 🎉</div>
+      <div class="subline" style="margin-top:10px;">You've been added to the SparkEdge admin team.<br>This document has everything you need to get started.</div>
+    </div>
+
+    <!-- YOUR DETAILS -->
+    <div class="card">
+      <div class="card-title">🧑‍💼 Your Profile</div>
+      <div class="field-row"><span class="field-label">Full Name</span><span class="field-value">${m.name}</span></div>
+      <div class="field-row"><span class="field-label">Role</span><span class="field-value">${m.role||'Team Member'}</span></div>
+      ${m.email ? `<div class="field-row"><span class="field-label">Email</span><span class="field-value">${m.email}</span></div>` : ''}
+      ${m.wa ? `<div class="field-row"><span class="field-label">WhatsApp</span><span class="field-value">${m.wa}</span></div>` : ''}
+      <div class="field-row"><span class="field-label">Member Since</span><span class="field-value">${m.addedAt||generatedOn}</span></div>
+      <div class="field-row"><span class="field-label">Status</span><span class="field-value" style="color:#22C55E;font-weight:700;">✅ Active</span></div>
+    </div>
+
+    <!-- LOGIN CREDENTIALS — CONFIDENTIAL -->
+    <div class="secret-box">
+      <div class="secret-title">🔐 Your Login Credentials — CONFIDENTIAL</div>
+      <div class="secret-sub">Keep this password private. Do not share it with anyone, including other team members.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div style="background:#080810;border:1px solid #1E1E30;border-radius:8px;padding:12px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#3A3A5A;margin-bottom:6px;">Panel URL / File</div>
+          <div style="font-size:12px;color:#E0E0F0;font-weight:600;">admin.html</div>
+          <div style="font-size:11px;color:#7A7A9A;margin-top:3px;">(shared by owner)</div>
+        </div>
+        <div style="background:#080810;border:1px solid #1E1E30;border-radius:8px;padding:12px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#3A3A5A;margin-bottom:6px;">Your Role</div>
+          <div style="font-size:12px;color:#8B5CF6;font-weight:700;">${m.role||'Team Member'}</div>
+        </div>
+      </div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#7A7A9A;margin-bottom:8px;text-align:center;">Your Password</div>
+      <div class="password-display">${m.password}</div>
+    </div>
+
+    <!-- PERMISSIONS -->
+    <div class="card">
+      <div class="card-title">🛡 Your Permissions</div>
+      ${permList ? `<ul class="perm-list">${permList}</ul>` : '<p style="font-size:12px;color:#7A7A9A;">No permissions assigned — contact the owner.</p>'}
+    </div>
+
+    <!-- HOW TO LOGIN -->
+    <div class="card">
+      <div class="card-title">🚀 How to Access the Admin Panel</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Open the admin file</div>
+            <div class="step-desc">Open the <code>admin.html</code> file shared by the owner — double-click it to open in your browser, or visit the shared URL if it's hosted online.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Enter your password</div>
+            <div class="step-desc">On the login screen, type your password exactly as shown above (case-sensitive). Press Enter or click the login button.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">You're in!</div>
+            <div class="step-desc">The dashboard opens with only the sections you have access to. Navigate using the sidebar. Your session stays active until you close the browser tab.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Need help or access issues?</div>
+            <div class="step-desc">Contact the owner (Raunak) directly on WhatsApp or email <code>sparkedge555@gmail.com</code>. Do not share your password with anyone.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMPORTANT RULES -->
+    <div class="warning">
+      <strong>⚠️ Important Rules:</strong><br>
+      • This document is <strong>confidential</strong> — do not forward it or share your password.<br>
+      • You can only access sections the owner has granted you — do not attempt to bypass restrictions.<br>
+      • Always log out (Settings → Log Out) if using a shared or public computer.<br>
+      • Report any issues or errors to the owner immediately — do not make changes outside your permissions.
+    </div>
+
+    <div class="footer">
+      <div style="margin-bottom:6px;">Generated by <strong style="color:#FF6B35;">SparkEdge Admin Panel</strong> — ${generatedOn}</div>
+      <div>Questions? <a href="mailto:sparkedge555@gmail.com">sparkedge555@gmail.com</a></div>
+    </div>
+
+  </div>
+</body>
+</html>`;
+
+  const blob = new Blob([html], {type: 'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const safeName = (m.name||'member').replace(/\s+/g,'-').toLowerCase();
+  a.href = url;
+  a.download = 'welcome-' + safeName + '.html';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ Welcome note for ' + m.name + ' downloaded! Open in browser, then Print as PDF to share.');
 }
 
 function closeMemberModal(){
