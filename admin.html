@@ -1,4 +1,4 @@
-gitgit<!DOCTYPE html>
+git<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -1344,7 +1344,7 @@ function toggleSidebar(){
     <!-- ══════════════════════════════════════════════════════
          TEAM MANAGEMENT & PASSWORD SHARING GUIDE
     ══════════════════════════════════════════════════════ -->
-    <div style="margin-top:32px;">
+    <div id="workflowTeamGuide" style="margin-top:32px;display:none;">
       <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin-bottom:6px;color:var(--text);">👥 Team Management Guide</div>
       <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">How to add team members, set permissions, and ensure they can log in from anywhere.</div>
 
@@ -1370,7 +1370,7 @@ function toggleSidebar(){
         <div>
           <div class="wf-title">🔑 Roles &amp; Permissions — What Each Member Can Do</div>
           <div class="wf-desc">
-            <strong style="color:var(--accent);">Owner:</strong> Full access. Can add/delete members, change settings, access finance, export/import everything.<br><br>
+            <strong style="color:var(--accent);">Owner (You — RAUNAK@1):</strong> Full access. Can add/delete members, change settings, access finance, export/import everything.<br><br>
             <strong style="color:#3B82F6;">Team Member:</strong> Can only do what you allow. Permissions are set per-member:<br><br>
             <div style="display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:12px;margin:10px 0;">
               <span style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);border-radius:5px;padding:2px 8px;color:#3B82F6;font-weight:600;white-space:nowrap;">👁 View Tickets</span><span>Can see all client tickets but not edit them. Good for read-only access.</span>
@@ -1397,7 +1397,7 @@ function toggleSidebar(){
         <div>
           <div class="wf-title">🛡 Security Best Practices for Team Access</div>
           <div class="wf-desc">
-            • <strong>Never share the Owner password</strong> with team members — give them their own unique passwords instead.<br>
+            • <strong>Never share the Owner password (RAUNAK@1)</strong> with team members — give them their own unique passwords instead.<br>
             • Each member should have a different password — e.g. Priya@2025, Rahul@2025.<br>
             • Passwords must be at least 6 characters and should mix letters + numbers + symbol.<br>
             • If a team member leaves — go to Team page → click ⛔ Suspend → they instantly lose access (no need to change anything else).<br>
@@ -1834,6 +1834,7 @@ function showPage(page) {
   if(page==='finance') renderFinancePage();
   if(page==='team') renderTeamPage();
   if(page==='settings') loadSettings();
+  if(page==='workflow'){ const tg=document.getElementById('workflowTeamGuide'); if(tg) tg.style.display=isOwner()?'block':'none'; }
 
   // Auto-close sidebar on mobile after navigation
   if(window.innerWidth <= 900) {
