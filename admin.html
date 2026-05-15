@@ -1,4 +1,4 @@
-git<!DOCTYPE html>
+gitgit<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -2310,11 +2310,11 @@ function buildClientHTML(t) {
     window.renderDashboard = function(d) {
       if(_origRender) _origRender(d);
       setTimeout(()=>{
-        const container = document.querySelector('.payment-section, .pay-section, [data-section="payment"], .card-body') || document.querySelector('#app');
-        if(container) {
+        const stagesList = document.querySelector('.stages-list');
+        if(stagesList && (\`${sitDiscount}${refDiscount}${refRewards}\`).trim()) {
           const banner = document.createElement('div');
           banner.innerHTML = \`${sitDiscount}${refDiscount}${refRewards}\`;
-          container.prepend(banner);
+          stagesList.parentNode.insertBefore(banner, stagesList);
         }
         // Patch pay button
         document.querySelectorAll('button, a').forEach(el=>{
