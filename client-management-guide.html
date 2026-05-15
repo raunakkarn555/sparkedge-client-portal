@@ -1,0 +1,2582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SparkEdge — Complete Client Engine v2.0</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080808;
+      --bg2: #0d0d0d;
+      --card: #111111;
+      --card2: #161616;
+      --border: rgba(255,255,255,0.07);
+      --border-hover: rgba(252,101,58,0.4);
+      --primary: #FC653A;
+      --primary-dim: rgba(252,101,58,0.1);
+      --text: #f0f0f0;
+      --muted: #888;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --info: #3b82f6;
+      --radius: 14px;
+      --radius-sm: 8px;
+      --nav-h: 68px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    /* ── SCROLL PROGRESS ── */
+    #scroll-progress {
+      position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+      background: linear-gradient(90deg, var(--primary), #ff9f7a);
+      z-index: 9999; transition: width 0.1s linear;
+    }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; height: var(--nav-h);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5%; background: rgba(8,8,8,0.92);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+    }
+    .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--text); }
+    .logo span { color: var(--primary); }
+    .nav-badge {
+      background: var(--primary-dim); border: 1px solid var(--border-hover);
+      color: var(--primary); font-size: 0.72rem; font-weight: 700;
+      padding: 3px 10px; border-radius: 50px; letter-spacing: 0.8px; text-transform: uppercase;
+    }
+
+    /* ── HERO ── */
+    .guide-hero {
+      padding: calc(var(--nav-h) + 80px) 6% 80px;
+      position: relative; overflow: hidden; text-align: center;
+    }
+    .guide-hero::before {
+      content: ''; position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 800px;
+      background: radial-gradient(circle, rgba(252,101,58,0.08), transparent 65%);
+      pointer-events: none;
+    }
+    .guide-hero-label {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--primary-dim); border: 1px solid var(--border-hover);
+      color: var(--primary); font-size: 0.78rem; font-weight: 700;
+      padding: 6px 16px; border-radius: 50px; letter-spacing: 1.2px;
+      text-transform: uppercase; margin-bottom: 24px;
+    }
+    .guide-hero h1 {
+      font-family: 'Syne', sans-serif; font-size: clamp(2.2rem, 5vw, 4rem);
+      font-weight: 800; line-height: 1.1; margin-bottom: 20px;
+    }
+    .guide-hero h1 span { color: var(--primary); }
+    .guide-hero p { color: var(--muted); max-width: 620px; margin: 0 auto 40px; font-size: 1.05rem; }
+    .hero-stats-row {
+      display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; margin-top: 40px;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat-num { font-family: 'Syne',sans-serif; font-size: 2rem; font-weight: 800; color: var(--primary); }
+    .hero-stat-label { font-size: 0.8rem; color: var(--muted); font-weight: 500; margin-top: 4px; }
+
+    /* ── TOC ── */
+    .toc-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px; margin-bottom: 70px;
+    }
+    .toc-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px 22px;
+      display: flex; align-items: center; gap: 14px;
+      text-decoration: none; color: var(--text);
+      transition: all 0.3s;
+    }
+    .toc-card:hover { border-color: var(--border-hover); transform: translateY(-3px); background: var(--card2); }
+    .toc-num {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--primary); display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne',sans-serif; font-weight: 800; font-size: 0.85rem;
+      color: #fff; flex-shrink: 0;
+    }
+    .toc-card-info strong { display: block; font-size: 0.9rem; font-weight: 700; }
+    .toc-card-info span { font-size: 0.78rem; color: var(--muted); }
+
+    /* ── MAIN LAYOUT ── */
+    .guide-wrap { max-width: 1000px; margin: 0 auto; padding: 0 5% 100px; }
+
+    /* ── PHASE HEADER ── */
+    .phase-header {
+      display: flex; align-items: center; gap: 16px;
+      padding: 32px 36px;
+      background: linear-gradient(135deg, var(--card), var(--card2));
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius);
+      margin-bottom: 20px; margin-top: 60px;
+    }
+    .phase-num {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--primary); display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne',sans-serif; font-weight: 800; font-size: 1.1rem;
+      color: #fff; flex-shrink: 0;
+    }
+    .phase-header-text h2 { font-family: 'Syne',sans-serif; font-size: 1.4rem; font-weight: 800; }
+    .phase-header-text p { color: var(--muted); font-size: 0.88rem; margin-top: 4px; }
+
+    /* ── STEP BLOCK ── */
+    .step-block {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 26px 30px;
+      margin-bottom: 16px; transition: all 0.3s;
+    }
+    .step-block:hover { border-color: rgba(252,101,58,0.2); }
+    .step-block h4 {
+      font-size: 1rem; font-weight: 700; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 9px;
+    }
+    .step-block h4 i { color: var(--primary); }
+    .step-block p { color: var(--muted); font-size: 0.92rem; line-height: 1.8; }
+    .step-block ul { padding-left: 18px; list-style: disc; margin-top: 10px; }
+    .step-block ul li { color: var(--muted); font-size: 0.92rem; line-height: 1.8; margin-bottom: 6px; }
+    .step-block ul li strong { color: var(--text); }
+
+    /* ── MSG TEMPLATE ── */
+    .msg-template {
+      background: var(--card2); border: 1px solid var(--border-hover);
+      border-radius: var(--radius-sm); padding: 22px 26px;
+      margin-top: 16px; position: relative;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem; color: #aaa; line-height: 2; white-space: pre-wrap;
+    }
+    .template-label {
+      font-family: 'Outfit', sans-serif; font-size: 0.72rem;
+      text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--primary); font-weight: 700;
+      margin-bottom: 14px; display: block;
+    }
+    .copy-btn {
+      position: absolute; top: 16px; right: 16px;
+      background: var(--primary-dim); border: 1px solid var(--border-hover);
+      border-radius: 6px; color: var(--primary);
+      font-size: 0.72rem; padding: 5px 12px;
+      cursor: pointer; font-family: 'Outfit',sans-serif; font-weight: 600;
+      transition: all 0.2s; letter-spacing: 0.5px;
+    }
+    .copy-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    /* ── CHECKLIST ── */
+    .checklist { list-style: none; margin-top: 14px; }
+    .checklist li {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+      color: var(--muted); font-size: 0.9rem; line-height: 1.65;
+    }
+    .checklist li:last-child { border-bottom: none; }
+    .checklist li i { color: var(--success); margin-top: 3px; flex-shrink: 0; font-size: 0.85rem; }
+    .checklist li strong { color: var(--text); }
+
+    /* ── OBJECTION CARD ── */
+    .objection-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 22px 26px;
+      margin-bottom: 14px; transition: all 0.3s;
+    }
+    .objection-card:hover { border-color: var(--border-hover); }
+    .objection-q { font-weight: 700; color: var(--text); font-size: 0.95rem; margin-bottom: 10px; }
+    .objection-q i { color: var(--primary); margin-right: 8px; }
+    .objection-a { color: var(--muted); font-size: 0.9rem; line-height: 1.85; }
+    .objection-a strong { color: var(--text); }
+
+    /* ── TIMELINE ── */
+    .timeline { position: relative; padding-left: 32px; }
+    .timeline::before { content:''; position:absolute; left:9px; top:0; bottom:0; width:2px; background:var(--border); }
+    .timeline-item { position:relative; margin-bottom:36px; }
+    .timeline-dot {
+      position:absolute; left:-32px; top:5px;
+      width:18px; height:18px; border-radius:50%;
+      background:var(--primary); border:3px solid var(--bg);
+      box-shadow:0 0 0 2px var(--primary);
+    }
+    .timeline-tag {
+      display:inline-flex; align-items:center; gap:5px;
+      padding:3px 10px; border-radius:50px;
+      background:var(--primary-dim); border:1px solid rgba(252,101,58,0.25);
+      font-size:0.72rem; color:var(--primary); font-weight:700;
+      margin-bottom:8px; text-transform:uppercase; letter-spacing:0.8px;
+    }
+    .timeline-item h4 { font-size:0.95rem; font-weight:700; margin-bottom:6px; }
+    .timeline-item p { color:var(--muted); font-size:0.88rem; line-height:1.75; }
+
+    /* ── TABLE ── */
+    .guide-table { width:100%; border-collapse:collapse; margin-top:18px; font-size:0.9rem; }
+    .guide-table th, .guide-table td {
+      text-align:left; padding:12px 16px; border-bottom:1px solid var(--border);
+    }
+    .guide-table th { color:var(--muted); font-weight:600; font-size:0.78rem; text-transform:uppercase; letter-spacing:1px; }
+    .guide-table td { color:var(--text); }
+    .guide-table tr:last-child td { border-bottom:none; }
+    .guide-table .highlight { color:var(--primary); font-weight:700; }
+    .guide-table tbody tr:hover td { background: var(--card2); }
+
+    /* ── PROMPT BOX ── */
+    .prompt-box {
+      background: linear-gradient(135deg, rgba(59,130,246,0.06), rgba(252,101,58,0.04));
+      border: 1px solid rgba(59,130,246,0.3);
+      border-radius: var(--radius); padding: 22px 26px;
+      margin-top: 16px; position: relative;
+    }
+    .prompt-label {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.3);
+      color: #60a5fa; font-size: 0.72rem; font-weight: 700;
+      padding: 4px 12px; border-radius: 50px; letter-spacing: 1px; text-transform: uppercase;
+      margin-bottom: 14px; display: block;
+    }
+    .prompt-box p { color: #aaa; font-size: 0.88rem; line-height: 1.85; font-family: 'JetBrains Mono', monospace; white-space: pre-wrap; }
+    .prompt-copy-btn {
+      position: absolute; top: 16px; right: 16px;
+      background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.3);
+      border-radius: 6px; color: #60a5fa;
+      font-size: 0.72rem; padding: 5px 12px;
+      cursor: pointer; font-family: 'Outfit',sans-serif; font-weight: 600;
+      transition: all 0.2s;
+    }
+    .prompt-copy-btn:hover { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+
+    /* ── INFO BOX ── */
+    .info-box {
+      background: var(--primary-dim); border: 1px solid rgba(252,101,58,0.25);
+      border-radius: var(--radius-sm); padding: 16px 20px;
+      margin-top: 14px;
+    }
+    .info-box p { color: #ccc; font-size: 0.88rem; line-height: 1.8; }
+    .info-box p strong { color: var(--primary); }
+
+    .warning-box {
+      background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.25);
+      border-radius: var(--radius-sm); padding: 16px 20px; margin-top: 14px;
+    }
+    .warning-box p { color: #ccc; font-size: 0.88rem; line-height: 1.8; }
+    .warning-box p strong { color: var(--warning); }
+
+    /* ── GRID 2 ── */
+    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
+    .mini-card {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:var(--radius); padding:20px 22px;
+    }
+    .mini-card h5 { font-size:0.9rem; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+    .mini-card h5 i { color:var(--primary); }
+    .mini-card p { color:var(--muted); font-size:0.84rem; line-height:1.75; }
+
+    /* ── SECTION DIVIDER ── */
+    .section-divider {
+      height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 60px 0;
+    }
+
+    /* ── TAG CHIPS ── */
+    .tag { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:50px; font-size:0.75rem; font-weight:600; margin-right:6px; margin-bottom:4px; }
+    .tag-green { background:rgba(34,197,94,0.1); color:#22c55e; border:1px solid rgba(34,197,94,0.2); }
+    .tag-orange { background:var(--primary-dim); color:var(--primary); border:1px solid rgba(252,101,58,0.2); }
+    .tag-blue { background:rgba(59,130,246,0.1); color:#60a5fa; border:1px solid rgba(59,130,246,0.2); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--card); border-top: 1px solid var(--border);
+      padding: 40px 6%; text-align: center;
+    }
+    footer p { color: var(--muted); font-size: 0.85rem; }
+    footer strong { color: var(--primary); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .toc-grid { grid-template-columns: 1fr; }
+      .phase-header { padding: 22px 20px; }
+      .step-block { padding: 20px 20px; }
+      .msg-template { font-size: 0.8rem; padding: 16px; }
+      .guide-hero h1 { font-size: 2rem; }
+    }
+
+    /* ── PRINT ── */
+    @media print {
+      .navbar, #scroll-progress { display:none; }
+      body { background: #fff; color: #000; }
+      .guide-hero { padding-top: 40px; }
+    }
+
+    /* ── HACK CARD ── */
+    .hack-card {
+      background: linear-gradient(135deg, rgba(252,101,58,0.06), rgba(255,159,122,0.03));
+      border: 1px solid rgba(252,101,58,0.25);
+      border-radius: var(--radius); padding: 22px 26px;
+      margin-bottom: 14px; position: relative; overflow: hidden;
+    }
+    .hack-card::before {
+      content: '⚡'; position: absolute; right: 20px; top: 14px;
+      font-size: 1.6rem; opacity: 0.12;
+    }
+    .hack-card-title {
+      font-size: 0.98rem; font-weight: 700; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 10px; color: var(--text);
+    }
+    .hack-card-title i { color: var(--primary); font-size: 0.95rem; }
+    .hack-card p { color: var(--muted); font-size: 0.9rem; line-height: 1.8; }
+    .hack-card ul { padding-left: 18px; margin-top: 8px; }
+    .hack-card ul li { color: var(--muted); font-size: 0.9rem; line-height: 1.8; margin-bottom: 4px; }
+    .hack-card ul li strong { color: var(--text); }
+
+    /* ── INSIGHT BOX ── */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(34,197,94,0.06), rgba(34,197,94,0.02));
+      border: 1px solid rgba(34,197,94,0.2);
+      border-radius: var(--radius-sm); padding: 16px 20px; margin-top: 14px;
+    }
+    .insight-box p { color: #ccc; font-size: 0.88rem; line-height: 1.8; }
+    .insight-box p strong { color: var(--success); }
+
+    /* ── STAT ROW MINI ── */
+    .stat-row-mini {
+      display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px;
+    }
+    .stat-mini {
+      background: var(--card2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 14px 18px;
+      flex: 1; min-width: 140px; text-align: center;
+    }
+    .stat-mini-num { font-family: 'Syne',sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--primary); }
+    .stat-mini-label { font-size: 0.76rem; color: var(--muted); margin-top: 4px; }
+
+    /* ── GRID 3 ── */
+    .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-top: 16px; }
+    @media(max-width:768px){ .grid-3 { grid-template-columns: 1fr; } }
+
+    /* ── BADGE ROW ── */
+    .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 50px; font-size: 0.78rem; font-weight: 700;
+    }
+    .badge-red { background: rgba(239,68,68,0.1); color:#f87171; border:1px solid rgba(239,68,68,0.2); }
+    .badge-purple { background: rgba(168,85,247,0.1); color:#c084fc; border:1px solid rgba(168,85,247,0.2); }
+    .badge-yellow { background: rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.2); }
+
+    /* ── RANKED LIST ── */
+    .ranked-list { list-style: none; margin-top: 14px; counter-reset: rank; }
+    .ranked-list li {
+      counter-increment: rank; display: flex; align-items: flex-start; gap: 14px;
+      padding: 12px 0; border-bottom: 1px solid var(--border);
+      color: var(--muted); font-size: 0.9rem; line-height: 1.7;
+    }
+    .ranked-list li:last-child { border-bottom: none; }
+    .ranked-list li::before {
+      content: counter(rank); min-width: 26px; height: 26px; border-radius: 50%;
+      background: var(--primary-dim); border: 1px solid rgba(252,101,58,0.3);
+      color: var(--primary); font-family: 'Syne',sans-serif; font-weight: 800;
+      font-size: 0.78rem; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .ranked-list li strong { color: var(--text); }
+
+    /* ── DO / DON'T GRID ── */
+    .do-dont { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+    @media(max-width:600px){ .do-dont { grid-template-columns:1fr; } }
+    .do-card {
+      background: rgba(34,197,94,0.05); border: 1px solid rgba(34,197,94,0.2);
+      border-radius: var(--radius-sm); padding: 16px 18px;
+    }
+    .do-card h6 { color: var(--success); font-size: 0.78rem; text-transform:uppercase; letter-spacing:1px; font-weight:700; margin-bottom:10px; display:flex;align-items:center;gap:6px; }
+    .do-card ul { padding-left: 16px; list-style: disc; }
+    .do-card ul li { color: var(--muted); font-size: 0.86rem; line-height: 1.75; margin-bottom: 4px; }
+    .dont-card {
+      background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.2);
+      border-radius: var(--radius-sm); padding: 16px 18px;
+    }
+    .dont-card h6 { color: #f87171; font-size: 0.78rem; text-transform:uppercase; letter-spacing:1px; font-weight:700; margin-bottom:10px; display:flex;align-items:center;gap:6px; }
+    .dont-card ul { padding-left: 16px; list-style: disc; }
+    .dont-card ul li { color: var(--muted); font-size: 0.86rem; line-height: 1.75; margin-bottom: 4px; }
+
+    /* ── MARKET HACK PHASE ── */
+    .market-phase-header {
+      display: flex; align-items: center; gap: 16px;
+      padding: 32px 36px;
+      background: linear-gradient(135deg, rgba(168,85,247,0.08), rgba(59,130,246,0.05));
+      border: 1px solid rgba(168,85,247,0.25);
+      border-left: 4px solid #a855f7;
+      border-radius: var(--radius);
+      margin-bottom: 20px; margin-top: 60px;
+    }
+    .market-phase-num {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: linear-gradient(135deg, #a855f7, #3b82f6);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne',sans-serif; font-weight: 800; font-size: 1.0rem;
+      color: #fff; flex-shrink: 0;
+    }
+    .market-phase-header h2 { font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:800; }
+    .market-phase-header p { color:var(--muted); font-size:0.88rem; margin-top:4px; }
+
+    /* ── TIPS HACK PHASE HEADER ── */
+    .tips-phase-header {
+      display: flex; align-items: center; gap: 16px;
+      padding: 32px 36px;
+      background: linear-gradient(135deg, rgba(34,197,94,0.06), rgba(252,101,58,0.03));
+      border: 1px solid rgba(34,197,94,0.2);
+      border-left: 4px solid var(--success);
+      border-radius: var(--radius);
+      margin-bottom: 20px; margin-top: 60px;
+    }
+    .tips-phase-num {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--success);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne',sans-serif; font-weight: 800; font-size: 1.0rem;
+      color: #fff; flex-shrink: 0;
+    }
+    .tips-phase-header h2 { font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:800; }
+    .tips-phase-header p { color:var(--muted); font-size:0.88rem; margin-top:4px; }
+
+    /* ── STEP NUMBER BADGE ── */
+    .step-num-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--primary); color: #fff;
+      font-size: 0.7rem; font-weight: 800; font-family:'Syne',sans-serif;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+<div id="scroll-progress"></div>
+
+<nav class="navbar">
+  <div class="logo">Spark<span>Edge</span></div>
+  <span class="nav-badge"><i class="fa-solid fa-lock" style="margin-right:5px;"></i> Internal Guide v2.0</span>
+</nav>
+
+<!-- HERO -->
+<div class="guide-hero">
+  <div class="guide-hero-label"><i class="fa-solid fa-rocket"></i> Complete Playbook · Internal Use Only</div>
+  <h1>SparkEdge <span>Client Engine</span><br>v2.0</h1>
+  <p>Every script, template, checklist, AI prompt and system you need — from getting your first client to scaling to ₹1L/month. Zero gaps.</p>
+  <div class="hero-stats-row">
+    <div class="hero-stat"><div class="hero-stat-num">15</div><div class="hero-stat-label">Phases Covered</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">50+</div><div class="hero-stat-label">Message Templates</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">15+</div><div class="hero-stat-label">AI Doc Prompts</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">100%</div><div class="hero-stat-label">Battle-Tested</div></div>
+  </div>
+</div>
+
+<div class="guide-wrap">
+
+  <!-- TABLE OF CONTENTS -->
+  <div style="margin-bottom:16px;">
+    <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700;margin-bottom:16px;">📋 What's In This Guide</div>
+  </div>
+  <div class="toc-grid">
+    <a href="#phase0" class="toc-card"><div class="toc-num">0</div><div class="toc-card-info"><strong>Getting Clients</strong><span>Outreach, channels, cold DM system</span></div></a>
+    <a href="#phase1" class="toc-card"><div class="toc-num">1</div><div class="toc-card-info"><strong>First Contact & Qualification</strong><span>Reply scripts, filters, speed</span></div></a>
+    <a href="#phase2" class="toc-card"><div class="toc-num">2</div><div class="toc-card-info"><strong>Discovery Call</strong><span>Script, questions, post-call</span></div></a>
+    <a href="#phase3" class="toc-card"><div class="toc-num">3</div><div class="toc-card-info"><strong>Proposal & Pricing</strong><span>Anchor strategy, templates</span></div></a>
+    <a href="#phase4" class="toc-card"><div class="toc-num">4</div><div class="toc-card-info"><strong>Objection Handling</strong><span>Every common objection answered</span></div></a>
+    <a href="#phase5" class="toc-card"><div class="toc-num">5</div><div class="toc-card-info"><strong>Booking & Payment</strong><span>50/50 flow, UPI, confirmation</span></div></a>
+    <a href="#phase6" class="toc-card"><div class="toc-num">6</div><div class="toc-card-info"><strong>Onboarding & Kickoff</strong><span>Form, files, scope lock</span></div></a>
+    <a href="#phase7" class="toc-card"><div class="toc-num">7</div><div class="toc-card-info"><strong>Progress & Communication</strong><span>Updates, check-ins, trust</span></div></a>
+    <a href="#phase8" class="toc-card"><div class="toc-num">8</div><div class="toc-card-info"><strong>Delivery, Review & Launch</strong><span>Preview, revisions, handover</span></div></a>
+    <a href="#phase9" class="toc-card"><div class="toc-num">9</div><div class="toc-card-info"><strong>Post-Launch & Retention</strong><span>Testimonials, upsells, care</span></div></a>
+    <a href="#phase10" class="toc-card"><div class="toc-num">10</div><div class="toc-card-info"><strong>Referral Program</strong><span>System, scripts, incentives</span></div></a>
+    <a href="#phase11" class="toc-card"><div class="toc-num">11</div><div class="toc-card-info"><strong>Follow-Up Sequences</strong><span>Cold/warm/seasonal lead revival</span></div></a>
+    <a href="#phase12" class="toc-card"><div class="toc-num">12</div><div class="toc-card-info"><strong>Scaling to ₹1L/month</strong><span>Systems, pricing, delegation</span></div></a>
+    <a href="#prompts" class="toc-card" style="border-color:rgba(59,130,246,0.3);"><div class="toc-num" style="background:#3b82f6;">AI</div><div class="toc-card-info"><strong>AI Document Prompts</strong><span>Generate all your soft copy docs</span></div></a>
+    <a href="#tips-hacks" class="toc-card" style="border-color:rgba(34,197,94,0.3);"><div class="toc-num" style="background:#22c55e;">💡</div><div class="toc-card-info"><strong>Tips & Tricks</strong><span>Power-user hacks, shortcuts, systems</span></div></a>
+    <a href="#market-hacks" class="toc-card" style="border-color:rgba(168,85,247,0.3);"><div class="toc-num" style="background:#a855f7;">🚀</div><div class="toc-card-info"><strong>Market & Sales Hacks</strong><span>Pricing psychology, urgency, conversion</span></div></a>
+    <a href="#internal-ops" class="toc-card" style="border-color:rgba(245,158,11,0.3);"><div class="toc-num" style="background:#f59e0b;">⚙️</div><div class="toc-card-info"><strong>Internal Ops Hacks</strong><span>Workflow speed, automation, templates</span></div></a>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       PHASE 0 — GETTING CLIENTS
+  ═══════════════════════════════════════════════ -->
+  <div id="phase0">
+    <div class="phase-header">
+      <div class="phase-num">0</div>
+      <div class="phase-header-text">
+        <h2>Getting Clients — Outreach & Acquisition</h2>
+        <p>Before conversion, you need leads. This phase covers every channel to fill your pipeline.</p>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-map"></i> Your 5 best client channels (ranked by ROI)</h4>
+      <div class="guide-table" style="margin-top:16px;">
+        <table class="guide-table">
+          <thead><tr><th>#</th><th>Channel</th><th>Effort</th><th>Speed to Lead</th><th>Best Action</th></tr></thead>
+          <tbody>
+            <tr><td class="highlight">1</td><td><strong>Warm Network (Friends, family, teachers)</strong></td><td>Low</td><td>Same day</td><td>Tell 20 people what you do</td></tr>
+            <tr><td class="highlight">2</td><td><strong>Cold WhatsApp DM (local businesses)</strong></td><td>Medium</td><td>1–3 days</td><td>50 DMs/week, custom opener</td></tr>
+            <tr><td class="highlight">3</td><td><strong>Instagram (niche content + DM)</strong></td><td>Medium</td><td>1–2 weeks</td><td>Post before/after, tips, reels</td></tr>
+            <tr><td class="highlight">4</td><td><strong>Referrals from past clients</strong></td><td>Low</td><td>Immediate</td><td>Ask every finished client</td></tr>
+            <tr><td class="highlight">5</td><td><strong>Google My Business / LinkedIn</strong></td><td>Low setup</td><td>2–4 weeks</td><td>Set up once, maintain weekly</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-brands fa-whatsapp"></i> Cold WhatsApp DM System (most underused, highest ROI)</h4>
+      <p>Find businesses near you with <strong>no website or a bad website</strong> — coaching centres, clinics, salons, tutors, shops. Look them up on Google Maps, JustDial, Instagram. Then send this:</p>
+      <div class="msg-template">
+        <span class="template-label">📲 Cold DM — No Website (Business Owner)</span>
+        <button class="copy-btn" onclick="copyText(this)">Copy</button>
+Hi [Name / Business Name] 👋
+
+I'm Raunak — I build conversion-focused websites for businesses like yours.
+
+I noticed you don't have a website yet. I've helped similar [coaching institutes / clinics / businesses] get 3× more enquiries online within the first month of launch.
+
+Would you be open to a free 10-minute call where I share exactly what would work for your business? No pressure, no pitch — just clarity.
+
+— Raunak Karn, SparkEdge
+      </div>
+
+      <div class="msg-template" style="margin-top:14px;">
+        <span class="template-label">📲 Cold DM — Has Bad Website</span>
+        <button class="copy-btn" onclick="copyText(this)">Copy</button>
+Hi [Name] 👋
+
+I came across your website — you've built something good, but I noticed a few things that are likely costing you leads (slow load, no clear CTA, not mobile-friendly).
+
+I fix exactly this for [coaching institutes / clinics / businesses] — a conversion-focused redesign typically takes 5–7 days.
+
+Happy to show you a quick audit of your current site for free. Worth 10 minutes?
+
+— Raunak, SparkEdge
+      </div>
+
+      <div class="info-box" style="margin-top:16px;">
+        <p><strong>Daily outreach goal:</strong> 10 DMs/day = 70/week = ~5–7 responses = 1–2 clients. This is math, not luck. Track every DM in a simple spreadsheet: Name | Business | Status | Date.</p>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-brands fa-instagram"></i> Instagram content system (30 min/day)</h4>
+      <ul>
+        <li><strong>Mon/Wed/Fri:</strong> Before/After website transformations (screenshot + commentary)</li>
+        <li><strong>Tue/Thu:</strong> "5 mistakes coaching institutes make on their website" — tip carousel</li>
+        <li><strong>Sat:</strong> Client result / testimonial post (screenshot of WhatsApp praise)</li>
+        <li><strong>Stories daily:</strong> Behind-the-scenes of a project in progress</li>
+        <li><strong>Bio:</strong> "I build websites that get leads for coaching institutes & businesses 🔥 DM to start"</li>
+      </ul>
+      <div class="info-box">
+        <p><strong>Rule:</strong> Every post ends with a CTA. "DM me 'WEBSITE' if you want this for your business." Soft but clear.</p>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-people-group"></i> Warm network script (use on Day 1)</h4>
+      <div class="msg-template">
+        <span class="template-label">📲 Warm Network — General Announcement</span>
+        <button class="copy-btn" onclick="copyText(this)">Copy</button>
+Hey [Name]! Hope you're doing well 🙂
+
+Quick update — I've launched my web design agency SparkEdge, and I'm currently taking on new clients.
+
+I build professional websites for coaching institutes, schools, clinics and businesses — fast delivery, clean design, and built to actually get leads.
+
+If you or anyone you know needs a website, I'd love to help. Free consultation, no pressure.
+
+Drop me a message here or WhatsApp: +91 91424 50715
+
+Thanks for the support always 🙏
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-magnifying-glass"></i> How to find 100 leads this week</h4>
+      <ul class="checklist">
+        <li><i class="fa-solid fa-check"></i> <strong>Google Maps:</strong> Search "coaching centre [your city]" — find ones with no website listed (or just a Facebook link)</li>
+        <li><i class="fa-solid fa-check"></i> <strong>JustDial:</strong> Browse category pages for clinics, schools, gyms, tutors — many have no site</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Instagram Explore:</strong> Search "[your city] coaching" — look for accounts with 200–2000 followers and no website link</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Local Facebook Groups:</strong> Business groups in your city. Post value, don't pitch directly.</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Ask your college network:</strong> Professors, seniors, batchmates running businesses or knowing someone who is</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       PHASE 1 — FIRST CONTACT
+  ═══════════════════════════════════════════════ -->
+  <div id="phase1">
+    <div class="phase-header">
+      <div class="phase-num">1</div>
+      <div class="phase-header-text">
+        <h2>First Contact & Lead Qualification</h2>
+        <p>Someone reached out. Now you qualify them fast and move them forward.</p>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-bolt"></i> The 30-minute rule</h4>
+      <p>Respond within <strong>30 minutes during business hours</strong>. Every hour you wait, conversion probability drops by ~15%. Speed is your #1 trust signal as a solo founder — it shows you're serious, attentive, and reliable. Set a phone notification for any new WhatsApp message.</p>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-message"></i> First reply template (inbound inquiry)</h4>
+      <div class="msg-template">
+        <span class="template-label">📲 First Reply — Inbound WhatsApp Lead</span>
+        <button class="copy-btn" onclick="copyText(this)">Copy</button>
+Hi [Name]! 👋 Thanks for reaching out to SparkEdge.
+
+I'm Raunak — I personally handle all projects here, so you're talking directly to the person who'll build your website.
+
+Quick question to get started: What kind of business do you have, and what are you looking to build? (e.g., 5-page coaching website, landing page, redesign)
+
+This helps me give you a proper recommendation right away. 🚀
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-filter"></i> Qualify the lead — 3 key questions</h4>
+      <p>Ask these before investing time in a call or proposal. One message, three questions naturally woven in:</p>
+      <ul class="checklist">
+        <li><i class="fa-solid fa-check"></i> <strong>What's your business?</strong> — Determines package, effort, and price point</li>
+        <li><i class="fa-solid fa-check"></i> <strong>What's your timeline?</strong> — "ASAP" = motivated buyer. "Someday" = nurture.</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Do you have a budget in mind?</strong> — Optional, but filters serious buyers fast</li>
+      </ul>
+      <div class="msg-template" style="margin-top:16px;">
+        <span class="template-label">📲 Qualification Message (after first reply)</span>
+        <button class="copy-btn" onclick="copyText(this)">Copy</button>
+Perfect! A few quick things to give you the best recommendation:
+
+1. What's your business exactly? (coaching, school, clinic, brand?)
+2. Do you need a fresh website or a redesign of an existing one?
+3. When would you like to go live — any timeline in mind?
+
+(No pressure on budget yet — just helps me suggest the right package 🙂)
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-traffic-light"></i> Lead scoring — know who to prioritize</h4>
+      <div class="grid-2">
+        <div class="mini-card">
+          <h5><i class="fa-solid fa-fire" style="color:#22c55e;"></i> Hot Lead (call TODAY)</h5>
+          <p>Knows what they want · Has a deadline · Mentions budget · Asked for price directly · Replies quickly · Has an existing business</p>
+        </div>
+        <div class="mini-card">
+          <h5><i class="fa-solid fa-snowflake" style="color:#60a5fa;"></i> Warm Lead (nurture)</h5>
+          <p>"Just exploring" · No timeline · Student starting a business · Hasn't replied in 24h · Price is first question before needs</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       PHASE 2 — DISCOVERY CALL
+  ═══════════════════════════════════════════════ -->
+  <div id="phase2">
+    <div class="phase-header">
+      <div class="phase-num">2</div>
+      <div class="phase-header-text">
+        <h2>Discovery Call Script</h2>
+        <p>15–20 minutes that turn a stranger into a convinced buyer.</p>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-phone"></i> Call structure — minute by minute</h4>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <span class="timeline-tag">0–2 min · Warm Up</span>
+          <h4>Open with their world, not yours</h4>
+          <p>"Thanks for the time — I'll keep this under 20 minutes. Tell me a bit about your business. How long have you been running it, and what's been going well lately?"<br><br>Let them talk. This builds rapport and gives you data for your pitch.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <span class="timeline-tag">2–7 min · Diagnose</span>
+          <h4>Find the exact gap — in their words</h4>
+          <p>"What made you reach out now? Are you currently getting enquiries from anywhere — Google, Instagram, word of mouth?"<br><br>Listen carefully. The words they use to describe the gap = the words you use in your proposal. Mirror their language back to them.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <span class="timeline-tag">7–12 min · Present</span>
+          <h4>Solution in 3 specific points, tied to their problem</h4>
+          <p>"Based on what you've told me, here's exactly what I'd build and why:" — Then give 3 concrete features connected to their stated problems. E.g. "You said parents search on Google — so we'd add local SEO and a Google Maps embed." Not a feature dump. Connection.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <span class="timeline-tag">12–15 min · Anchor & Close</span>
+          <h4>Name the price range, commit to a next step</h4>
+          <p>"For something like this, we'd be looking at around ₹12,999 — I'll send you a detailed written proposal within an hour. Does that timeline work?"<br><br>Never end without a committed next step. "I'll be in touch" is not a next step.</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <span class="timeline-tag">15–20 min · Buffer</span>
+          <h4>Handle one objection if it comes up</h4>
+          <p>If they raise price or timeline, address it directly. Don't dodge. Use the objection scripts in Phase 4. If it's complex, say "Let me address this in the proposal — I'll show you exactly what you get for that investment."</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-lightbulb"></i> Discovery questions — keep these handy</h4>
+      <ul class="checklist">
+        <li><i class="fa-solid fa-check"></i> "How do most of your current clients find you — online or offline?"</li>
+        <li><i class="fa-solid fa-check"></i> "Do you have a website already? If yes, what feels broken about it?"</li>
+        <li><i class="fa-solid fa-check"></i> "What does a successful website look like for you — what would it do for your business?"</li>
+        <li><i class="fa-solid fa-check"></i> "Have you worked with any agencies before? What was that experience like?"</li>
+        <li><i class="fa-solid fa-check"></i> "If the website is live in 2 weeks — what changes for your business?"</li>
+        <li><i class="fa-solid fa-check"></i> "Who is your ideal customer? What do they search for when they need you?"</li>
+        <li><i class="fa-solid fa-check"></i> "What are your 2–3 biggest competitors doing online that you'd like to match or beat?"</li>
+      </ul>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-message"></i> Post-call message (send within 60 minutes)</h4>
+      <div class="msg-template">
+        <span class="template-label">📲 Post-Call Summary — WhatsApp</span>
+        <button class="copy-btn" onclick="copyText(this)">Copy</button>
+Great speaking with you, [Name]! 🙌
+
+Here's a quick recap of what we discussed:
+
+🎯 Goal: [e.g., Get more student enquiries through Google & WhatsApp]
+🛠️ Solution: [e.g., 5-page website — Home, About, Courses, Admission, Contact]
+💰 Estimated investment: ₹[X]
+📅 Timeline: [X] days from start date
+
+I'll send you a detailed proposal within the next hour that includes exactly what's covered, the payment structure, and the start date.
+
+Any questions in the meantime — just reply here 🙂
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       PHASE 3 — PROPOSAL & PRICING
+  ═══════════════════════════════════════════════ -->
+  <div id="phase3">
+    <div class="phase-header">
+      <div class="phase-num">3</div>
+      <div class="phase-header-text">
+        <h2>Proposal & Pricing Strategy</h2>
+        <p>A proposal that closes — not a document that creates confusion.</p>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-file-lines"></i> Proposal structure — 5 elements only</h4>
+      <ul class="checklist">
+        <li><i class="fa-solid fa-check"></i> <strong>Problem restatement</strong> — Reflect back what they told you. Shows you listened. Makes it personal.</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Recommended solution</strong> — Name the package. List deliverables in plain language (not jargon).</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Single clear investment</strong> — One number, not a range. Ranges invite negotiation.</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Exact timeline</strong> — Specific dates. "By [Date]" not "approximately 7 days".</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Clear next step</strong> — "Reply YES and I send the payment link + kickoff form." Frictionless.</li>
+      </ul>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-indian-rupee-sign"></i> Pricing anchor strategy</h4>
+      <p>Always show 3 options. The middle package is what you want them to pick. The top package makes the middle feel reasonable. The bottom gives them an "escape hatch" without losing the deal.</p>
+      <table class="guide-table">
+        <thead><tr><th>Package</th><th>Price</th><th>Pages</th><th>Delivery</th><th>Support</th><th>Best For</th></tr></thead>
+        <tbody>
+          <tr><td>Starter</td><td>₹6,999</td><td>1 page</td><td>3 days</td><td>2 weeks</td><td>Solo coaches, freelancers, new businesses</td></tr>
+          <tr><td class="highlight">Growth ⭐</td><td class="highlight">₹12,999</td><td>4–5 pages</td><td>7 days</td><td>1 month</td><td>Coaching institutes, schools — most clients</td></tr>
+          <tr><td>Authority</td><td>₹19,999</td><td>6–8 pages</td><td>14 days</td><td>3 months</td><td>Hospitals, premium brands, multi-location</td></tr>
+        </tbody>
+      </table>
+      <div class="info-box">
+        <p><strong>Tip:</strong> Lead with Growth. If they push back on price, drop to Starter. If they're clearly premium, anchor with Authority first to make Growth feel like a steal.</p>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-message"></i> Proposal WhatsApp message</h4>
+      <div class="msg-template">
+        <span class="template-label">📲 Proposal — WhatsApp</span>
+        <button class="copy-btn" onclick="copyText(this)">Copy</button>
+Hi [Name] — here's your SparkEdge proposal 👇
+
+🎯 YOUR GOAL
+[Their stated goal — in their exact words]
+
+🛠️ RECOMMENDED: Growth Package
+• 5-page website (Home, About, Courses/Services, Admission/Contact, Gallery)
+• Mobile-first responsive design
+• WhatsApp CTA + Lead capture form
+• On-page SEO + Google Search Console setup
+• Free GitHub Pages hosting (no monthly fee ever)
+• 1 month free support after launch
+
+💰 Investment: ₹12,999
+• 50% today to begin: ₹6,500
+• 50% on delivery (after you approve the final site): ₹6,499
+
+📅 Start Date: [Date] → Live by: [Date + 7 days]
+
+To confirm: reply YES and I'll send the payment link + a 5-minute kickoff form. Work begins the same day payment is received.
+
+Questions? Just ask 🙌
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-plus"></i> Add-ons pricing menu</h4>
+      <table class="guide-table">
+        <thead><tr><th>Add-On</th><th>What It Includes</th><th>Price</th></tr></thead>
+        <tbody>
+          <tr><td>Custom Domain Setup</td><td>yourname.in / .com connected to GitHub Pages</td><td>₹500 one-time</td></tr>
+          <tr><td>Google Analytics Setup</td><td>Traffic tracking, conversions, source data</td><td>₹999</td></tr>
+          <tr><td>Extra Page</td><td>One additional page added to site</td><td>₹1,500/page</td></tr>
+          <tr><td>Blog Section</td><td>Blog index + 3 starter articles written</td><td>₹2,999</td></tr>
+          <tr><td>Monthly Maintenance</td><td>Content updates, minor changes, uptime</td><td>₹999–₹1,999/mo</td></tr>
+          <tr><td>Landing Page</td><td>High-conversion standalone page for a course</td><td>₹3,999</td></tr>
+          <tr><td>Ebook Design</td><td>10–15 page lead magnet ebook</td><td>₹2,999</td></tr>
+          <tr><td>Speed Audit & Fix</td><td>Lighthouse score optimisation</td><td>₹1,999</td></tr>
+          <tr><td>WhatsApp Chatbot</td><td>Auto-reply + lead capture via WhatsApp API</td><td>₹3,499</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       PHASE 4 — OBJECTIONS
+  ═══════════════════════════════════════════════ -->
+  <div id="phase4">
+    <div class="phase-header">
+      <div class="phase-num">4</div>
+      <div class="phase-header-text">
+        <h2>Objection Handling</h2>
+        <p>Every common pushback — with the exact words to handle it.</p>
+      </div>
+    </div>
+
+    <div class="objection-card">
+      <div class="objection-q"><i class="fa-solid fa-circle-question"></i> "It's too expensive / bahut mehnga hai."</div>
+      <div class="objection-a">"I understand completely. Let me put it in context: <strong>₹12,999 is about ₹1,100/month over a year.</strong> If the website brings in even one new student or client per month — at any fee — you've paid for it many times over. Most of our clients see their first lead within the first week of launch. Would a smaller package make more sense to start — we have a Starter at ₹6,999 with a 3-day turnaround?"</div>
+    </div>
+
+    <div class="objection-card">
+      <div class="objection-q"><i class="fa-solid fa-circle-question"></i> "I need to think about it / soch ke batata hoon."</div>
+      <div class="objection-a">"Completely fair — take the time you need. Can I ask one thing: is it the budget, the timing, or something about the proposal that needs more clarity? Even one specific concern — I'll address it directly and it'll make your decision much easier."</div>
+    </div>
+
+    <div class="objection-card">
+      <div class="objection-q"><i class="fa-solid fa-circle-question"></i> "Can you show me examples first?"</div>
+      <div class="objection-a">"Absolutely — check out our projects page: sparkedge-agency.github.io/projects.html. Each project shows the live site, the client type, and the result. Which industry is closest to yours? I'll pull the most relevant example for you right now."</div>
+    </div>
+
+    <div class="objection-card">
+      <div class="objection-q"><i class="fa-solid fa-circle-question"></i> "I'm also talking to other agencies."</div>
+      <div class="objection-a">"You should. Here's our edge: <strong>you talk directly to the founder (me)</strong> — no account managers, no juniors. Delivery in 3–7 days, not weeks. Written scope before we start, no hidden costs. And 50% payment only after delivery. Most agencies can't say all four. Happy to match timelines — take whatever time you need."</div>
+    </div>
+
+    <div class="objection-card">
+      <div class="objection-q"><i class="fa-solid fa-circle-question"></i> "Do I have to pay everything upfront?"</div>
+      <div class="objection-a">"No — we take <strong>50% to begin and 50% only on delivery, after you've approved the final website.</strong> You don't pay the second half until you've seen it and said yes. Zero risk on your side."</div>
+    </div>
+
+    <div class="objection-card">
+      <div class="objection-q"><i class="fa-solid fa-circle-question"></i> "What if I don't like what you build?"</div>
+      <div class="objection-a">"Great question — every package includes a revision round. Growth includes 1 month of free changes after launch, Authority includes 3 months. And you'll see a live preview link before anything goes public — you approve it before it's live. If something's wrong, I fix it. Simple."</div>
+    </div>
+
+    <div class="objection-card">
+      <div class="objection-q"><i class="fa-solid fa-circle-question"></i> "My friend said he can make one for free."</div>
+      <div class="objection-a">"He probably can build something. The question is: will it load fast, rank on Google, look professional on mobile, and actually convert visitors into enquiries? Free usually means Wix/WordPress with generic templates that look like everyone else. What we build is custom-coded, conversion-optimised, and SEO-ready. If the site brings in one extra student, it's paid for itself."</div>
+    </div>
+
+    <div class="objection-card">
+      <div class="objection-q"><i class="fa-solid fa-circle-question"></i> "I already have a website."</div>
+      <div class="objection-a">"That's great — mind if I take a quick look? [Ask for the URL.] I often spot 2–3 things that are quietly costing businesses leads — slow speed, no WhatsApp CTA, weak mobile layout. If your site is already working well, I'll tell you honestly. If there's room to improve, I'll show you exactly what I'd change."</div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       PHASE 5 — BOOKING & PAYMENT
+  ═══════════════════════════════════════════════ -->
+  <div id="phase5">
+    <div class="phase-header">
+      <div class="phase-num">5</div>
+      <div class="phase-header-text">
+        <h2>Booking & Payment Flow</h2>
+        <p>From "YES" to confirmed project — smooth, professional, no confusion.</p>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-flag-checkered"></i> After they say YES — your 4-step response (within 30 min)</h4>
+      <ul class="checklist">
+        <li><i class="fa-solid fa-check"></i> <strong>Step 1:</strong> Send the payment link (UPI QR / PhonePe / bank transfer details)</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Step 2:</strong> Send the kickoff Google Form link (see Phase 6)</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Step 3:</strong> Confirm the start date and delivery date explicitly in writing</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Step 4:</strong> Send a scope confirmation message (exact deliverables, no surprises)</li>
+      </ul>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-message"></i> Payment request message</h4>
+      <div class="msg-template">
+        <span class="template-label">📲 Payment Request — WhatsApp</span>
+        <button class="copy-btn" onclick="copyText(this)">Copy</button>
+Amazing — let's get started! 🎉
+
+Here's the payment details for the first 50% (₹[X]):
+
+📱 UPI ID: [your-upi-id@bank]
+🏦 Or: PhonePe / GPay / Paytm — same UPI ID
+📋 Account details if needed:
+   Name: Raunak Karn
+   Account: [XXXX]
+   IFSC: [XXXX]
+   Bank: [Bank Name]
+
+Once I receive the payment screenshot, I'll send you the kickoff form and we begin today 🚀
+
+Any questions about the payment — just ask!
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-message"></i> Payment confirmation message</h4>
+      <div class="msg-template">
+        <span class="template-label">📲 Payment Received — WhatsApp</span>
+        <button class="copy-btn" onclick="copyText(this)">Copy</button>
+Payment received — thank you! ✅
+
+You're officially a SparkEdge client. Here's your project summary:
+
+📋 Project: [Package Name] — [Business Name]
+📦 Deliverables: [List key deliverables]
+📅 Start: Today, [Date]
+🚀 Delivery target: [Date]
+💰 Remaining balance (on delivery): ₹[X]
+
+Next step: Please fill this kickoff form — it takes 5–8 minutes and gives me everything I need to begin:
+[Google Form link]
+
+I'll send you a progress update every 2 days. Questions anytime — I'm here 🙌
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-file-invoice"></i> Payment tracking — what to record</h4>
+      <ul class="checklist">
+        <li><i class="fa-solid fa-check"></i> Client name + business name</li>
+        <li><i class="fa-solid fa-check"></i> Package + total amount</li>
+        <li><i class="fa-solid fa-check"></i> 50% advance — amount + date received + UPI ref ID</li>
+        <li><i class="fa-solid fa-check"></i> Start date + delivery date</li>
+        <li><i class="fa-solid fa-check"></i> 50% balance — amount + date received (on delivery)</li>
+        <li><i class="fa-solid fa-check"></i> Any add-ons ordered + their status</li>
+      </ul>
+      <div class="info-box">
+        <p><strong>Tool:</strong> Use a simple Google Sheet titled "SparkEdge Projects" with one row per client. See the AI Prompts section to auto-generate this sheet structure.</p>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-shield-halved"></i> Payment protection rules</h4>
+      <ul>
+        <li><strong>Never start work without receiving the advance.</strong> "I'll pay after I see the work" is a red flag — don't agree.</li>
+        <li><strong>Never deliver final files before receiving the remaining 50%.</strong> The preview link is fine. But final source code and handover happen after full payment.</li>
+        <li><strong>Get confirmation in writing.</strong> WhatsApp messages count. Screenshot everything.</li>
+        <li><strong>If a client ghosts after advance:</strong> Wait 7 days, send two polite follow-ups, then archive the project. You keep the advance per your terms.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       PHASE 6 — ONBOARDING & KICKOFF
+  ═══════════════════════════════════════════════ -->
+  <div id="phase6">
+    <div class="phase-header">
+      <div class="phase-num">6</div>
+      <div class="phase-header-text">
+        <h2>Onboarding & Project Kickoff</h2>
+        <p>Collect everything you need upfront. Never chase clients for content mid-project.</p>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-list-check"></i> Kickoff form — every field you need</h4>
+      <p>Create this as a Google Form. Link it in every payment confirmation message.</p>
+      <ul class="checklist">
+        <li><i class="fa-solid fa-check"></i> <strong>Business name</strong> — Full legal name + display name if different</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Tagline / one-liner</strong> — What they do in one sentence</li>
+        <li><i class="fa-solid fa-check"></i> <strong>About the business</strong> — 2–3 paragraph description (free text)</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Logo file</strong> — PNG with transparent background (Google Drive link)</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Brand colours</strong> — Hex codes, or tick "No preference — SparkEdge chooses"</li>
+        <li><i class="fa-solid fa-check"></i> <strong>3 reference websites</strong> — Style/design they like (URLs)</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Services/courses/products list</strong> — Name + short description each</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Pricing (if applicable)</strong> — To show on site or not</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Contact info for site</strong> — Phone, email, address, WhatsApp number</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Team/faculty photos</strong> — Google Drive link</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Social media links</strong> — Instagram, Facebook, YouTube, etc.</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Target audience</strong> — Who visits the site, what do they want to know</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Any other notes</strong> — Free text field for anything else</li>
+      </ul>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-message"></i> Kickoff confirmation message</h4>
+      <div class="msg-template">
+        <span class="template-label">📲 Kickoff Started — WhatsApp</span>
+        <button class="copy-btn" onclick="copyText(this)">Copy</button>
+Form received — thank you! We're officially building 🔥
+
+Here's your project plan:
+
+📋 SCOPE LOCKED
+[List exactly what's included — page by page]
+
+📅 TIMELINE
+• Design begins: Today, [Date]
+• First draft / preview: [Date]
+• Final delivery: [Date]
+
+📬 HOW WE COMMUNICATE
+• I'll send you a progress update every 2 days
+• You can message me anytime — I respond within 2–3 hours
+• Revisions collected in one round after preview
+
+If you have additional files (photos, logos) — share them in a Google Drive folder and drop the link here.
+
+Let's make something great 🚀
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-triangle-exclamation"></i> Scope lock — prevent scope creep</h4>
+      <p>Scope creep (clients adding pages, features or "small" requests after the project starts) is the #1 cause of unprofitable projects. Prevent it at kickoff:</p>
+      <ul>
+        <li>Always list <strong>exact pages and features</strong> in your kickoff confirmation (not "a website" — "5-page website: Home, About, 3 service pages, Contact")</li>
+        <li>If they ask for something outside the original scope mid-project, say: <strong>"That's a great idea — it's just outside the original scope. I can add it for ₹1,500 and deliver it 2 days after the main site. Want me to include it?"</strong></li>
+        <li>Never say yes to extra work "just this once" without charging — it sets a precedent</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       PHASE 7 — PROGRESS & COMMUNICATION
+  ═══════════════════════════════════════════════ -->
+  <div id="phase7">
+    <div class="phase-header">
+      <div class="phase-num">7</div>
+      <div class="phase-header-text">
+        <h2>Progress Updates & Client Communication</h2>
+        <p>How to keep clients happy and confident without over-communicating.</p>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-calendar-check"></i> Communication cadence</h4>
+      <div class="grid-2">
+        <div class="mini-card">
+          <h5><i class="fa-solid fa-clock"></i> Day 1 — Project Start</h5>
+          <p>Kickoff confirmation + scope recap. Sets the professional tone. Client feels in safe hands.</p>
+        </div>
+        <div class="mini-card">
+          <h5><i class="fa-solid fa-clock"></i> Day 2–3 — Progress Update</h5>
+          <p>Send a screenshot or partial preview. "Here's the homepage structure — getting cleaner ✅" — brief, visual, reassuring.</p>
+        </div>
+        <div class="mini-card">
+          <h5><i class="fa-solid fa-clock"></i> Day 5–6 — Preview Ready</h5>
+          <p>Send the full live preview link. Give clear review instructions. One structured round of revisions.</p>
+        </div>
+        <div class="mini-card">
+          <h5><i class="fa-solid fa-clock"></i> Day 7 — Delivery</h5>
+          <p>Final approval + payment collection + files handover + launch message.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-message"></i> Mid-project progress update message</h4>
+      <div class="msg-template">
+        <span class="template-label">📲 Progress Update — Day 2–3</span>
+        <button class="copy-btn" onclick="copyText(this)">Copy</button>
+Hi [Name] — quick progress update on your website 🙌
+
+Here's where we are:
+✅ Homepage — Complete
+✅ About page — Complete
+🔄 Courses/Services page — In progress
+⬜ Contact page — Starting tomorrow
+⬜ SEO + final polish — Day 6
+
+Everything's on track for delivery by [Date]. 
+
+[Optional: attach a screenshot of what's done]
+
+Any specific additions or preferences you'd like me to keep in mind? Otherwise I'll keep moving forward 🚀
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-triangle-exclamation"></i> If you're running behind schedule</h4>
+      <div class="msg-template">
+        <span class="template-label">📲 Delay Notice — WhatsApp</span>
+        <button class="copy-btn" onclick="copyText(this)">Copy</button>
+Hi [Name] — just wanted to give you a heads up.
+
+I'm making good progress on your website but I want to take an extra day to get the [specific section] exactly right before sending the preview.
+
+New delivery estimate: [New Date] — that's [X] days from the original plan.
+
+I'd rather take 1 extra day than send you something that doesn't meet my standard. Thank you for your patience — I'll make it worth it 🙏
+      </div>
+      <div class="warning-box">
+        <p><strong>Rule:</strong> Always communicate delays proactively, before the deadline. A client who hears from you first is understanding. A client who has to follow up is angry.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       PHASE 8 — DELIVERY & LAUNCH
+  ═══════════════════════════════════════════════ -->
+  <div id="phase8">
+    <div class="phase-header">
+      <div class="phase-num">8</div>
+      <div class="phase-header-text">
+        <h2>Delivery, Review & Launch</h2>
+        <p>Preview → Revisions → Final approval → Payment → Handover. Every step.</p>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-paper-plane"></i> Preview message</h4>
+      <div class="msg-template">
+        <span class="template-label">📲 Preview Ready — WhatsApp</span>
+        <button class="copy-btn" onclick="copyText(this)">Copy</button>
+[Name], your website is ready for review! 🎉
+
+🔗 Preview link: [GitHub Pages link]
+
+Please check these 5 things:
+✅ All text content is accurate
+✅ All pages look good on your mobile phone
+✅ The contact form / WhatsApp button works
+✅ Your logo and brand colours look right
+✅ All services/courses are listed correctly
+
+Send me your feedback in one message listing any changes. I'll update everything within 24 hours.
+
+Once you're happy — we collect the final 50% payment and I hand over all files. We're almost there 🙌
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-check-double"></i> Pre-launch checklist (run this yourself)</h4>
+      <ul class="checklist">
+        <li><i class="fa-solid fa-check"></i> All pages load correctly — no 404s or broken links</li>
+        <li><i class="fa-solid fa-check"></i> Mobile responsive on iOS and Android (test both)</li>
+        <li><i class="fa-solid fa-check"></i> Contact form submits successfully and goes to client's email</li>
+        <li><i class="fa-solid fa-check"></i> WhatsApp CTA button opens correctly with pre-filled message</li>
+        <li><i class="fa-solid fa-check"></i> All images load and are compressed (under 200KB each)</li>
+        <li><i class="fa-solid fa-check"></i> Page title and meta description set for each page</li>
+        <li><i class="fa-solid fa-check"></i> Favicon added</li>
+        <li><i class="fa-solid fa-check"></i> Google Analytics tracking code added (if in scope)</li>
+        <li><i class="fa-solid fa-check"></i> GitHub Pages deployment confirmed live</li>
+        <li><i class="fa-solid fa-check"></i> Custom domain connected (if in scope)</li>
+        <li><i class="fa-solid fa-check"></i> Google Search Console sitemap submitted</li>
+        <li><i class="fa-solid fa-check"></i> Speed test run (Lighthouse score > 80)</li>
+      </ul>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-handshake"></i> Handover checklist</h4>
+      <ul class="checklist">
+        <li><i class="fa-solid fa-check"></i> Final approval received from client in writing (WhatsApp message)</li>
+        <li><i class="fa-solid fa-check"></i> Final 50% payment collected and confirmed</li>
+        <li><i class="fa-solid fa-check"></i> All source files (HTML, CSS, JS, images) delivered via Google Drive</li>
+        <li><i class="fa-solid fa-check"></i> GitHub repo access shared or transferred</li>
+        <li><i class="fa-solid fa-check"></i> Management/editing guide shared (how to update content)</li>
+        <li><i class="fa-solid fa-check"></i> Login credentials shared (if any — Google Analytics, etc.)</li>
+        <li><i class="fa-solid fa-check"></i> Ask for Google Review and WhatsApp testimonial</li>
+      </ul>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-rocket"></i> Launch day message</h4>
+      <div class="msg-template">
+        <span class="template-label">📲 Launch Day — WhatsApp</span>
+        <button class="copy-btn" onclick="copyText(this)">Copy</button>
+🚀 You're officially LIVE, [Name]!
+
+Your website: [URL]
+
+Here's what's been set up:
+✅ GitHub Pages hosting — free, fast, reliable
+✅ Google indexing submitted (shows up in ~2 weeks)
+✅ WhatsApp CTA active
+✅ Lead form live
+
+YOUR NEXT STEPS (do these today):
+1. Share the link in your WhatsApp status
+2. Add the URL to your Instagram bio
+3. Post it on Facebook/Instagram with a launch announcement
+4. Add it to your Google Business Profile if you have one
+
+All source files are in the Google Drive folder I shared.
+
+It was a genuine pleasure working on this — thank you for trusting SparkEdge 🙏
+
+If you ever need changes or want to add something new — I'm always here. Let me know how the enquiries start coming in! 🎯
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       PHASE 9 — POST-LAUNCH & RETENTION
+  ═══════════════════════════════════════════════ -->
+  <div id="phase9">
+    <div class="phase-header">
+      <div class="phase-num">9</div>
+      <div class="phase-header-text">
+        <h2>Post-Launch & Client Retention</h2>
+        <p>The project doesn't end at launch. This is where long-term revenue is built.</p>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-star"></i> Day 7 — Testimonial request</h4>
+      <div class="msg-template">
+        <span class="template-label">📲 Testimonial Request — Day 7</span>
+        <button class="copy-btn" onclick="copyText(this)">Copy</button>
+Hi [Name]! It's been a week since your site went live — how's it going? Seeing any enquiries come through? 🙂
+
+If you've had a good experience working with us, could you write a quick 2–3 line review? 
+
+You can reply right here — I'll use it on our website with your name and business name (unless you'd prefer just your first name).
+
+Honest feedback helps other business owners trust us. It means a lot 🙏
+
+No pressure at all, and thank you again for the project!
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-rotate"></i> Day 30 — Check-in + upsell</h4>
+      <div class="msg-template">
+        <span class="template-label">📲 30-Day Check-In + Upsell</span>
+        <button class="copy-btn" onclick="copyText(this)">Copy</button>
+Hey [Name] 👋 It's been a month since your site launched — just checking in!
+
+How's the website performing? Are enquiries coming in from it?
+
+A few things some of our clients have been adding this month:
+• 📝 Blog section — helps your Google ranking a lot (₹2,999)
+• 📄 Additional course landing pages — one per course or batch (₹1,500/page)
+• 📊 Google Analytics dashboard — so you can see exactly how many people visit (₹999)
+
+No pressure — just want to make sure the site keeps working hard for you. If any of these sound useful, just reply and I'll send details 🙂
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-rotate"></i> Monthly maintenance pitch (recurring revenue)</h4>
+      <div class="msg-template">
+        <span class="template-label">📲 Monthly Maintenance Pitch</span>
+        <button class="copy-btn" onclick="copyText(this)">Copy</button>
+Hi [Name] — just following up on your site. 
+
+One thing I offer a few long-term clients is a monthly maintenance plan (₹999/month):
+
+✅ Up to 3 content updates/month (text, images, new info)
+✅ Minor design tweaks
+✅ Uptime monitoring
+✅ Priority response time
+
+It's basically having me on call to keep your site current without needing to contact me every time. 
+
+Would that be useful for you? Happy to set it up from next month 🙂
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       PHASE 10 — REFERRAL PROGRAM
+  ═══════════════════════════════════════════════ -->
+  <div id="phase10">
+    <div class="phase-header">
+      <div class="phase-num">10</div>
+      <div class="phase-header-text">
+        <h2>Referral Program</h2>
+        <p>Your most profitable acquisition channel — clients who sell for you.</p>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-gift"></i> Referral incentive structure</h4>
+      <table class="guide-table">
+        <thead><tr><th>Referred Client Takes</th><th>Your Referrer Gets</th><th>When Paid</th></tr></thead>
+        <tbody>
+          <tr><td>Starter Package (₹6,999)</td><td>₹500 cash or ₹700 discount on next project</td><td>After referred client pays advance</td></tr>
+          <tr><td class="highlight">Growth Package (₹12,999)</td><td class="highlight">₹1,000 cash or ₹1,500 discount</td><td>After referred client pays advance</td></tr>
+          <tr><td>Authority Package (₹19,999+)</td><td>₹2,000 cash or ₹2,500 discount</td><td>After referred client pays advance</td></tr>
+          <tr><td>Any Add-On</td><td>10% of the add-on value</td><td>On collection</td></tr>
+        </tbody>
+      </table>
+      <div class="info-box">
+        <p><strong>Rule:</strong> Always pay referral bonuses within 3 days of receiving the referred client's payment. Reliability = more referrals.</p>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-message"></i> Referral ask message (send at Day 7 or Day 30)</h4>
+      <div class="msg-template">
+        <span class="template-label">📲 Referral Ask — WhatsApp</span>
+        <button class="copy-btn" onclick="copyText(this)">Copy</button>
+Hi [Name]! Hope the website is doing well for you 🙂
+
+Quick ask — do you know any other coaching institutes, schools, clinics, or business owners who might benefit from a professional website?
+
+If you refer someone and they become a client, I'll give you:
+• ₹1,000 cash (for Growth package)
+• Or a ₹1,500 discount on any future project
+
+Just introduce us over WhatsApp — I'll take care of the rest. No pressure, and thank you for even thinking about it 🙏
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-share-nodes"></i> How to make referrals happen naturally</h4>
+      <ul>
+        <li><strong>Over-deliver on every project.</strong> Happy clients refer without being asked. Ask only makes it 2× more likely.</li>
+        <li><strong>Ask at the right moment:</strong> Day 7 after launch (when they're still excited) or when they report their first enquiry.</li>
+        <li><strong>Make the ask specific:</strong> "Do you know anyone in coaching or education?" beats "do you know anyone?"</li>
+        <li><strong>Remind them passively:</strong> Add a line in your launch message: "If you know anyone else who'd benefit from a website like this — happy to help them too 🙂"</li>
+        <li><strong>Create a referral card message</strong> they can forward: "SparkEdge built my website — highly recommend. Contact: wa.me/919142450715"</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       PHASE 11 — FOLLOW-UP SEQUENCES
+  ═══════════════════════════════════════════════ -->
+  <div id="phase11">
+    <div class="phase-header">
+      <div class="phase-num">11</div>
+      <div class="phase-header-text">
+        <h2>Follow-Up Sequences</h2>
+        <p>For every lead who went quiet — a precise, non-pushy way to revive them.</p>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-clock-rotate-left"></i> Cold lead revival sequence (3 messages over 2 weeks)</h4>
+      <div class="msg-template">
+        <span class="template-label">📲 Follow-Up #1 — Day 3 (After Silence)</span>
+        <button class="copy-btn" onclick="copyText(this)">Copy</button>
+Hi [Name] — just following up from our chat the other day.
+
+No pressure at all — just wanted to check if you had any questions about the proposal, or if your plans have changed.
+
+If timing isn't right, totally fine. I can put this on hold and reach out in a few weeks when you're ready. Just let me know what works best 🙂
+      </div>
+      <div class="msg-template" style="margin-top:14px;">
+        <span class="template-label">📲 Follow-Up #2 — Day 7</span>
+        <button class="copy-btn" onclick="copyText(this)">Copy</button>
+Hey [Name] — one last check-in before I close your enquiry for now.
+
+We just completed a website for a [similar business type] last week — if you'd like to see what we built, I can share the link.
+
+We still have a slot open this week if you'd like to move forward. Just say the word 🙌
+      </div>
+      <div class="msg-template" style="margin-top:14px;">
+        <span class="template-label">📲 Follow-Up #3 — Day 14 (Final)</span>
+        <button class="copy-btn" onclick="copyText(this)">Copy</button>
+Hi [Name] — just closing your enquiry from my end for now since I haven't heard back.
+
+No worries at all — whenever you're ready for a website, we're here. I'll keep your details.
+
+One last thing: if it was something in the proposal that didn't feel right, I'd genuinely like to know — helps me improve 🙏
+
+Take care, and best of luck with [their business]!
+— Raunak
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-calendar-day"></i> Seasonal re-engagement (use 3× a year)</h4>
+      <div class="msg-template">
+        <span class="template-label">📲 Admission Season Re-Engagement</span>
+        <button class="copy-btn" onclick="copyText(this)">Copy</button>
+Hi [Name]! It's Raunak from SparkEdge — we spoke a while back about a website for [business name].
+
+Admission season is coming up, and I wanted to check if now's a better time to get your online presence ready.
+
+A proper website takes 7 days to build — if we start this week, you'll be live before students start searching. That's a real advantage over competitors who aren't online.
+
+Want to jump on a quick 15-minute call? 📞
+      </div>
+      <div class="msg-template" style="margin-top:14px;">
+        <span class="template-label">📲 New Year / Fresh Start Re-Engagement</span>
+        <button class="copy-btn" onclick="copyText(this)">Copy</button>
+Hi [Name]! Raunak from SparkEdge — happy new year 🙏
+
+New year is a great time to get your business's online presence sorted. A lot of our clients who launched websites in January saw a big uptick in enquiries by March.
+
+We're taking on 3 new projects this month — would love for [business name] to be one of them. Want to talk?
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       PHASE 12 — SCALING TO ₹1L/MONTH
+  ═══════════════════════════════════════════════ -->
+  <div id="phase12">
+    <div class="phase-header">
+      <div class="phase-num">12</div>
+      <div class="phase-header-text">
+        <h2>Scaling to ₹1L/Month</h2>
+        <p>The systems, pricing moves, and mindset shifts that get you there.</p>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-calculator"></i> The math to ₹1 lakh/month</h4>
+      <table class="guide-table">
+        <thead><tr><th>Path</th><th>Projects/month</th><th>Revenue</th><th>Effort</th></tr></thead>
+        <tbody>
+          <tr><td>8 Starter projects</td><td>8 × ₹6,999</td><td>₹56,000</td><td>Very high (8 projects)</td></tr>
+          <tr><td class="highlight">6 Growth + 1 Authority</td><td class="highlight">7 projects</td><td class="highlight">₹97,994</td><td class="highlight">Manageable</td></tr>
+          <tr><td>3 Authority + recurring</td><td>3 + 5 maintenance</td><td>₹64,995 + ₹5K recurring</td><td>Low volume, higher quality</td></tr>
+          <tr><td>4 Growth + 3 maintenance + 2 add-ons</td><td>Mix</td><td>₹52K + ₹3K + ₹7K = ₹62K</td><td>Sustainable long-term</td></tr>
+        </tbody>
+      </table>
+      <div class="info-box">
+        <p><strong>Target:</strong> 5–7 Growth/Authority projects/month is the sweet spot. Below 5 is survivable but thin. Above 8 as a solo founder will burn you out. Build recurring revenue (maintenance plans) to smooth out project dips.</p>
+      </div>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-arrow-trend-up"></i> The 4 levers to scale revenue</h4>
+      <ul class="checklist">
+        <li><i class="fa-solid fa-check"></i> <strong>Lever 1 — Raise prices.</strong> Every 3 months, increase each package by ₹1,000–₹2,000. Your skills improve; your price should too. No existing client is affected — this is for new inquiries only.</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Lever 2 — Add-ons.</strong> Every project should include at least one add-on conversation. Google Analytics, domain setup, monthly maintenance — these are easy yes's that add ₹1,500–₹3,000 per project.</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Lever 3 — Recurring retainers.</strong> 5 maintenance clients at ₹1,500/month = ₹7,500 guaranteed every month before you take on a single new project.</li>
+        <li><i class="fa-solid fa-check"></i> <strong>Lever 4 — Referral system.</strong> Once you have 10 happy clients, you should get 2–3 referrals/month passively. Referrals close at 60–70% vs 10–15% for cold outreach.</li>
+      </ul>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-gears"></i> Systems to build as you scale</h4>
+      <ul>
+        <li><strong>Project tracking sheet:</strong> Google Sheets — one row per client. Columns: Name | Business | Package | Advance | Balance | Status | Delivery Date | Notes</li>
+        <li><strong>Template library:</strong> Save every proposal, message and checklist in one Google Doc. Copy-paste, don't retype.</li>
+        <li><strong>Asset folder system:</strong> One Google Drive folder per client. Inside: Kickoff Form Responses / Client Files / Final Deliverables / Project Notes</li>
+        <li><strong>Weekly review (30 min every Sunday):</strong> How many leads in? Proposals sent? Projects started? Revenue collected? What's behind? What's next?</li>
+        <li><strong>Portfolio update cadence:</strong> Add every finished project to your website within 3 days of delivery. Fresh portfolio = more trust = higher conversion.</li>
+      </ul>
+    </div>
+
+    <div class="step-block">
+      <h4><i class="fa-solid fa-users"></i> When to hire / delegate (₹70K+ months)</h4>
+      <ul>
+        <li>You're turning down projects due to capacity → it's time to bring in a junior (batch-mate, college student) for ₹3,000–₹5,000/project</li>
+        <li>You're spending more than 2 hours/week on Instagram content → outsource content creation</li>
+        <li>Clients keep asking for things outside your skill set (backend, app) → build a referral network with complementary developers; earn a cut</li>
+        <li><strong>Rule:</strong> Delegate everything that doesn't require your direct client relationship or your design judgment. Keep: client calls, proposals, project oversight. Delegate: content updates, social posts, basic HTML edits.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       AI PROMPTS — DOCUMENT GENERATION
+  ═══════════════════════════════════════════════ -->
+  <div id="prompts">
+    <div class="phase-header" style="border-left-color:#3b82f6;">
+      <div class="phase-num" style="background:#3b82f6;">AI</div>
+      <div class="phase-header-text">
+        <h2>AI Prompts — Generate Your Soft Copy Documents</h2>
+        <p>Copy these prompts into ChatGPT, Claude, or any AI to instantly create professional documents.</p>
+      </div>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <p style="color:var(--muted);font-size:0.9rem;">Use these prompts in <strong style="color:#fff;">Claude.ai</strong> or <strong style="color:#fff;">ChatGPT</strong>. Each prompt generates a ready-to-use document. Replace [bracketed items] with your real details before running.</p>
+    </div>
+
+    <!-- PROMPT 1 -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-file-contract"></i> 1. Client Proposal Document</h4>
+      <p>Generates a clean, professional PDF-ready proposal to send to clients.</p>
+      <div class="prompt-box">
+        <span class="prompt-label"><i class="fa-solid fa-robot"></i> AI Prompt — Client Proposal</span>
+        <button class="prompt-copy-btn" onclick="copyText(this)">Copy</button>
+        <p>Create a professional client proposal document for my web design agency called SparkEdge. The client details are:
+
+Client Name: [Name]
+Business Name: [Business]
+Business Type: [e.g., Coaching Institute]
+Their Goal: [e.g., Get more student admissions online]
+Package: Growth Package
+Deliverables: 5-page website (Home, About, Courses, Admission, Contact), Mobile-responsive design, WhatsApp CTA, Lead form, On-page SEO, Free GitHub Pages hosting, 1 month support
+Investment: ₹12,999 (50% advance: ₹6,500 | 50% on delivery: ₹6,499)
+Start Date: [Date]
+Delivery Date: [Date + 7 days]
+
+Format it as a clean professional document with sections: About SparkEdge, Understanding Your Goals, Our Recommended Solution, Investment & Payment Terms, Timeline, What Happens Next. Use a formal but warm tone. Include a "To Accept" section at the bottom.</p>
+      </div>
+    </div>
+
+    <!-- PROMPT 2 -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-file-signature"></i> 2. Simple Client Agreement / Contract</h4>
+      <p>A one-page agreement that protects you and sets clear expectations.</p>
+      <div class="prompt-box">
+        <span class="prompt-label"><i class="fa-solid fa-robot"></i> AI Prompt — Client Agreement</span>
+        <button class="prompt-copy-btn" onclick="copyText(this)">Copy</button>
+        <p>Write a simple, clear client service agreement for my web design business SparkEdge. Include these clauses:
+
+1. Project Scope — clearly defines what is included (list pages/features) and what is not
+2. Payment Terms — 50% advance to start, 50% on delivery and approval. Work does not begin without advance payment.
+3. Revision Policy — one structured revision round included. Additional revisions billed at ₹500/round.
+4. Delivery Timeline — project delivered by [date]. Delays communicated proactively.
+5. Content Responsibility — client is responsible for providing all content (text, logos, images) within 48 hours of kickoff. Delays in content provision extend the delivery date accordingly.
+6. Intellectual Property — client owns the final delivered website files. SparkEdge retains the right to display the work in its portfolio.
+7. Refund Policy — advance is non-refundable if work has begun. If SparkEdge cannot complete the project, a full refund is issued.
+8. Communication — primary communication via WhatsApp. Response within 2–3 hours during business hours (9am–9pm IST, Mon–Sat).
+
+Keep it in simple, plain English. Under 500 words. Professional but readable. Add signature lines at the bottom for both parties.</p>
+      </div>
+    </div>
+
+    <!-- PROMPT 3 -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-receipt"></i> 3. Invoice / Payment Receipt</h4>
+      <p>Professional invoice to send after receiving payment.</p>
+      <div class="prompt-box">
+        <span class="prompt-label"><i class="fa-solid fa-robot"></i> AI Prompt — Invoice</span>
+        <button class="prompt-copy-btn" onclick="copyText(this)">Copy</button>
+        <p>Create a professional invoice document for my web design agency. Details:
+
+Agency: SparkEdge
+Founder: Raunak Karn
+Email: sparkedge555@gmail.com
+Phone: +91 91424 50715
+
+Invoice To:
+Client Name: [Name]
+Business: [Business Name]
+Date: [Date]
+Invoice Number: SE-[001]
+
+Services Rendered:
+- [Package Name] Web Design & Development: ₹[Amount]
+- [Any Add-ons]: ₹[Amount]
+
+Payment Type: Advance (50%) / Final (50%) / Full Payment
+Amount: ₹[X]
+Payment Method: UPI
+Transaction Reference: [Ref ID]
+
+Format it cleanly with a header, itemised services table, payment summary, and a thank you note at the bottom. Professional and minimal design described in the document.</p>
+      </div>
+    </div>
+
+    <!-- PROMPT 4 -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-table-list"></i> 4. Project Tracker Spreadsheet Structure</h4>
+      <p>Generate the structure for a Google Sheets project and revenue tracker.</p>
+      <div class="prompt-box">
+        <span class="prompt-label"><i class="fa-solid fa-robot"></i> AI Prompt — Project Tracker</span>
+        <button class="prompt-copy-btn" onclick="copyText(this)">Copy</button>
+        <p>Design a Google Sheets spreadsheet structure for my web design agency SparkEdge to track all client projects and revenue. 
+
+Create two sheets:
+
+Sheet 1: PROJECT TRACKER
+Columns: Project ID | Client Name | Business Name | Business Type | Package | Total Value | Advance Paid (₹) | Advance Date | Balance Due (₹) | Balance Paid Date | Start Date | Delivery Date | Status (Enquiry/Proposal Sent/Advance Paid/In Progress/Preview Sent/Complete/Cancelled) | Notes
+
+Sheet 2: REVENUE TRACKER  
+Columns: Month | Projects Completed | Total Revenue | Advance Collected | Balance Collected | Add-On Revenue | Referral Bonus Paid | Net Revenue | Target | % to Target
+
+Also create a Sheet 3: LEAD TRACKER
+Columns: Date | Name | Business | Source (WhatsApp/Instagram/Referral/Cold DM) | Status (New/Qualified/Proposal Sent/Negotiating/Won/Lost) | Reason Lost | Follow-Up Date | Notes
+
+Give me the exact column headers and a few example rows so I can copy this into Google Sheets directly.</p>
+      </div>
+    </div>
+
+    <!-- PROMPT 5 -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-clipboard-list"></i> 5. Project Brief / Scope of Work Document</h4>
+      <p>Detailed scope document to lock the project before starting. Prevents scope creep.</p>
+      <div class="prompt-box">
+        <span class="prompt-label"><i class="fa-solid fa-robot"></i> AI Prompt — Scope of Work</span>
+        <button class="prompt-copy-btn" onclick="copyText(this)">Copy</button>
+        <p>Create a Project Scope of Work (SOW) document for a web design project. Details:
+
+Agency: SparkEdge (Raunak Karn)
+Client: [Client Name], [Business Name]
+Project: [Package Name] Website
+Date: [Date]
+
+Pages to be built:
+1. Home — Hero section, Services overview, Why choose us, CTA, Testimonials
+2. About — Founder/team bio, Mission, Values
+3. [Services/Courses] — [List each]
+4. Contact — Form, WhatsApp CTA, Address, Map embed
+5. [Any other pages]
+
+Explicitly Included:
+- Mobile-responsive design
+- On-page SEO (titles, meta descriptions, schema)
+- WhatsApp floating button
+- Contact form (submissions to client email)
+- Free GitHub Pages hosting setup
+- Google Search Console submission
+- [List any agreed add-ons]
+
+Explicitly NOT Included (out of scope):
+- Backend / database functionality
+- Payment gateway integration
+- E-commerce / booking system
+- Ongoing content writing
+- Social media management
+- Any pages not listed above
+
+Format as a clean professional document. Include a client sign-off section at the bottom.</p>
+      </div>
+    </div>
+
+    <!-- PROMPT 6 -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-handshake"></i> 6. Onboarding Welcome Packet</h4>
+      <p>A polished welcome document to send to every new client after payment.</p>
+      <div class="prompt-box">
+        <span class="prompt-label"><i class="fa-solid fa-robot"></i> AI Prompt — Welcome Packet</span>
+        <button class="prompt-copy-btn" onclick="copyText(this)">Copy</button>
+        <p>Create a client onboarding welcome packet document for SparkEdge web design agency. This is sent to every new client after they make their advance payment.
+
+Include these sections:
+1. Welcome message from Raunak Karn (warm, personal, confident)
+2. Your Project at a Glance (package, pages, timeline, delivery date)
+3. How We Work Together (communication style, update frequency, revision process)
+4. What I Need From You (checklist of content to provide — logo, text, photos, references)
+5. What Happens Next (step-by-step timeline from today to launch)
+6. How to Reach Me (WhatsApp: +91 91424 50715, Email: sparkedge555@gmail.com, Hours: 9am–9pm Mon–Sat)
+7. A short section on what makes SparkEdge different (direct founder access, fast delivery, conversion focus, IIT-trained technical foundation)
+
+Tone: Warm, professional, confident. Not corporate-stiff. Like a trusted expert speaking directly to the client. Under 600 words.</p>
+      </div>
+    </div>
+
+    <!-- PROMPT 7 -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-star"></i> 7. Testimonial Request Email / Message</h4>
+      <p>Multiple versions — WhatsApp, email, and a Google review request.</p>
+      <div class="prompt-box">
+        <span class="prompt-label"><i class="fa-solid fa-robot"></i> AI Prompt — Testimonial Templates</span>
+        <button class="prompt-copy-btn" onclick="copyText(this)">Copy</button>
+        <p>Write 3 versions of a testimonial request for SparkEdge web design agency:
+
+Version 1: WhatsApp message — casual, warm, under 80 words. Sent 7 days after launch.
+Version 2: Email — slightly more formal, includes a suggested format for the review (3-4 guiding questions to make it easy to write), under 150 words.
+Version 3: Google Review request — very short (under 50 words), includes a direct link placeholder [Google Review Link] and explains why it helps.
+
+Context: The client just had their website launched. They seemed happy. I want to ask genuinely without feeling pushy.
+
+Also write a short "fill in the blank" template I can give clients to make it easy:
+"[Name] hired SparkEdge to build a website for [business]. The experience was... What I liked most was... Since launch, [results]. I would recommend SparkEdge because..."</p>
+      </div>
+    </div>
+
+    <!-- PROMPT 8 -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-bullhorn"></i> 8. Instagram / Social Content Calendar</h4>
+      <p>Generate 30 days of content ideas for your agency Instagram.</p>
+      <div class="prompt-box">
+        <span class="prompt-label"><i class="fa-solid fa-robot"></i> AI Prompt — Content Calendar</span>
+        <button class="prompt-copy-btn" onclick="copyText(this)">Copy</button>
+        <p>Create a 30-day Instagram content calendar for SparkEdge, a web design agency run by a solo founder (Raunak Karn, IIT Patna student) that builds conversion-focused websites for coaching institutes, schools, clinics, and small businesses in India.
+
+Target audience: Small business owners, coaching institute owners, school administrators, clinic owners in India.
+
+For each day, give:
+- Content type (carousel, reel, single image, story)
+- Topic / title
+- Hook (first line that makes them stop scrolling)
+- Brief content outline (3–5 bullet points)
+- CTA (what they should do after)
+
+Content mix should include:
+- Before/after website transformations (6 posts)
+- Educational tips for business owners (8 posts)
+- "Mistakes to avoid" type content (4 posts)
+- Client result / testimonial stories (4 posts)
+- Behind-the-scenes / personal brand posts (4 posts)
+- Direct offer / service awareness (4 posts)
+
+Make every hook specific and scroll-stopping. Avoid generic content.</p>
+      </div>
+    </div>
+
+    <!-- PROMPT 9 -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-file-pdf"></i> 9. Service Brochure / One-Pager</h4>
+      <p>A professional one-page brochure to share with warm leads or in person.</p>
+      <div class="prompt-box">
+        <span class="prompt-label"><i class="fa-solid fa-robot"></i> AI Prompt — Service Brochure</span>
+        <button class="prompt-copy-btn" onclick="copyText(this)">Copy</button>
+        <p>Write the full text content for a one-page PDF brochure for SparkEdge web design agency. This will be formatted into a PDF later — just give me the clean text content.
+
+Include:
+1. Headline — compelling, benefit-focused, aimed at coaching institutes and small businesses
+2. Sub-headline — what makes SparkEdge different (1 sentence)
+3. 3 core services with 2-line descriptions each: Website Development, Landing Pages, Ebook Design
+4. 3 packages (Starter ₹6,999, Growth ₹12,999, Authority ₹19,999) with 3 bullet points each
+5. 3 client results / proof points (can be slightly generic/aspirational since we're building portfolio)
+6. Why SparkEdge (3 short points: Founded by IIT Patna student, direct founder communication, 3–7 day delivery)
+7. Call to action with WhatsApp number +91 91424 50715 and website URL
+8. Footer: sparkedge555@gmail.com | © 2026 SparkEdge
+
+Tone: Premium, confident, Indian market-aware. No fluff.</p>
+      </div>
+    </div>
+
+    <!-- PROMPT 10 -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-envelope"></i> 10. Cold Email Outreach Sequence</h4>
+      <p>3-email cold sequence for reaching coaching institutes and business owners.</p>
+      <div class="prompt-box">
+        <span class="prompt-label"><i class="fa-solid fa-robot"></i> AI Prompt — Cold Email Sequence</span>
+        <button class="prompt-copy-btn" onclick="copyText(this)">Copy</button>
+        <p>Write a 3-email cold outreach sequence for SparkEdge web design agency targeting coaching institute owners in India who don't have a website or have a poor website.
+
+Email 1 — Initial outreach: Short (under 100 words), personalized opener, one specific pain point, soft CTA (free audit offer). Subject line: something intriguing, not salesy.
+
+Email 2 — Follow-up (3 days later): Reference the first email, share one proof point (result or project), slightly warmer CTA (15-minute call). Under 80 words.
+
+Email 3 — Final follow-up (7 days after Email 2): "Closing your file" style — creates urgency without being aggressive. Leaves the door open. Under 60 words.
+
+Context: Sender is Raunak Karn, IIT Patna student, founder of SparkEdge. Builds high-conversion websites in 3–7 days. ₹6,999–₹19,999 range.
+
+Make each email sound human, not templated. Avoid corporate language.</p>
+      </div>
+    </div>
+
+    <!-- PROMPT 11 -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-chart-bar"></i> 11. Monthly Business Review Template</h4>
+      <p>A structured monthly review to track growth, revenue, and areas to improve.</p>
+      <div class="prompt-box">
+        <span class="prompt-label"><i class="fa-solid fa-robot"></i> AI Prompt — Monthly Review</span>
+        <button class="prompt-copy-btn" onclick="copyText(this)">Copy</button>
+        <p>Create a monthly business review template for a solo web design agency (SparkEdge). I'll fill this in at the end of every month to track growth. 
+
+Include these sections with fill-in prompts under each:
+1. Revenue Summary — total revenue, target, variance, breakdown by project
+2. Lead Pipeline — leads generated, proposals sent, conversion rate, main sources
+3. Projects — completed, in progress, cancelled, average delivery time
+4. Client Satisfaction — testimonials received, complaints, NPS rating
+5. Top 3 Wins This Month
+6. Top 3 Challenges / What Didn't Work
+7. Skills Developed / Learned
+8. Revenue Goal for Next Month
+9. Top 3 Actions for Next Month (specific, actionable)
+10. Reflection — one paragraph on overall trajectory
+
+Format it as a fillable document I can complete in 20–30 minutes each month.</p>
+      </div>
+    </div>
+
+    <!-- PROMPT 12 -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-graduation-cap"></i> 12. Client Handover Guide (Management Manual)</h4>
+      <p>A guide you give every client showing them how to manage their own website.</p>
+      <div class="prompt-box">
+        <span class="prompt-label"><i class="fa-solid fa-robot"></i> AI Prompt — Client Management Guide</span>
+        <button class="prompt-copy-btn" onclick="copyText(this)">Copy</button>
+        <p>Write a simple website management guide for a non-technical client receiving their new SparkEdge website. The site is built in pure HTML/CSS/JS and hosted on GitHub Pages.
+
+Cover:
+1. How to update text content (find the file, find the text, change it safely)
+2. How to replace an image (naming the file, uploading to the folder)
+3. How to update contact information (phone, email, WhatsApp number on the site)
+4. How to check if the website is live
+5. How to view basic traffic (Google Analytics if set up, or Search Console)
+6. What NOT to touch (structural HTML, CSS variables, script tags)
+7. When to contact SparkEdge for help (and how — WhatsApp: +91 91424 50715)
+8. How to take a backup (download all files from GitHub)
+
+Write it for someone with zero technical knowledge. Use simple language, numbered steps, and practical examples. Warm, supportive tone.</p>
+      </div>
+    </div>
+
+    <!-- PROMPT 13 -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-magnifying-glass-chart"></i> 13. Free Website Audit Template</h4>
+      <p>Use this to audit a prospect's current website and send them a personalised audit — a powerful lead generation tool.</p>
+      <div class="prompt-box">
+        <span class="prompt-label"><i class="fa-solid fa-robot"></i> AI Prompt — Website Audit Report</span>
+        <button class="prompt-copy-btn" onclick="copyText(this)">Copy</button>
+        <p>Create a website audit report for a prospect's current website. I'll share observations and you'll structure it into a professional, easy-to-read report I can send them.
+
+My observations about their website [URL: ____________]:
+- Speed: [Fast / Slow / Very Slow]
+- Mobile: [Looks fine / Broken on mobile / Not responsive]
+- CTA: [Has WhatsApp button / No clear CTA / Hard to find contact]
+- Design: [Modern / Outdated / Generic template]
+- SEO: [Has meta tags / No meta descriptions / No schema]
+- Content: [Clear / Confusing / Missing key info]
+- [Any other notes]
+
+Format the report as:
+1. Executive Summary (2–3 sentences on overall state)
+2. Issue #1 — [Issue] | Impact: [High/Medium/Low] | Recommended Fix
+3. Issue #2...
+4. Issue #3...
+[Up to 6 issues]
+5. Opportunity Summary — what they're losing by not fixing this
+6. Recommended Next Step — a free consultation with SparkEdge
+
+Tone: Expert, constructive, helpful — not critical or condescending. Make them feel like this is a valuable gift, not a sales pitch.</p>
+      </div>
+    </div>
+
+    <!-- PROMPT 14 -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-award"></i> 14. Case Study Template (for portfolio)</h4>
+      <p>Turn every project into a proper case study for your website and social media.</p>
+      <div class="prompt-box">
+        <span class="prompt-label"><i class="fa-solid fa-robot"></i> AI Prompt — Project Case Study</span>
+        <button class="prompt-copy-btn" onclick="copyText(this)">Copy</button>
+        <p>Write a project case study for SparkEdge's portfolio. Format it for both the website projects page and as a standalone PDF.
+
+Project Details:
+- Client: [Name / Business]
+- Industry: [Coaching / School / Clinic / etc.]
+- Package: [Package Name]
+- Challenge: [What problem did they have before?]
+- Solution: [What did we build and why?]
+- Features delivered: [List]
+- Timeline: [X days]
+- Result: [Any measurable outcome — leads, calls, feedback]
+- Client quote: [Their exact words if available]
+
+Structure the case study as:
+1. Headline — outcome-focused (e.g., "How [Business] Got Their First Online Leads in 7 Days")
+2. The Challenge — 2–3 sentences
+3. Our Approach — what we built and the thinking behind key decisions
+4. What We Delivered — feature list with brief explanation of each
+5. The Result — outcome and client feedback
+6. Call to Action — "Want similar results? Talk to Raunak → wa.me/919142450715"
+
+Professional tone. Under 400 words. Suitable for posting on Instagram as a carousel too.</p>
+      </div>
+    </div>
+
+    <!-- PROMPT 15 -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-id-card"></i> 15. Professional Bio (for outreach, LinkedIn, portfolio)</h4>
+      <p>Multiple versions of Raunak's bio for different contexts.</p>
+      <div class="prompt-box">
+        <span class="prompt-label"><i class="fa-solid fa-robot"></i> AI Prompt — Professional Bio</span>
+        <button class="prompt-copy-btn" onclick="copyText(this)">Copy</button>
+        <p>Write 4 versions of a professional bio for Raunak Karn, founder of SparkEdge:
+
+Context:
+- BSc CSDA student at IIT Patna
+- Founder of SparkEdge web design agency
+- Builds conversion-focused websites for coaching institutes, schools, clinics and businesses across India
+- Generated ₹30K+ in agency revenue in 3 months as a student
+- Published poet and writer on Rekhta and Poetistic
+- Delivered 30+ projects
+- Based in India
+
+Version 1: Twitter/Instagram bio (under 150 characters)
+Version 2: LinkedIn headline (under 220 characters)  
+Version 3: LinkedIn About section (200–250 words) — professional, story-driven, ends with CTA
+Version 4: Website "About" paragraph (100–120 words) — warm, expert, personal
+
+Tone across all: Confident but not arrogant. Specific numbers. Relatable for Indian business owners. The IIT background should be mentioned once — naturally, not as a flex.</p>
+      </div>
+    </div>
+
+  </div>
+  <!-- end prompts section -->
+
+  <div class="section-divider"></div>
+
+  <!-- ════════════════════════════════════════════
+       TIPS & TRICKS — POWER USER HACKS
+  ═══════════════════════════════════════════════ -->
+  <div id="tips-hacks">
+    <div class="tips-phase-header">
+      <div class="tips-phase-num"><i class="fa-solid fa-lightbulb"></i></div>
+      <div style="flex:1;">
+        <h2><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--success);margin-right:10px;"></i>Tips, Tricks & Internal Hacks</h2>
+        <p>Shortcuts, systems, and insider knowledge that save hours and win more deals.</p>
+      </div>
+    </div>
+
+    <!-- BLOCK: SPEED HACKS -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-bolt-lightning"></i> Speed Hacks — Do More in Less Time</h4>
+      <p>Being faster than your competition is one of your biggest edges as a solo founder. Here's how to compound that advantage:</p>
+
+      <div class="hack-card" style="margin-top:16px;">
+        <div class="hack-card-title"><i class="fa-solid fa-keyboard"></i> Keyboard Shortcut System for WhatsApp Web</div>
+        <ul>
+          <li><strong>Use WhatsApp Quick Replies (Saved Replies):</strong> Go to WhatsApp Business App → Business Tools → Quick Replies. Save your most-used messages (proposal summary, payment link, testimonial request) as shortcuts like /proposal, /pay, /review. One tap = full message.</li>
+          <li><strong>Pin your 5 hottest leads</strong> to the top of WhatsApp so you never miss a follow-up.</li>
+          <li><strong>Create a broadcast list</strong> of past clients — use it for seasonal re-engagement (not spam).</li>
+        </ul>
+      </div>
+
+      <div class="hack-card">
+        <div class="hack-card-title"><i class="fa-solid fa-clone"></i> The "One Client Folder" System</div>
+        <p>For every new client, immediately create: <strong>Google Drive → SparkEdge Projects → [ClientName-BusinessName-Date]</strong>. Inside: 4 subfolders — <strong>📥 Client Assets</strong> (logos, images they send), <strong>📝 Kickoff</strong> (form responses), <strong>🖥️ Final Files</strong> (HTML/CSS/JS), <strong>💬 Notes</strong> (scope agreements, call notes). This takes 90 seconds and saves 3 hours of "where did they send that logo?" chaos.</p>
+      </div>
+
+      <div class="hack-card">
+        <div class="hack-card-title"><i class="fa-solid fa-gauge-high"></i> GitHub Pages Deploy Hack</div>
+        <ul>
+          <li>Keep a <strong>master template repository</strong> for each package type (Starter, Growth, Authority) as a private GitHub repo</li>
+          <li>When you start a new project, <strong>duplicate the template repo</strong> — don't build from zero. Saves 2–4 hours per project</li>
+          <li>Use GitHub Pages + <code>CNAME</code> file for custom domain — takes 5 minutes once you know the workflow</li>
+          <li><strong>Auto-preview trick:</strong> Use GitHub Pages URL as your staging link — show clients real live preview, not screenshots</li>
+        </ul>
+      </div>
+
+      <div class="hack-card">
+        <div class="hack-card-title"><i class="fa-brands fa-figma"></i> Design Speed Trick</div>
+        <p>Don't design every site from scratch. Build a <strong>SparkEdge Component Library</strong> — a single HTML file containing your best nav, hero, features grid, testimonials, and footer sections in different styles. Copy-paste components, then customise colours and content. Cuts design time by 60%.</p>
+      </div>
+    </div>
+
+    <!-- BLOCK: CONVERSION TRICKS -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-chart-line"></i> Conversion-Boosting Tricks</h4>
+
+      <div class="do-dont">
+        <div class="do-card">
+          <h6><i class="fa-solid fa-circle-check"></i> Always Do This</h6>
+          <ul>
+            <li>Send the proposal within 60 minutes of the call</li>
+            <li>Name a specific delivery date (not "about 7 days")</li>
+            <li>Follow up exactly at Day 3, 7, 14 — not earlier</li>
+            <li>Mirror the client's exact words in proposals</li>
+            <li>Always get written confirmation before starting work</li>
+            <li>Send a progress update proactively every 2 days</li>
+          </ul>
+        </div>
+        <div class="dont-card">
+          <h6><i class="fa-solid fa-circle-xmark"></i> Never Do This</h6>
+          <ul>
+            <li>Send proposals without a clear next step</li>
+            <li>Start work without receiving advance payment</li>
+            <li>Agree to unlimited revisions verbally</li>
+            <li>Ghost a client for 48+ hours mid-project</li>
+            <li>Negotiate price via WhatsApp back-and-forth</li>
+            <li>Share final files before receiving full payment</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOCK: PROPOSAL TRICKS -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-file-waveform"></i> Proposal Psychology Tricks</h4>
+      <ol class="ranked-list">
+        <li><strong>Name their goal first, price last.</strong> The order inside your proposal matters. Problem → Solution → Value → Price. Never lead with price.</li>
+        <li><strong>Include a "What You Don't Have to Worry About" section.</strong> "You don't need to understand code. You don't need to manage hosting. You don't need to hire separately for SEO." Reduce friction in their mind.</li>
+        <li><strong>Use rupee math, not just rupee amounts.</strong> ₹12,999 ÷ 365 = ₹35/day. ₹35/day for a website that works 24/7. This reframing closes undecided leads.</li>
+        <li><strong>End every proposal with a bold deadline.</strong> "This slot is available until [Date + 3 days]. After that I'm fully booked and cannot guarantee the same timeline." Scarcity + specificity = action.</li>
+        <li><strong>Always include a testimonial snippet</strong> in the proposal body. One line from a past client does more than three paragraphs from you.</li>
+      </ol>
+    </div>
+
+    <!-- BLOCK: TOOL STACK -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-toolbox"></i> Your Internal Tool Stack (All Free)</h4>
+      <div class="grid-3">
+        <div class="mini-card">
+          <h5><i class="fa-brands fa-google"></i> Google Workspace</h5>
+          <p>Sheets for project tracking, Forms for kickoff, Drive for file management, Docs for proposals. Your entire ops system, free.</p>
+        </div>
+        <div class="mini-card">
+          <h5><i class="fa-brands fa-github"></i> GitHub</h5>
+          <p>Private repos for client projects, GitHub Pages for free hosting, version history as your backup system.</p>
+        </div>
+        <div class="mini-card">
+          <h5><i class="fa-solid fa-robot"></i> Claude / ChatGPT</h5>
+          <p>Every document, proposal, script, and social post. Use the AI Prompts section — saves 5–8 hrs/week of writing.</p>
+        </div>
+        <div class="mini-card">
+          <h5><i class="fa-solid fa-gauge"></i> PageSpeed Insights</h5>
+          <p>Run every site through Google's free tool before delivery. Target Lighthouse score 85+. Screenshot it for clients.</p>
+        </div>
+        <div class="mini-card">
+          <h5><i class="fa-solid fa-magnifying-glass-chart"></i> Search Console</h5>
+          <p>Set up for every client's site. Submit sitemap. This alone makes you look 10× more professional than competitors.</p>
+        </div>
+        <div class="mini-card">
+          <h5><i class="fa-solid fa-palette"></i> Canva</h5>
+          <p>Social posts, case study carousels, proposal covers, portfolio graphics. Use SparkEdge brand colours consistently.</p>
+        </div>
+      </div>
+      <div class="insight-box">
+        <p><strong>Pro tip:</strong> Create a "SparkEdge Brand Kit" on Canva with your logo, primary orange (#FC653A), fonts, and standard layouts. All social content takes half the time once this is set up.</p>
+      </div>
+    </div>
+
+    <!-- BLOCK: COMMUNICATION HACKS -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-comments"></i> Client Communication Hacks That Build Trust</h4>
+      <div class="hack-card">
+        <div class="hack-card-title"><i class="fa-solid fa-eye"></i> The "Seen but Not Replied" Fix</div>
+        <p>If a client opens your message but doesn't reply, send: <em>"Just wanted to make sure my last message came through clearly — happy to clarify anything 🙂"</em> This re-opens the door without pressure.</p>
+      </div>
+      <div class="hack-card">
+        <div class="hack-card-title"><i class="fa-solid fa-camera"></i> Screenshot Progress, Don't Just Describe It</div>
+        <p>Every progress update should have a <strong>screenshot or screencast</strong>. Clients trust what they can see. A photo of 50% done feels better than "I've completed half the work." Use Loom for 60-second walkthroughs — free and powerful.</p>
+      </div>
+      <div class="hack-card">
+        <div class="hack-card-title"><i class="fa-solid fa-hourglass-half"></i> Anchor Their Expectations on Day 1</div>
+        <p>At the kickoff, send: <em>"Here's what to expect from me: progress update every 2 days, preview link on Day 5–6, final delivery by [Date]. I'll always reach out first if anything changes."</em> This one message eliminates 90% of anxious check-in messages from clients.</p>
+      </div>
+      <div class="hack-card">
+        <div class="hack-card-title"><i class="fa-solid fa-shield-heart"></i> The "No Surprise" Guarantee Language</div>
+        <p>Use this in every proposal: <strong>"Everything in the scope above is included. There are no hidden costs. Any additions outside this scope will be quoted separately before being done — you'll always know the price before I proceed."</strong> This phrase alone reduces post-project disputes by 95%.</p>
+      </div>
+    </div>
+
+    <!-- BLOCK: WEEKLY RHYTHM -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-calendar-week"></i> The Ideal Weekly Rhythm (Solo Founder)</h4>
+      <table class="guide-table">
+        <thead><tr><th><i class="fa-solid fa-calendar-day"></i> Day</th><th>Morning (9–12)</th><th>Afternoon (12–5)</th><th>Evening (6–8)</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Mon</strong></td><td>Review leads from weekend · Respond to all pending messages</td><td>Active project work</td><td>10 outreach DMs</td></tr>
+          <tr><td><strong>Tue</strong></td><td>Active project work</td><td>Active project work</td><td>Instagram content (1 post)</td></tr>
+          <tr><td><strong>Wed</strong></td><td>Discovery calls if any booked</td><td>Proposal writing + follow-ups</td><td>10 outreach DMs</td></tr>
+          <tr><td><strong>Thu</strong></td><td>Active project work</td><td>Active project work</td><td>Client check-in messages</td></tr>
+          <tr><td><strong>Fri</strong></td><td>Deliver previews / collect feedback</td><td>Revisions or new project start</td><td>Portfolio updates + invoicing</td></tr>
+          <tr><td><strong>Sat</strong></td><td>Launches + final handovers</td><td>Outreach batch (20+ DMs)</td><td>Instagram content</td></tr>
+          <tr><td><strong>Sun</strong></td><td>30-min weekly review (see Scaling phase)</td><td>Plan next week's projects</td><td>Rest 🙏</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ════════════════════════════════════════════
+       MARKET & SALES HACKS
+  ═══════════════════════════════════════════════ -->
+  <div id="market-hacks">
+    <div class="market-phase-header">
+      <div class="market-phase-num"><i class="fa-solid fa-rocket"></i></div>
+      <div style="flex:1;">
+        <h2><i class="fa-solid fa-sack-dollar" style="color:#a855f7;margin-right:10px;"></i>Market & Sales Hacks</h2>
+        <p>Pricing psychology, urgency triggers, positioning moves, and conversion weapons.</p>
+      </div>
+    </div>
+
+    <!-- PRICING PSYCHOLOGY -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-brain"></i> Pricing Psychology — Make Every Rupee Feel Justified</h4>
+
+      <div class="hack-card">
+        <div class="hack-card-title"><i class="fa-solid fa-tag"></i> Charm Pricing for Indian Market</div>
+        <p>End prices in ₹999 instead of ₹1,000. But for agency packages, use <strong>₹12,999 not ₹12,000</strong>. Why? ₹12,999 reads as specific and calculated — like you've priced exactly for the work. ₹12,000 reads as a round guess. Specificity = trust.</p>
+      </div>
+
+      <div class="hack-card">
+        <div class="hack-card-title"><i class="fa-solid fa-scale-balanced"></i> The Anchor Package Trick (Advanced)</div>
+        <p>When a lead seems budget-conscious, don't start with Growth (₹12,999). Start with Authority (₹19,999). Describe it. Then say: <em>"Based on what you've shared, I'd actually recommend our Growth package — it covers everything you need at ₹12,999."</em> Now ₹12,999 feels like a discount, not a cost. <strong>Anchor high, close at mid.</strong></p>
+      </div>
+
+      <div class="hack-card">
+        <div class="hack-card-title"><i class="fa-solid fa-arrows-split-up-and-left"></i> Split Payment as a Sales Tool</div>
+        <p>Never frame 50/50 as "we need some money upfront." Frame it as: <em>"We do 50% at the start and 50% only after you've reviewed and approved the final website — so you're not paying for something you haven't seen."</em> This <strong>completely removes the risk perception</strong> and makes the ₹6,500 feel easy to say yes to.</p>
+      </div>
+
+      <div class="hack-card">
+        <div class="hack-card-title"><i class="fa-solid fa-percent"></i> The "Add-On Before Closing" Move</div>
+        <p>When a client says yes to a package, immediately say: <em>"One thing most of my clients add — a custom domain setup (₹500 one-time). It makes your site feel far more professional. Want to include it?"</em> At the moment of buying, they're already in "yes mode." 70% say yes. This alone adds ₹500–₹2,000 to every project.</p>
+      </div>
+
+      <div class="stat-row-mini">
+        <div class="stat-mini"><div class="stat-mini-num">70%</div><div class="stat-mini-label">say yes to add-ons at close</div></div>
+        <div class="stat-mini"><div class="stat-mini-num">3×</div><div class="stat-mini-label">referral close rate vs cold</div></div>
+        <div class="stat-mini"><div class="stat-mini-num">₹1,500</div><div class="stat-mini-label">avg add-on revenue per deal</div></div>
+        <div class="stat-mini"><div class="stat-mini-num">60 min</div><div class="stat-mini-label">proposal-to-send window</div></div>
+      </div>
+    </div>
+
+    <!-- URGENCY & SCARCITY -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-hourglass-end"></i> Urgency & Scarcity — Ethical Triggers That Work</h4>
+      <div class="warning-box">
+        <p><strong>Rule:</strong> Only use urgency that is <strong>real</strong>. Never fake scarcity — it destroys trust the moment a prospect finds out. These techniques work because they reflect actual constraints.</p>
+      </div>
+
+      <div class="hack-card" style="margin-top:16px;">
+        <div class="hack-card-title"><i class="fa-solid fa-calendar-xmark"></i> Capacity Scarcity</div>
+        <p>As a solo founder, you genuinely cannot run more than 3–4 active projects at once. Say so: <em>"I'm currently wrapping up 2 projects and have one slot open this week. If you'd like to secure that, I'd need the kickoff form and advance by [specific date]."</em> Real, honest, effective.</p>
+      </div>
+
+      <div class="hack-card">
+        <div class="hack-card-title"><i class="fa-solid fa-calendar-check"></i> Seasonal Urgency for Indian Markets</div>
+        <p>Use Indian admission and business cycles as real urgency triggers:</p>
+        <ul>
+          <li><strong>Jan–Mar:</strong> "Admission season starts in April — your website needs to be live before parents start searching."</li>
+          <li><strong>Jun–Jul:</strong> "New batch season — get online before the enquiries peak."</li>
+          <li><strong>Oct–Nov:</strong> "Diwali brings a surge in people researching local services — ideal time to go live."</li>
+          <li><strong>Dec:</strong> "January is the #1 month for new business decisions — get your website ready now."</li>
+        </ul>
+      </div>
+
+      <div class="hack-card">
+        <div class="hack-card-title"><i class="fa-solid fa-stopwatch"></i> The 3-Day Proposal Window</div>
+        <p>Every proposal should include: <em>"This proposal is valid for 3 days as slots fill quickly. I can hold your slot until [Date]. After that, I'll need to open it for other enquiries."</em> This is honest — you do have other leads — and creates a natural closing window without hard pressure.</p>
+      </div>
+    </div>
+
+    <!-- POSITIONING -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-chess-king"></i> Market Positioning — How to Be the Obvious Choice</h4>
+
+      <div class="hack-card">
+        <div class="hack-card-title"><i class="fa-solid fa-crosshairs"></i> Niche Positioning vs. Generalist</div>
+        <p>Most web designers say "I build websites for businesses." You should say: <strong>"I build conversion-focused websites for coaching institutes and educational businesses across India."</strong> This niche positioning means:</p>
+        <ul>
+          <li>Coaching institute owners feel you "get" their world</li>
+          <li>You can reference case studies from their exact industry</li>
+          <li>You command higher prices (specialist premium)</li>
+          <li>Referrals happen naturally within the niche network</li>
+        </ul>
+      </div>
+
+      <div class="hack-card">
+        <div class="hack-card-title"><i class="fa-solid fa-user-tie"></i> The "IIT Founder" Positioning (Use Carefully)</div>
+        <p>Being a BSc CSDA student at IIT Patna is a trust signal — especially with educated clients (schools, coaching institutes, clinics). Use it once, naturally: <em>"I'm Raunak — I'm currently at IIT Patna studying data science, which gives me a strong technical foundation for building fast, optimised sites."</em> Never lead with it. Let it surface naturally as a credibility layer.</p>
+      </div>
+
+      <div class="hack-card">
+        <div class="hack-card-title"><i class="fa-solid fa-trophy"></i> The "Proof First" Pitch for Cold Leads</div>
+        <p>For cold DMs, don't pitch features — pitch results: <em>"One of my recent clients, a coaching institute in [city], got 14 WhatsApp enquiries in their first week online. Happy to share what we built for them."</em> Evidence opens doors. Credentials get you in. Results close.</p>
+      </div>
+
+      <div class="hack-card">
+        <div class="hack-card-title"><i class="fa-solid fa-handshake-simple"></i> The Competitive Wedge</div>
+        <p>When a prospect says they're comparing you with other agencies, use this: <em>"Happy to be compared! A few things I'd ask any agency: Do you get to talk directly to the person building your site? Is the delivery timeline in writing? Is the second payment genuinely held until you approve the site? We say yes to all three — and most can't."</em></p>
+      </div>
+    </div>
+
+    <!-- INSTAGRAM HACKS -->
+    <div class="step-block">
+      <h4><i class="fa-brands fa-instagram"></i> Instagram Content Hacks for Lead Generation</h4>
+
+      <div class="hack-card">
+        <div class="hack-card-title"><i class="fa-solid fa-film"></i> The Before/After Reel Formula</div>
+        <ul>
+          <li><strong>0–3 sec:</strong> Show the "before" — bad website, no website, generic template. Add text: "This was costing them leads daily."</li>
+          <li><strong>3–7 sec:</strong> Transition to the "after" — your build. Make it smooth.</li>
+          <li><strong>7–10 sec:</strong> Show the WhatsApp button, mobile view, speed score.</li>
+          <li><strong>Caption:</strong> "Built in 7 days. [Business type] in [City]. DM me 'WEBSITE' if you want this." Simple CTA.</li>
+          <li><strong>Result:</strong> Reels like this regularly generate 2–5 DMs per post.</li>
+        </ul>
+      </div>
+
+      <div class="hack-card">
+        <div class="hack-card-title"><i class="fa-solid fa-scroll"></i> Carousel Post Formats That Convert</div>
+        <ul>
+          <li><strong>"5 reasons your [coaching institute] website isn't getting enquiries"</strong> — slides 1–5 each with one reason, slide 6 with your CTA</li>
+          <li><strong>"What ₹12,999 gets you at SparkEdge" </strong> — itemised value breakdown per slide</li>
+          <li><strong>"Client result: [Business] — before, after, outcome"</strong> — story format, ends with referral ask</li>
+          <li><strong>"Questions to ask before hiring a web designer"</strong> — educational, positions you as expert, attracts warm leads</li>
+        </ul>
+      </div>
+
+      <div class="hack-card">
+        <div class="hack-card-title"><i class="fa-solid fa-comment-dots"></i> The DM Trigger Comment Strategy</div>
+        <p>On every Instagram post, pin a comment: <em>"💬 DM me 'WEBSITE' and I'll send you a free audit of your current site (or a free wireframe idea if you don't have one yet)."</em> This creates a clear entry point. When someone DMs "WEBSITE," reply with your first-contact template immediately.</p>
+      </div>
+    </div>
+
+    <!-- LEAD REVIVAL -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-heart-pulse"></i> Dead Lead Revival Hacks</h4>
+      <p>Leads that went quiet aren't dead — they're just waiting for the right trigger. Use these specific techniques:</p>
+
+      <div class="hack-card">
+        <div class="hack-card-title"><i class="fa-solid fa-newspaper"></i> The "I Thought of You" Message</div>
+        <div class="msg-template" style="margin-top:10px;">
+          <span class="template-label">📲 Dead Lead Revival — "Thought of You"</span>
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+Hi [Name]! It's Raunak from SparkEdge — we spoke a while back.
+
+I just finished a website for a [similar business type] in [nearby city] and thought of you — it came out really well and the client is already seeing enquiries.
+
+Sharing the link in case it sparks any ideas: [project link if public]
+
+If you're still thinking about getting a site done, happy to jump on a quick call — no pressure at all 🙂
+        </div>
+      </div>
+
+      <div class="hack-card">
+        <div class="hack-card-title"><i class="fa-solid fa-gift"></i> The "Free Audit" Revival</div>
+        <div class="msg-template" style="margin-top:10px;">
+          <span class="template-label">📲 Dead Lead Revival — Free Audit Offer</span>
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+Hi [Name]! Quick one —
+
+I was doing some research and ran a quick check on how easy it is to find [their business type] in [their city] on Google. Honestly, the gap is bigger than I expected.
+
+I put together a 3-point note on what's costing businesses like yours leads right now. Happy to share it — free, no strings. Want me to send it over?
+        </div>
+      </div>
+    </div>
+
+    <!-- REFERRAL AMPLIFICATION -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-network-wired"></i> Referral Amplification Hacks</h4>
+      <ol class="ranked-list">
+        <li><strong>Ask for a referral at peak excitement — not at payment.</strong> The moment a client sees their live site for the first time is your best referral window. That's when they're most likely to share it organically anyway. Catch that energy.</li>
+        <li><strong>Give them a pre-written message to forward.</strong> "SparkEdge built my website — Raunak is excellent, super professional and very fast. Contact: wa.me/919142450715" — send this to them and say "feel free to forward this to anyone who needs a site." Most will.</li>
+        <li><strong>Build a referral "leaderboard" in your head.</strong> Know which 3 clients have the widest network. A coaching institute principal knows 50+ other educators. A clinic owner knows other clinic owners. Invest extra care in these relationships.</li>
+        <li><strong>Create a "Partners" tier.</strong> For clients who refer 3+ people, give them unlimited minor updates for 3 months free. This costs you almost nothing and creates a super-referrer who actively sells for you.</li>
+        <li><strong>LinkedIn outreach hack:</strong> When a client launches, ask them to change their LinkedIn intro to include their website link. Their connections see it. Warm impression of SparkEdge, zero effort from you.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ════════════════════════════════════════════
+       INTERNAL OPS HACKS
+  ═══════════════════════════════════════════════ -->
+  <div id="internal-ops">
+    <div class="phase-header" style="border-left-color:#f59e0b;">
+      <div class="phase-num" style="background:#f59e0b;"><i class="fa-solid fa-gears"></i></div>
+      <div class="phase-header-text">
+        <h2><i class="fa-solid fa-screwdriver-wrench" style="color:#f59e0b;margin-right:10px;"></i>Internal Operations Hacks</h2>
+        <p>Workflow automation, tracking systems, and behind-the-scenes efficiency unlocks.</p>
+      </div>
+    </div>
+
+    <!-- TRACKING -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-table-cells"></i> The Master Tracking Sheet Setup</h4>
+      <p>Open Google Sheets → new sheet titled <strong>"SparkEdge Operations"</strong>. Create these tabs:</p>
+      <ul class="checklist">
+        <li><i class="fa-solid fa-check"></i><strong>📋 Active Projects</strong> — Client | Package | Advance Paid | Balance | Start | Delivery | Status | Notes</li>
+        <li><i class="fa-solid fa-check"></i><strong>💰 Revenue Tracker</strong> — Month | Projects Delivered | Gross Revenue | Add-On Revenue | Referral Payouts | Net</li>
+        <li><i class="fa-solid fa-check"></i><strong>📣 Outreach Log</strong> — Date | Platform | Name | Business | Message Sent | Response | Status</li>
+        <li><i class="fa-solid fa-check"></i><strong>🔁 Follow-Up Queue</strong> — Lead Name | Last Contact | Next Follow-Up Date | Notes</li>
+        <li><i class="fa-solid fa-check"></i><strong>⭐ Testimonials</strong> — Client | Date | Testimonial Text | Used On (website/Instagram/proposal)</li>
+      </ul>
+      <div class="info-box">
+        <p><strong>Hack:</strong> Use conditional formatting — colour Active rows green, Delivered rows grey, At-Risk (delayed) rows red. You'll see your entire pipeline at a glance in under 3 seconds.</p>
+      </div>
+    </div>
+
+    <!-- AUTO REMINDERS -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-bell"></i> The Follow-Up Reminder System (Zero Memory Required)</h4>
+      <div class="hack-card">
+        <div class="hack-card-title"><i class="fa-brands fa-google"></i> Google Calendar Reminder Protocol</div>
+        <p>The moment a client says "I'll think about it" — open Google Calendar and set <strong>3 reminders</strong>:</p>
+        <ul>
+          <li>📅 +3 days: "Follow up [Name] — [Business]" with their WhatsApp number in description</li>
+          <li>📅 +7 days: "Follow up [Name] — second touch"</li>
+          <li>📅 +14 days: "Final close or archive — [Name]"</li>
+        </ul>
+        <p style="margin-top:10px;">When a client confirms, set:</p>
+        <ul>
+          <li>📅 Project delivery date: "Deliver [Name] website — collect balance"</li>
+          <li>📅 +7 days post-launch: "Testimonial request — [Name]"</li>
+          <li>📅 +30 days post-launch: "Check-in + upsell — [Name]"</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- WHATSAPP BUSINESS HACKS -->
+    <div class="step-block">
+      <h4><i class="fa-brands fa-whatsapp"></i> WhatsApp Business Setup Hacks</h4>
+      <ul class="checklist">
+        <li><i class="fa-solid fa-check"></i><strong>Business Profile:</strong> Set your name as "Raunak Karn — SparkEdge Web Design" so clients see your brand when they save you</li>
+        <li><i class="fa-solid fa-check"></i><strong>Status rotation (weekly):</strong> Mon — project progress screenshot · Wed — before/after · Fri — client testimonial · Weekend — personal (builds humanness)</li>
+        <li><i class="fa-solid fa-check"></i><strong>Away message (nights 10PM–8AM):</strong> "Hi! I'll get back to you by 9AM. — Raunak, SparkEdge" — sets expectations, looks professional</li>
+        <li><i class="fa-solid fa-check"></i><strong>Labels:</strong> Label every contact — 🔴 Hot Lead · 🟡 Warm Lead · 🟢 Active Client · ✅ Delivered · 🔵 Past Client · ⭐ Referral Partner</li>
+        <li><i class="fa-solid fa-check"></i><strong>Catalog:</strong> Add your 3 packages with prices and features as a WhatsApp Catalog — prospects can browse before they even message you</li>
+      </ul>
+    </div>
+
+    <!-- QUALITY ASSURANCE -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-shield-check"></i> Quality Assurance — Your Internal QA Checklist</h4>
+      <p>Run this on every project before sending the preview link to the client. Print it or duplicate it per project in Google Docs.</p>
+      <div class="grid-2" style="margin-top:16px;">
+        <div class="mini-card">
+          <h5><i class="fa-solid fa-mobile-screen"></i> Mobile & Performance</h5>
+          <ul style="padding-left:16px;list-style:disc;margin-top:8px;">
+            <li style="color:var(--muted);font-size:0.84rem;line-height:1.8;">Test on Chrome mobile emulator (5 device sizes)</li>
+            <li style="color:var(--muted);font-size:0.84rem;line-height:1.8;">Run Lighthouse — score 85+ for Performance</li>
+            <li style="color:var(--muted);font-size:0.84rem;line-height:1.8;">All images under 200KB (use Squoosh.app)</li>
+            <li style="color:var(--muted);font-size:0.84rem;line-height:1.8;">No horizontal scroll on mobile</li>
+            <li style="color:var(--muted);font-size:0.84rem;line-height:1.8;">Font sizes readable without zoom</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <h5><i class="fa-solid fa-link"></i> Links & Forms</h5>
+          <ul style="padding-left:16px;list-style:disc;margin-top:8px;">
+            <li style="color:var(--muted);font-size:0.84rem;line-height:1.8;">WhatsApp CTA links to correct number</li>
+            <li style="color:var(--muted);font-size:0.84rem;line-height:1.8;">Contact form sends to client's email</li>
+            <li style="color:var(--muted);font-size:0.84rem;line-height:1.8;">All nav links work on all pages</li>
+            <li style="color:var(--muted);font-size:0.84rem;line-height:1.8;">No 404 errors (check each URL)</li>
+            <li style="color:var(--muted);font-size:0.84rem;line-height:1.8;">Social links open correctly</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <h5><i class="fa-solid fa-search"></i> SEO Basics</h5>
+          <ul style="padding-left:16px;list-style:disc;margin-top:8px;">
+            <li style="color:var(--muted);font-size:0.84rem;line-height:1.8;">Unique title tag per page (includes location)</li>
+            <li style="color:var(--muted);font-size:0.84rem;line-height:1.8;">Meta description set (150–160 chars)</li>
+            <li style="color:var(--muted);font-size:0.84rem;line-height:1.8;">H1 tag present and keyword-rich</li>
+            <li style="color:var(--muted);font-size:0.84rem;line-height:1.8;">Alt text on all images</li>
+            <li style="color:var(--muted);font-size:0.84rem;line-height:1.8;">Sitemap submitted to Search Console</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <h5><i class="fa-solid fa-eye"></i> Visual Polish</h5>
+          <ul style="padding-left:16px;list-style:disc;margin-top:8px;">
+            <li style="color:var(--muted);font-size:0.84rem;line-height:1.8;">Favicon set (client's logo or initials)</li>
+            <li style="color:var(--muted);font-size:0.84rem;line-height:1.8;">Consistent brand colours throughout</li>
+            <li style="color:var(--muted);font-size:0.84rem;line-height:1.8;">No placeholder text left ("Lorem ipsum")</li>
+            <li style="color:var(--muted);font-size:0.84rem;line-height:1.8;">All typos caught (run Grammarly)</li>
+            <li style="color:var(--muted);font-size:0.84rem;line-height:1.8;">Smooth scroll and hover effects work</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- REVENUE PROTECTION -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-vault"></i> Revenue Protection Rules</h4>
+      <div class="do-dont">
+        <div class="do-card">
+          <h6><i class="fa-solid fa-lock"></i> Protect Your Money</h6>
+          <ul>
+            <li>Always get 50% before writing a single line of code</li>
+            <li>Keep all source files until final payment is received</li>
+            <li>Confirm every scope change in writing before doing it</li>
+            <li>For add-ons, get payment before starting the add-on</li>
+            <li>Save every payment screenshot in the client folder</li>
+            <li>Never give out GitHub repo access without full payment</li>
+          </ul>
+        </div>
+        <div class="dont-card">
+          <h6><i class="fa-solid fa-triangle-exclamation"></i> Scope Creep Killers</h6>
+          <ul>
+            <li>Never agree verbally to "just one more thing"</li>
+            <li>When asked for extra pages, quote ₹1,500/page immediately</li>
+            <li>Revisions = content changes. Design overhaul = new quote</li>
+            <li>Set revision rounds in writing: "1 round of consolidated feedback"</li>
+            <li>Don't start revision round 2 without agreeing on scope</li>
+            <li>If a project goes 2 weeks over, charge a delay fee</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- MONTHLY REVIEW -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-magnifying-glass-chart"></i> The 30-Minute Monthly Business Review</h4>
+      <p>Do this on the last Sunday of every month. Answer each question in writing (keep a running Google Doc):</p>
+      <ol class="ranked-list">
+        <li><strong>Revenue:</strong> Total collected this month? Vs. last month? Vs. target? Where's the gap?</li>
+        <li><strong>Pipeline:</strong> How many active leads right now? How many proposals outstanding? Close rate this month?</li>
+        <li><strong>Delivery quality:</strong> Any client complaints or revision overruns this month? What caused them? What changes next time?</li>
+        <li><strong>Growth levers:</strong> Did I raise prices? Add a new add-on? Build a new template? Launch a case study?</li>
+        <li><strong>Next month goal:</strong> Projects target, revenue target, one new thing to try (new channel, new service, new system).</li>
+      </ol>
+      <div class="insight-box">
+        <p><strong>SparkEdge growth formula:</strong> Every month, get <strong>1 new client channel</strong> working better, deliver <strong>1 more project</strong> than last month, and increase your <strong>average deal size by ₹500</strong>. Do this consistently and ₹1L/month is inevitable — not aspirational.</p>
+      </div>
+    </div>
+
+    <!-- PROMPT: BUSINESS REVIEW -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-robot"></i> AI Prompt — Monthly Business Review Analysis</h4>
+      <p>Paste your month's data and get strategic recommendations instantly.</p>
+      <div class="prompt-box">
+        <span class="prompt-label"><i class="fa-solid fa-robot"></i> AI Prompt — Monthly Review</span>
+        <button class="prompt-copy-btn" onclick="copyText(this)">Copy</button>
+        <p>I'm the founder of SparkEdge, a solo web design agency in India. Here's my monthly data:
+
+Month: [Month, Year]
+Revenue collected: ₹[X]
+Projects delivered: [N]
+New leads received: [N]
+Proposals sent: [N]
+Proposals closed: [N]
+Outreach DMs sent: [N]
+Add-ons sold: [List]
+
+Last month revenue: ₹[X]
+Monthly target: ₹[X]
+
+Key challenges this month: [describe]
+What worked well: [describe]
+
+Based on this data:
+1. Calculate my close rate, average deal size, and revenue per lead
+2. Identify my 3 biggest leverage points to grow next month
+3. Flag any warning signs (e.g., low close rate, high effort/low revenue)
+4. Give me 3 specific actions for next month — prioritised by impact
+5. Suggest one new thing to test based on my current stage
+
+Be direct and specific. I want analysis, not generic advice.</p>
+      </div>
+    </div>
+
+    <!-- PROMPT: CLIENT HEALTH CHECK -->
+    <div class="step-block">
+      <h4><i class="fa-solid fa-heartbeat"></i> AI Prompt — Client Relationship Health Check</h4>
+      <p>Use this when a client relationship feels strained or a project is going off-track.</p>
+      <div class="prompt-box">
+        <span class="prompt-label"><i class="fa-solid fa-robot"></i> AI Prompt — Client Recovery</span>
+        <button class="prompt-copy-btn" onclick="copyText(this)">Copy</button>
+        <p>I'm running a web design agency called SparkEdge and I have a client situation that needs careful handling.
+
+Client: [Name], [Business Type]
+Package: [Package]
+Current situation: [Describe what's happened — delayed delivery, client is unhappy, miscommunication, scope creep, etc.]
+Their last message/reaction: [Paste or describe]
+What I've done so far: [Your actions]
+What outcome I want: [Complete the project successfully / retain them for future work / resolve without refund / other]
+
+Please:
+1. Analyse what likely went wrong from the client's perspective
+2. Write a WhatsApp message I can send right now to de-escalate and regain trust
+3. Suggest 2–3 concrete actions to fix the situation operationally
+4. Give me a long-term lesson to prevent this type of issue in future projects
+
+Tone for the message: Calm, accountable, professional — not defensive or over-apologetic.</p>
+      </div>
+    </div>
+
+  </div><!-- end internal-ops -->
+
+  <div class="section-divider"></div>
+
+  <!-- QUICK REFERENCE -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px 36px;margin-bottom:40px;">
+    <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700;margin-bottom:20px;"><i class="fa-solid fa-bolt" style="color:var(--primary);margin-right:6px;"></i> Quick Reference — Numbers to Remember</div>
+    <div class="grid-2">
+      <div>
+        <ul class="checklist">
+          <li><i class="fa-solid fa-check"></i><strong>Reply speed:</strong> Under 30 min during business hours</li>
+          <li><i class="fa-solid fa-check"></i><strong>Payment split:</strong> 50% advance · 50% on delivery</li>
+          <li><i class="fa-solid fa-check"></i><strong>Starter:</strong> ₹6,999 · 1 page · 3 days</li>
+          <li><i class="fa-solid fa-check"></i><strong>Growth (push this):</strong> ₹12,999 · 5 pages · 7 days</li>
+          <li><i class="fa-solid fa-check"></i><strong>Authority:</strong> ₹19,999 · 7 pages · 14 days</li>
+          <li><i class="fa-solid fa-check"></i><strong>Referral bonus:</strong> ₹500–₹2,000 per referral</li>
+          <li><i class="fa-solid fa-check"></i><strong>Add-on avg revenue:</strong> ₹1,500 per project</li>
+          <li><i class="fa-solid fa-check"></i><strong>Proposal window:</strong> Valid 3 days after sending</li>
+        </ul>
+      </div>
+      <div>
+        <ul class="checklist">
+          <li><i class="fa-solid fa-check"></i><strong>Outreach goal:</strong> 10 DMs/day minimum</li>
+          <li><i class="fa-solid fa-check"></i><strong>Follow-up sequence:</strong> Day 3 · Day 7 · Day 14</li>
+          <li><i class="fa-solid fa-check"></i><strong>Testimonial ask:</strong> Day 7 after launch</li>
+          <li><i class="fa-solid fa-check"></i><strong>Upsell check-in:</strong> Day 30 after launch</li>
+          <li><i class="fa-solid fa-check"></i><strong>Progress updates:</strong> Every 2 days during project</li>
+          <li><i class="fa-solid fa-check"></i><strong>Monthly target:</strong> 5–7 projects = ₹65K–₹1L</li>
+          <li><i class="fa-solid fa-check"></i><strong>Max solo capacity:</strong> 3–4 active projects at once</li>
+          <li><i class="fa-solid fa-check"></i><strong>Lighthouse target:</strong> 85+ score before delivery</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="margin-top:24px;border-top:1px solid var(--border);padding-top:20px;">
+      <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700;margin-bottom:14px;"><i class="fa-solid fa-phone" style="color:var(--primary);margin-right:6px;"></i> Emergency Contacts & Links</div>
+      <div class="grid-3" style="margin-top:0;">
+        <div class="mini-card">
+          <h5><i class="fa-brands fa-whatsapp"></i> SparkEdge WhatsApp</h5>
+          <p>+91 91424 50715 · wa.me/919142450715</p>
+        </div>
+        <div class="mini-card">
+          <h5><i class="fa-solid fa-envelope"></i> Agency Email</h5>
+          <p>sparkedge555@gmail.com</p>
+        </div>
+        <div class="mini-card">
+          <h5><i class="fa-brands fa-github"></i> Portfolio</h5>
+          <p>sparkedge-agency.github.io/projects.html</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end guide-wrap -->
+
+<footer>
+  <p><i class="fa-solid fa-shield-halved" style="color:var(--primary);margin-right:6px;"></i>SparkEdge Client Engine v2.0 <span style="color:var(--primary);">+ Enhanced Edition</span> · <strong>Internal Use Only</strong> · Not for Client Distribution</p>
+  <p style="margin-top:8px;"><i class="fa-solid fa-user" style="color:var(--muted);margin-right:5px;"></i>Raunak Karn · <i class="fa-brands fa-whatsapp" style="color:#22c55e;margin-right:4px;margin-left:6px;"></i>+91 91424 50715 · <i class="fa-solid fa-envelope" style="color:var(--muted);margin-right:4px;margin-left:6px;"></i>sparkedge555@gmail.com</p>
+</footer>
+
+<script>
+// Scroll progress
+window.addEventListener('scroll', () => {
+  const el = document.getElementById('scroll-progress');
+  const h = document.documentElement;
+  el.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight) * 100) + '%';
+}, { passive: true });
+
+// Copy function for both templates and prompts
+function copyText(btn) {
+  const parent = btn.closest('.msg-template, .prompt-box');
+  const labelEl = parent.querySelector('.template-label, .prompt-label');
+  const pEl = parent.querySelector('p');
+
+  let text = '';
+  if (pEl) {
+    text = pEl.innerText.trim();
+  } else {
+    text = parent.innerText
+      .replace(labelEl ? labelEl.innerText : '', '')
+      .replace(btn.innerText, '')
+      .trim();
+  }
+
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.innerText;
+    btn.innerText = 'Copied!';
+    btn.style.background = '#22c55e';
+    btn.style.color = '#fff';
+    btn.style.borderColor = '#22c55e';
+    setTimeout(() => {
+      btn.innerText = orig;
+      btn.style.background = '';
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }, 2000);
+  });
+}
+</script>
+
+</body>
+</html>

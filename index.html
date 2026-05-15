@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SparkEdge — Client Portal</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+</head>
+<body class="login-page">
+
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-1"></div>
+  <div class="bg-glow glow-2"></div>
+
+  <div class="login-wrap">
+    <div class="login-card">
+
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+            <polygon points="14,2 26,20 2,20" fill="url(#lg)"/>
+            <defs>
+              <linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#FF6B35"/>
+                <stop offset="100%" style="stop-color:#FF3CAC"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <span class="brand-name">SparkEdge</span>
+      </div>
+
+      <h1 class="login-title">Client Portal</h1>
+      <p class="login-sub">Enter your unique Ticket ID to access your private project dashboard.</p>
+
+      <div class="input-group">
+        <label for="ticketInput">Your Ticket ID</label>
+        <input
+          type="text"
+          id="ticketInput"
+          placeholder="e.g. SE-001"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+
+      <button class="btn-primary" onclick="accessPortal()">
+        Access My Dashboard
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <p id="errorMsg" class="error-msg" style="display:none">
+        ⚠️ Invalid Ticket ID. Please check with your project manager.
+      </p>
+
+      <div class="login-footer">
+        Need help? &nbsp;<a href="mailto:sparkedge555@gmail.com">sparkedge555@gmail.com</a>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('ticketInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') accessPortal();
+    });
+
+    function accessPortal() {
+      const input    = document.getElementById('ticketInput').value.trim().toUpperCase();
+      const errorMsg = document.getElementById('errorMsg');
+
+      /* ──────────────────────────────────────────────────────────
+         ADD NEW TICKET IDs HERE each time you onboard a client.
+         Example: add 'SE-004' when you create SE-004.html
+      ────────────────────────────────────────────────────────── */
+      const validTickets = ['SE-001', 'SE-002', 'SE-003', ];
+
+      if (validTickets.includes(input)) {
+        errorMsg.style.display = 'none';
+        window.location.href = `${input}.html`;   /* flat folder — files are in same folder */
+      } else {
+        errorMsg.style.display = 'block';
+        const inp = document.getElementById('ticketInput');
+        inp.classList.add('shake');
+        setTimeout(() => inp.classList.remove('shake'), 500);
+      }
+    }
+  </script>
+
+</body>
+</html>

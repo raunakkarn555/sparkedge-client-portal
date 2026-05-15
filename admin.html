@@ -1,0 +1,3275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SparkEdge — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#080810;--bg-card:#0E0E1A;--bg-raised:#141422;--bg-hover:#1A1A2A;
+  --border:#1E1E30;--border-bright:#2A2A40;
+  --accent:#FF6B35;--accent2:#FF3CAC;--gold:#FFB347;
+  --purple:#7B5EA7;--blue:#3B82F6;--green:#22C55E;--red:#EF4444;--yellow:#F59E0B;
+  --text:#F0F0FA;--text-muted:#7A7A9A;--text-dim:#3A3A5A;
+  --radius:12px;--radius-sm:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border-bright);border-radius:4px;}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  position:fixed;left:0;top:0;bottom:0;width:220px;
+  background:var(--bg-card);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;z-index:50;
+}
+.sidebar-brand{
+  padding:22px 20px 18px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.sb-icon{
+  width:34px;height:34px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.sb-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text);}
+.sb-tag{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);background:rgba(255,107,53,.12);border:1px solid rgba(255,107,53,.2);padding:2px 7px;border-radius:4px;}
+
+.sidebar-nav{padding:16px 12px;display:flex;flex-direction:column;gap:4px;flex:1;overflow-y:auto;}
+.nav-section-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);padding:10px 8px 6px;}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 10px;border-radius:var(--radius-sm);
+  font-size:13px;font-weight:500;color:var(--text-muted);
+  cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left;
+}
+.nav-item:hover{background:var(--bg-raised);color:var(--text);}
+.nav-item.active{background:rgba(255,107,53,.12);color:var(--accent);border:1px solid rgba(255,107,53,.2);}
+.nav-item-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;}
+
+.sidebar-footer{padding:14px 12px;border-top:1px solid var(--border);}
+.sidebar-footer a{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);text-decoration:none;padding:7px 10px;border-radius:8px;transition:color .15s;}
+.sidebar-footer a:hover{color:var(--text);}
+
+/* ── MAIN AREA ── */
+.main{margin-left:220px;min-height:100vh;display:flex;flex-direction:column;}
+.topbar{
+  padding:16px 28px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(8,8,16,.8);backdrop-filter:blur(12px);
+  position:sticky;top:0;z-index:40;
+}
+.topbar-left{display:flex;align-items:center;gap:12px;}
+.page-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;}
+.page-sub{font-size:12px;color:var(--text-muted);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
+.btn-primary:hover{opacity:.88;}
+.btn-secondary{background:var(--bg-raised);border:1px solid var(--border);color:var(--text-muted);}
+.btn-secondary:hover{border-color:var(--border-bright);color:var(--text);}
+.btn-ghost{background:none;border:1px solid var(--border);color:var(--text-muted);}
+.btn-ghost:hover{background:var(--bg-raised);color:var(--text);}
+.btn-green{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#22C55E;}
+.btn-green:hover{background:rgba(34,197,94,.22);}
+.btn-red{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#EF4444;}
+.btn-red:hover{background:rgba(239,68,68,.2);}
+.btn-sm{padding:5px 11px;font-size:12px;}
+
+/* ── PAGE VIEWS ── */
+.page-view{display:none;padding:28px;animation:fadeIn .2s ease;}
+.page-view.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+/* ── STATS ROW ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;}
+.stat-card-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;}
+.stat-card-val{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#fff;line-height:1;}
+.stat-card-sub{font-size:12px;color:var(--text-muted);margin-top:5px;}
+
+/* ── TICKETS TABLE ── */
+.tickets-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.tickets-header h2{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;}
+.ticket-list{display:flex;flex-direction:column;gap:10px;}
+.ticket-card{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:18px 20px;
+  display:grid;grid-template-columns:80px 1fr auto auto auto;
+  align-items:center;gap:16px;
+  cursor:pointer;transition:all .15s;
+}
+.ticket-card:hover{border-color:var(--border-bright);background:var(--bg-raised);}
+.ticket-id{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--accent);}
+.ticket-info .ti-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.ticket-info .ti-project{font-size:12px;color:var(--text-muted);}
+.ticket-progress-wrap{width:120px;}
+.ticket-progress-bar{height:4px;background:var(--bg-raised);border-radius:4px;overflow:hidden;margin-top:5px;}
+.ticket-progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));border-radius:4px;transition:width .5s;}
+.ticket-progress-pct{font-size:11px;color:var(--text-muted);}
+.status-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;}
+.status-pill.not-started{background:rgba(120,120,140,.12);border:1px solid rgba(120,120,140,.25);color:#8A8A9A;}
+.status-pill.in-progress{background:rgba(255,107,53,.12);border:1px solid rgba(255,107,53,.3);color:var(--accent);}
+.status-pill.completed{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#22C55E;}
+.status-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+.ticket-actions{display:flex;gap:6px;align-items:center;}
+
+/* ── EDITOR LAYOUT ── */
+.editor-grid{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;}
+.editor-left{display:flex;flex-direction:column;gap:16px;}
+.editor-right{display:flex;flex-direction:column;gap:16px;position:sticky;top:80px;}
+
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.card-header-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;background:rgba(255,107,53,.1);}
+.card-header-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;}
+.card-header-sub{font-size:11px;color:var(--text-muted);margin-top:1px;}
+.card-body{padding:20px;}
+
+/* ── FORM FIELDS ── */
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.field-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field.full{grid-column:1/-1;}
+.field label{font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--text-muted);}
+.field input,.field textarea,.field select{
+  background:var(--bg-raised);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:9px 12px;
+  font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);
+  outline:none;transition:border-color .15s;width:100%;
+}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:rgba(255,107,53,.5);}
+.field textarea{resize:vertical;min-height:60px;line-height:1.5;}
+.field select option{background:var(--bg-card);}
+.field input[type="range"]{padding:4px 0;accent-color:var(--accent);cursor:pointer;}
+.range-display{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--accent);text-align:center;margin-top:4px;}
+
+/* ── SECTION DIVIDER ── */
+.section-divider{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);padding:14px 0 8px;border-bottom:1px solid var(--border);margin-bottom:14px;grid-column:1/-1;}
+
+/* ── STAGE BUILDER ── */
+.stages-list{display:flex;flex-direction:column;gap:8px;}
+.stage-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;}
+.stage-row input,.stage-row select{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;}
+.stage-row input:focus,.stage-row select:focus{border-color:rgba(255,107,53,.4);}
+.stage-row .sr-name{flex:1;}
+.stage-status-select{font-size:11px;padding:5px 8px;}
+.btn-remove{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#EF4444;border-radius:6px;padding:5px 8px;cursor:pointer;font-size:12px;transition:background .15s;}
+.btn-remove:hover{background:rgba(239,68,68,.2);}
+.btn-add-row{display:flex;align-items:center;gap:6px;background:none;border:1px dashed var(--border);border-radius:var(--radius-sm);padding:9px 14px;font-size:12px;color:var(--text-muted);cursor:pointer;width:100%;transition:all .15s;}
+.btn-add-row:hover{border-color:rgba(255,107,53,.4);color:var(--accent);}
+
+/* ── TIMELINE BUILDER ── */
+.timeline-list{display:flex;flex-direction:column;gap:8px;}
+.tl-row{background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;}
+.tl-row-top{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:8px;}
+.tl-row-bottom input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;}
+.tl-row-bottom input:focus{border-color:rgba(255,107,53,.4);}
+.tl-row input,.tl-row select{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;}
+.tl-row input:focus,.tl-row select:focus{border-color:rgba(255,107,53,.4);}
+
+/* ── DELIVERABLES ── */
+.deliv-list{display:flex;flex-direction:column;gap:8px;}
+.deliv-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;}
+.deliv-row input{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;width:100%;}
+.deliv-row input:focus{border-color:rgba(255,107,53,.4);}
+.done-toggle{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted);white-space:nowrap;cursor:pointer;}
+.done-toggle input[type="checkbox"]{accent-color:var(--green);width:14px;height:14px;cursor:pointer;}
+
+/* ── FILES BUILDER ── */
+.files-list{display:flex;flex-direction:column;gap:8px;}
+.file-row{display:grid;grid-template-columns:1fr auto 2fr auto;gap:8px;align-items:center;background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;}
+.file-row input,.file-row select{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;}
+.file-row input:focus,.file-row select:focus{border-color:rgba(255,107,53,.4);}
+
+/* ── DOC TRACKER ── */
+.doc-tracker{display:flex;flex-direction:column;gap:10px;}
+.doc-track-item{display:flex;align-items:center;gap:12px;background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;}
+.doc-track-icon{font-size:18px;width:28px;text-align:center;flex-shrink:0;}
+.doc-track-info{flex:1;}
+.doc-track-name{font-size:13px;font-weight:600;color:var(--text);}
+.doc-track-sub{font-size:11px;color:var(--text-muted);margin-top:1px;}
+.doc-track-toggle{position:relative;width:38px;height:20px;flex-shrink:0;}
+.doc-track-toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:var(--border);border-radius:20px;cursor:pointer;transition:.2s;}
+.toggle-slider::before{content:'';position:absolute;left:3px;top:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:.2s;}
+.doc-track-toggle input:checked+.toggle-slider{background:var(--green);}
+.doc-track-toggle input:checked+.toggle-slider::before{transform:translateX(18px);}
+
+/* ── WA BUTTON ── */
+.wa-block{display:flex;flex-direction:column;gap:8px;}
+.wa-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px;border-radius:var(--radius-sm);
+  background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.3);
+  color:#25D366;font-size:13px;font-weight:700;
+  text-decoration:none;cursor:pointer;transition:background .15s;
+}
+.wa-btn:hover{background:rgba(37,211,102,.2);}
+.wa-input{display:flex;gap:8px;align-items:center;}
+.wa-input input{flex:1;background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;color:var(--text);outline:none;font-family:'DM Sans',sans-serif;}
+.wa-input input:focus{border-color:rgba(37,211,102,.4);}
+
+/* ── GENERATE SECTION ── */
+.generate-section{background:linear-gradient(135deg,rgba(255,107,53,.08),rgba(255,60,172,.04));border:1px solid rgba(255,107,53,.2);border-radius:var(--radius);padding:20px;}
+.gen-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;margin-bottom:6px;}
+.gen-sub{font-size:12px;color:var(--text-muted);line-height:1.6;margin-bottom:16px;}
+.gen-steps{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.gen-step{display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--text-muted);line-height:1.5;}
+.gen-step-num{width:18px;height:18px;background:var(--accent);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0;margin-top:1px;}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;width:100%;max-width:520px;overflow:hidden;animation:modalIn .2s ease;max-height:90vh;overflow-y:auto;}
+@keyframes modalIn{from{transform:scale(.95);opacity:0;}to{transform:scale(1);opacity:1;}}
+.modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;}
+.modal-close{background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;line-height:1;padding:2px 6px;border-radius:6px;}
+.modal-close:hover{background:var(--bg-raised);color:var(--text);}
+.modal-body{padding:24px;display:flex;flex-direction:column;gap:14px;}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:24px;right:24px;
+  background:var(--bg-card);border:1px solid var(--green);
+  border-radius:10px;padding:12px 18px;
+  font-size:13px;font-weight:600;color:var(--green);
+  display:flex;align-items:center;gap:8px;
+  transform:translateY(80px);opacity:0;
+  transition:all .3s ease;z-index:300;
+}
+.toast.show{transform:none;opacity:1;}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:60px 20px;color:var(--text-dim);}
+.empty-state .es-icon{font-size:40px;margin-bottom:12px;}
+.empty-state .es-text{font-size:14px;}
+
+/* ── REFERRAL SYSTEM ── */
+.referral-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.referral-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+.ref-stat{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;}
+.ref-stat-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px;}
+.ref-stat-val{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#fff;}
+.voucher-list{display:flex;flex-direction:column;gap:10px;}
+.voucher-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:14px;}
+.voucher-card.used{opacity:.55;}
+.vc-code{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--accent);letter-spacing:2px;}
+.vc-meta{font-size:12px;color:var(--text-muted);margin-top:3px;}
+.vc-discount{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--gold);}
+.vc-pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;}
+.vc-pill.active{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#22C55E;}
+.vc-pill.used{background:rgba(120,120,140,.1);border:1px solid rgba(120,120,140,.2);color:#8A8A9A;}
+.vc-pill.expired{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#EF4444;}
+.vc-actions{display:flex;gap:6px;}
+.ref-applied-banner{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:#22C55E;margin-top:10px;display:flex;align-items:center;gap:8px;}
+
+/* ── HOW TO BOX ── */
+.howto{background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:var(--radius);padding:16px 18px;}
+.howto-title{font-size:12px;font-weight:700;color:#3B82F6;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.howto ol{padding-left:18px;display:flex;flex-direction:column;gap:7px;}
+.howto li{font-size:12px;color:var(--text-muted);line-height:1.6;}
+.howto code{background:var(--bg-raised);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:11px;color:var(--accent);font-family:monospace;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .sidebar{display:none;}
+  .main{margin-left:0;}
+  .editor-grid{grid-template-columns:1fr;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .ticket-card{grid-template-columns:60px 1fr;}.ticket-card>*:nth-child(n+3){display:none;}
+}
+/* ── SHAKE ── */
+@keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-6px);}40%{transform:translateX(6px);}60%{transform:translateX(-4px);}80%{transform:translateX(4px);}}
+.shake{animation:shake .4s ease;}
+/* ── DISCOUNT SECTION ── */
+.discount-block{background:rgba(255,179,71,.06);border:1px solid rgba(255,179,71,.2);border-radius:var(--radius-sm);padding:14px;margin-top:12px;}
+.discount-block-title{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.disc-type-btn{flex:1;padding:7px;border-radius:8px;border:1px solid var(--border);background:var(--bg-raised);font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer;transition:all .15s;}
+.disc-type-btn.active{background:rgba(255,179,71,.15);border-color:rgba(255,179,71,.4);color:var(--gold);}
+/* ── WORKFLOW PAGE ── */
+.workflow-step{display:flex;gap:16px;padding:18px 20px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;align-items:flex-start;}
+.wf-num{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff;flex-shrink:0;}
+.wf-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px;}
+.wf-desc{font-size:12px;color:var(--text-muted);line-height:1.7;}
+.wf-docs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.wf-doc-pill{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:600;color:#3B82F6;}
+.wf-timing{font-size:11px;color:var(--gold);background:rgba(255,179,71,.1);border:1px solid rgba(255,179,71,.2);border-radius:5px;padding:2px 8px;margin-top:6px;display:inline-block;}
+/* ── GUIDE / SETTINGS ── */
+.guide-section{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;overflow:hidden;}
+.guide-section-hdr{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.guide-section-body{padding:20px;font-size:13px;color:var(--text-muted);line-height:1.8;}
+.guide-section-body strong{color:var(--text);}
+.guide-section-body code{background:var(--bg-raised);border:1px solid var(--border);border-radius:4px;padding:1px 7px;font-size:11px;color:var(--accent);font-family:monospace;}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);}
+.settings-row:last-child{border-bottom:none;}
+.settings-label{font-size:13px;font-weight:600;}
+.settings-sub{font-size:12px;color:var(--text-muted);margin-top:2px;}
+.settings-input{background:var(--bg-raised);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;width:220px;}
+.settings-input:focus{border-color:rgba(255,107,53,.4);}
+/* ── TEAM / FINANCE ── */
+.team-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;align-items:center;gap:16px;margin-bottom:10px;}
+.team-avatar{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.finance-bar{height:8px;background:var(--bg-raised);border-radius:10px;overflow:hidden;margin-top:5px;}
+.finance-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));border-radius:10px;}
+.client-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);}
+.client-row:last-child{border-bottom:none;}
+
+/* ── LOGIN SCREEN ── */
+#adminLoginScreen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;}
+.admin-login-card{background:var(--bg-card);border:1px solid var(--border);border-radius:18px;padding:40px;width:100%;max-width:380px;text-align:center;}
+.admin-login-icon{width:60px;height:60px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:26px;}
+.admin-login-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px;}
+.admin-login-sub{font-size:13px;color:var(--text-muted);margin-bottom:28px;}
+.admin-login-field{position:relative;margin-bottom:14px;}
+.admin-login-field input{width:100%;background:var(--bg-raised);border:1px solid var(--border);border-radius:10px;padding:12px 44px 12px 16px;font-size:14px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s;}
+.admin-login-field input:focus{border-color:rgba(255,107,53,.5);}
+.admin-toggle-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;padding:2px;}
+.admin-login-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#fff;cursor:pointer;margin-bottom:10px;transition:opacity .15s;}
+.admin-login-btn:hover{opacity:.88;}
+.admin-login-error{color:#EF4444;font-size:12px;margin-top:4px;display:none;}
+.admin-lock-icon{font-size:14px;color:var(--text-dim);margin-top:16px;}
+
+/* ── MOBILE HAMBURGER ── */
+.mobile-topbar{display:none;position:fixed;top:0;left:0;right:0;height:56px;background:var(--bg-card);border-bottom:1px solid var(--border);z-index:60;align-items:center;padding:0 16px;gap:12px;}
+.hamburger-btn{background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px;line-height:1;}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:55;}
+.sidebar-overlay.open{display:block;}
+.sidebar.open{transform:translateX(0)!important;}
+@media(max-width:900px){
+  .mobile-topbar{display:flex;}
+  .sidebar{transform:translateX(-100%);transition:transform .25s ease;display:flex!important;}
+  .main{margin-left:0;padding-top:56px;}
+  .topbar{top:56px;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .editor-grid{grid-template-columns:1fr;}
+  .editor-right{position:static;}
+  .ticket-card{grid-template-columns:70px 1fr auto;gap:10px;}
+  .ticket-card>*:nth-child(n+4){display:none;}
+  .ticket-progress-wrap{display:none;}
+  .field-grid{grid-template-columns:1fr;}
+  .field-grid-3{grid-template-columns:1fr;}
+  .settings-input{width:100%;}
+  .settings-row{flex-direction:column;align-items:flex-start;gap:8px;}
+  .referral-grid{grid-template-columns:1fr;}
+  .voucher-card{grid-template-columns:1fr auto;}
+  .file-row{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:480px){
+  .stats-row{grid-template-columns:1fr;}
+  .page-view{padding:16px;}
+  .admin-login-card{padding:28px 20px;}
+  .topbar{padding:12px 16px;}
+  .topbar-right .btn span{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════ ADMIN LOGIN SCREEN ══════════ -->
+<div id="adminLoginScreen">
+  <div class="admin-login-card">
+    <div class="admin-login-icon">🔐</div>
+    <div class="admin-login-title">Admin Access</div>
+    <div class="admin-login-sub">Enter your password to access the SparkEdge admin panel.</div>
+    <div class="admin-login-field">
+      <input type="password" id="adminPwdInput" placeholder="Enter password" onkeydown="if(event.key==='Enter')checkAdminPwd()"/>
+      <button class="admin-toggle-eye" onclick="togglePwdView()" id="eyeBtn">👁</button>
+    </div>
+    <div class="admin-login-error" id="adminPwdError">⚠ Incorrect password. Please try again.</div>
+    <button class="admin-login-btn" onclick="checkAdminPwd()">
+      Unlock Admin Panel →
+    </button>
+    <div class="admin-lock-icon">🔒 SparkEdge Internal Workspace</div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   MULTI-USER AUTH SYSTEM
+   Owner: RAUNAK@1 (full access)
+   Members: stored in localStorage, set by owner
+   Settings unlock: separate password (owner only)
+═══════════════════════════════════════════════ */
+const AUTH_KEY = 'se_members';
+const SETTINGS_AUTH_KEY = 'se_settings_pwd';
+
+function getMembers(){
+  try{ return JSON.parse(localStorage.getItem(AUTH_KEY))||[]; }catch{ return []; }
+}
+function saveMembers(m){ localStorage.setItem(AUTH_KEY, JSON.stringify(m)); }
+function getSettingsPwd(){
+  return localStorage.getItem(SETTINGS_AUTH_KEY)||'Settings@1';
+}
+
+// Current logged-in user context
+window.SE_USER = null; // set on login
+
+(function(){
+  // Check session
+  const sess = sessionStorage.getItem('se_session');
+  if(sess){
+    try{
+      window.SE_USER = JSON.parse(sess);
+      document.getElementById('adminLoginScreen').style.display='none';
+    }catch{}
+  }
+
+  function checkAdminPwd(){
+    const val = document.getElementById('adminPwdInput').value;
+    const err = document.getElementById('adminPwdError');
+    err.style.display='none';
+
+    // Owner check
+    if(val === 'RAUNAK@1'){
+      window.SE_USER = {name:'Raunak (Owner)', role:'owner', permissions:['all']};
+      sessionStorage.setItem('se_session', JSON.stringify(window.SE_USER));
+      doUnlock();
+      return;
+    }
+
+    // Member check
+    const members = getMembers();
+    const member = members.find(m => m.password === val && m.status === 'active');
+    if(member){
+      window.SE_USER = {name:member.name, role:member.role, permissions:member.permissions||[], memberId:member.id};
+      sessionStorage.setItem('se_session', JSON.stringify(window.SE_USER));
+      doUnlock();
+      return;
+    }
+
+    // Failed
+    err.style.display='block';
+    document.getElementById('adminPwdInput').classList.add('shake');
+    setTimeout(()=>document.getElementById('adminPwdInput').classList.remove('shake'),500);
+  }
+
+  function doUnlock(){
+    const screen = document.getElementById('adminLoginScreen');
+    screen.style.opacity='0'; screen.style.transition='opacity .3s';
+    setTimeout(()=>{screen.style.display='none';}, 300);
+    document.getElementById('adminPwdError').style.display='none';
+    // update sidebar user badge after unlock
+    if(typeof updateUserBadge==='function') updateUserBadge();
+    // Apply permission restrictions
+    if(typeof applyPermissions==='function') applyPermissions();
+  }
+
+  function togglePwdView(){
+    const inp = document.getElementById('adminPwdInput');
+    const btn = document.getElementById('eyeBtn');
+    inp.type = inp.type==='password' ? 'text' : 'password';
+    btn.textContent = inp.type==='password' ? '👁' : '🙈';
+  }
+  window.checkAdminPwd = checkAdminPwd;
+  window.togglePwdView = togglePwdView;
+})();
+</script>
+
+<!-- ══════════ MOBILE TOPBAR ══════════ -->
+<div class="mobile-topbar">
+  <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="sb-icon" style="width:28px;height:28px;border-radius:7px;">⚡</div>
+    <span style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;">SparkEdge</span>
+  </div>
+</div>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<script>
+function toggleSidebar(){
+  const sb=document.querySelector('.sidebar');
+  const ov=document.getElementById('sidebarOverlay');
+  const open=sb.classList.toggle('open');
+  ov.classList.toggle('open',open);
+}
+</script>
+
+<!-- ══════════ SIDEBAR ══════════ -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sb-icon">
+      <svg width="18" height="18" viewBox="0 0 28 28" fill="none">
+        <path d="M16 3L6 16H14L12 25L22 12H14L16 3Z" fill="white"/>
+      </svg>
+    </div>
+    <div style="flex:1;min-width:0;">
+      <div class="sb-name">SparkEdge</div>
+      <div class="sb-tag" id="userRoleBadge">Admin</div>
+    </div>
+  </div>
+  <div id="userBadge" style="margin:0 12px 8px;padding:8px 12px;background:rgba(255,107,53,.06);border:1px solid rgba(255,107,53,.15);border-radius:8px;font-size:11px;">
+    <div style="color:var(--text-muted);">Logged in as</div>
+    <div id="userNameDisplay" style="font-weight:700;color:var(--text);font-size:12px;margin-top:2px;">Loading...</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Workspace</div>
+    <button class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">
+      <span class="nav-item-icon">⚡</span> Dashboard
+    </button>
+    <button class="nav-item" onclick="showPage('tickets')" id="nav-tickets">
+      <span class="nav-item-icon">🎫</span> Tickets
+      <span class="nav-badge" id="ticketCountBadge">2</span>
+    </button>
+    <button class="nav-item" onclick="showPage('newticket')" id="nav-newticket">
+      <span class="nav-item-icon">➕</span> New Ticket
+    </button>
+    <div class="nav-section-label">Sections</div>
+    <button class="nav-item" onclick="showPage('clients')" id="nav-clients">
+      <span class="nav-item-icon">👥</span> Clients
+    </button>
+    <button class="nav-item" onclick="showPage('finance')" id="nav-finance">
+      <span class="nav-item-icon">💰</span> Finance
+    </button>
+    <button class="nav-item" onclick="showPage('team')" id="nav-team">
+      <span class="nav-item-icon">🧑‍💻</span> Team
+    </button>
+    <div class="nav-section-label">Knowledge</div>
+    <button class="nav-item" onclick="showPage('workflow')" id="nav-workflow">
+      <span class="nav-item-icon">🗺️</span> Workflow
+    </button>
+    <button class="nav-item" onclick="showPage('guide')" id="nav-guide">
+      <span class="nav-item-icon">📖</span> System Guide
+    </button>
+    <div class="nav-section-label">Tools</div>
+    <button class="nav-item" onclick="showPage('settings')" id="nav-settings">
+      <span class="nav-item-icon">⚙️</span> Settings
+    </button>
+    <button class="nav-item" onclick="window.open('docs.html','_blank')">
+      <span class="nav-item-icon">📄</span> Doc Generator ↗
+    </button>
+    <button class="nav-item" onclick="window.open('index.html','_blank')">
+      <span class="nav-item-icon">🌐</span> Client Portal ↗
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="mailto:sparkedge555@gmail.com">✉ sparkedge555@gmail.com</a>
+  </div>
+</aside>
+
+<!-- ══════════ MAIN ══════════ -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div>
+        <div class="page-title" id="topbarTitle">Dashboard</div>
+        <div class="page-sub" id="topbarSub">SparkEdge internal workspace</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-secondary btn-sm" onclick="exportData()" id="exportBtn" style="background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.3);color:#22C55E;">⬇ Export</button>
+      <button class="btn btn-secondary btn-sm" onclick="openImportModal()" id="importBtn" style="background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.3);color:#3B82F6;">⬆ Import</button>
+      <button class="btn btn-primary" onclick="showPage('newticket')" id="newTicketBtn">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+        New Ticket
+      </button>
+    </div>
+  </div>
+
+  <!-- ════ PAGE: DASHBOARD ════ -->
+  <div class="page-view active" id="page-dashboard" style="padding:28px;">
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card">
+        <div class="stat-card-label">Total Clients</div>
+        <div class="stat-card-val" id="stat-total">0</div>
+        <div class="stat-card-sub">All time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">In Progress</div>
+        <div class="stat-card-val" id="stat-inprogress" style="color:var(--accent);">0</div>
+        <div class="stat-card-sub">Active projects</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Completed</div>
+        <div class="stat-card-val" id="stat-completed" style="color:var(--green);">0</div>
+        <div class="stat-card-sub">Delivered</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">Revenue</div>
+        <div class="stat-card-val" id="stat-revenue" style="color:var(--gold);font-size:20px;">₹0</div>
+        <div class="stat-card-sub">Total project value</div>
+      </div>
+    </div>
+
+    <div class="tickets-header">
+      <h2>All Tickets</h2>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('tickets')">View All →</button>
+    </div>
+    <div class="ticket-list" id="dashTicketList">
+      <div class="empty-state"><div class="es-icon">📭</div><div class="es-text">No tickets yet. Create your first one!</div></div>
+    </div>
+
+    <div style="margin-top:24px;">
+      <div class="howto">
+        <div class="howto-title">ℹ️ How This Admin Panel Works</div>
+        <ol>
+          <li>Create or edit a ticket here using the visual form — <strong>no code editing needed.</strong></li>
+          <li>Click <strong>"Generate & Download File"</strong> → you get the client's <code>.html</code> file.</li>
+          <li>Put that file in your <code>clients/</code> folder and <strong>push to GitHub</strong> → live in 60 seconds.</li>
+          <li>For a NEW ticket, also add the ticket ID to <code>index.html</code> (one line — shown in the generator).</li>
+          <li>This admin panel itself stays local — it's just for YOU, not hosted publicly.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ PAGE: TICKETS ════ -->
+  <div class="page-view" id="page-tickets" style="padding:28px;">
+    <div class="tickets-header">
+      <h2>All Client Tickets</h2>
+      <button class="btn btn-primary" onclick="showPage('newticket')">+ New Ticket</button>
+    </div>
+    <div class="ticket-list" id="allTicketList">
+      <div class="empty-state"><div class="es-icon">📭</div><div class="es-text">No tickets yet.</div></div>
+    </div>
+  </div>
+
+  <!-- ════ PAGE: EDITOR ════ -->
+  <div class="page-view" id="page-editor" style="padding:28px;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px;">
+      <button class="btn btn-ghost btn-sm" onclick="showPage('tickets')">← Back</button>
+      <div>
+        <div class="page-title" id="editorTicketId">Editing SE-001</div>
+        <div class="page-sub" id="editorClientName">Rohan Mehta</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;">
+        <button class="btn btn-red btn-sm" onclick="deleteTicket()">🗑 Delete</button>
+        <button class="btn btn-secondary" onclick="saveCurrentTicket()">💾 Save</button>
+        <button class="btn btn-primary" onclick="generateAndDownload()">
+          ⬇ Generate & Download File
+        </button>
+      </div>
+    </div>
+
+    <div class="editor-grid">
+      <!-- LEFT: FORM -->
+      <div class="editor-left">
+
+        <!-- Identity -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-icon">🪪</div>
+            <div><div class="card-header-title">Client Identity</div></div>
+          </div>
+          <div class="card-body">
+            <div class="field-grid">
+              <div class="field"><label>Ticket ID</label><input id="e_ticketId" placeholder="SE-001" readonly style="opacity:.5;cursor:not-allowed;"/></div>
+              <div class="field"><label>Client Name</label><input id="e_clientName" placeholder="Rohan Mehta"/></div>
+              <div class="field full"><label>Project Name</label><input id="e_projectName" placeholder="Brand Identity & Logo Design"/></div>
+              <div class="field"><label>WhatsApp Number</label><input id="e_whatsapp" placeholder="+91 98765 43210"/></div>
+              <div class="field"><label>Client Email</label><input id="e_clientEmail" placeholder="client@email.com"/></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dates & Status -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-icon">📅</div>
+            <div><div class="card-header-title">Dates & Status</div></div>
+          </div>
+          <div class="card-body">
+            <div class="field-grid">
+              <div class="field"><label>Start Date</label><input id="e_startDate" placeholder="Jan 15, 2025"/></div>
+              <div class="field"><label>Deadline</label><input id="e_deadline" placeholder="Feb 28, 2025"/></div>
+              <div class="field">
+                <label>Status</label>
+                <select id="e_status">
+                  <option>Not Started</option>
+                  <option>In Progress</option>
+                  <option>Completed</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Progress: <span id="progressLabel">0%</span></label>
+                <input type="range" id="e_progress" min="0" max="100" value="0" oninput="document.getElementById('progressLabel').textContent=this.value+'%'"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-icon">💰</div>
+            <div><div class="card-header-title">Payment</div></div>
+          </div>
+          <div class="card-body">
+            <div class="field" style="margin-bottom:14px;">
+              <label>Total Project Value (₹)</label>
+              <input id="e_payTotal" placeholder="45000" oninput="recalcDiscountedTotal()"/>
+            </div>
+            <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;">Payment Stages</div>
+            <div class="stages-list" id="stagesList"></div>
+            <button class="btn-add-row" style="margin-top:8px;" onclick="addStage()">+ Add Stage</button>
+
+            <!-- ── Situational Discount ── -->
+            <div class="discount-block" style="margin-top:16px;">
+              <div class="discount-block-title">🏷️ Situational Discount</div>
+              <div style="display:flex;gap:8px;margin-bottom:10px;">
+                <button class="disc-type-btn active" id="discTypeNone" onclick="setDiscType('none')">No Discount</button>
+                <button class="disc-type-btn" id="discTypeFlat" onclick="setDiscType('flat')">Flat (₹)</button>
+                <button class="disc-type-btn" id="discTypePercent" onclick="setDiscType('percent')">Percent (%)</button>
+              </div>
+              <div id="discValueWrap" style="display:none;">
+                <div class="field" style="margin-bottom:8px;">
+                  <label id="discValueLabel">Discount Amount (₹)</label>
+                  <input id="e_discountValue" type="number" placeholder="500" oninput="recalcDiscountedTotal()"/>
+                </div>
+                <div class="field" style="margin-bottom:8px;">
+                  <label>Reason for Discount (shown to client)</label>
+                  <input id="e_discountReason" placeholder="e.g. Festival offer, repeat client, etc."/>
+                </div>
+              </div>
+              <div id="discountTotalPreview" style="display:none;background:rgba(255,179,71,.08);border:1px solid rgba(255,179,71,.2);border-radius:8px;padding:10px 12px;font-size:13px;">
+                <span style="color:var(--text-muted);">Original: </span><span id="discOrigAmt" style="color:var(--text);font-weight:600;"></span>
+                &nbsp;→&nbsp;
+                <span style="color:var(--text-muted);">After Discount: </span><span id="discFinalAmt" style="color:var(--gold);font-weight:700;font-family:'Syne',sans-serif;"></span>
+                <span id="discSavedLabel" style="color:var(--green);font-size:11px;margin-left:8px;"></span>
+              </div>
+            </div>
+
+            <!-- ── Referral Discount (link existing voucher to this ticket) ── -->
+            <div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:var(--radius-sm);padding:14px;margin-top:12px;">
+              <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:10px;">🎟 Referral Discount</div>
+              <div id="refDiscountStatus" style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">No referral discount applied to this ticket.</div>
+              <div style="display:flex;gap:8px;">
+                <input id="e_refVoucherCode" placeholder="Enter voucher code e.g. SE-REF-ROHAN" style="flex:1;background:var(--bg-raised);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--text);outline:none;font-family:'DM Sans',sans-serif;" oninput="this.value=this.value.toUpperCase()"/>
+                <button class="btn btn-green btn-sm" onclick="applyRefDiscountToTicket()">Apply</button>
+                <button class="btn btn-red btn-sm" onclick="removeRefDiscountFromTicket()">✕</button>
+              </div>
+              <div style="font-size:11px;color:var(--text-dim);margin-top:6px;">When applied, the ticket page will show a green "Referral Discount Applied" banner with savings details.</div>
+            </div>
+
+            <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+              <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;">Payment Details (shown to client)</div>
+              <button class="btn btn-green btn-sm" style="width:100%;" onclick="openPaymentModal()">💳 Preview Pay Online Button →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Files -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-icon">📁</div>
+            <div><div class="card-header-title">Project Files</div></div>
+          </div>
+          <div class="card-body">
+            <div class="files-list" id="filesList"></div>
+            <button class="btn-add-row" style="margin-top:8px;" onclick="addFile()">+ Add File Link</button>
+          </div>
+        </div>
+
+        <!-- Deliverables -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-icon">✅</div>
+            <div><div class="card-header-title">Deliverables Checklist</div></div>
+          </div>
+          <div class="card-body">
+            <div class="deliv-list" id="delivList"></div>
+            <button class="btn-add-row" style="margin-top:8px;" onclick="addDeliverable()">+ Add Deliverable</button>
+          </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-icon">🗓️</div>
+            <div><div class="card-header-title">Update Timeline</div><div class="card-header-sub">Most recent first</div></div>
+          </div>
+          <div class="card-body">
+            <div class="timeline-list" id="timelineList"></div>
+            <button class="btn-add-row" style="margin-top:8px;" onclick="addTimeline()">+ Add Update</button>
+          </div>
+        </div>
+
+        <!-- Manager Note -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-icon">💬</div>
+            <div><div class="card-header-title">Note from Manager</div><div class="card-header-sub">HTML allowed</div></div>
+          </div>
+          <div class="card-body">
+            <div class="field">
+              <textarea id="e_managerNote" rows="4" placeholder="Hi [Name]! We're excited to work with you..."></textarea>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: SIDEBAR CARDS -->
+      <div class="editor-right">
+
+        <!-- WhatsApp -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-icon">💬</div>
+            <div><div class="card-header-title">WhatsApp</div></div>
+          </div>
+          <div class="card-body">
+            <div class="wa-block">
+              <div class="wa-input">
+                <input id="wa_message" placeholder="Type a quick message..." value="Hi! Here's your project update link:"/>
+              </div>
+              <a class="wa-btn" id="waLink" href="#" target="_blank">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5C4.41 1.5 1.5 4.41 1.5 8c0 1.19.32 2.31.88 3.27L1.5 14.5l3.3-.87C5.74 14.18 6.85 14.5 8 14.5c3.59 0 6.5-2.91 6.5-6.5S11.59 1.5 8 1.5z" stroke="#25D366" stroke-width="1.2"/><path d="M6 5.5c0-.28.22-.5.5-.5h.5c.28 0 .5.22.5.5v1c0 .28-.22.5-.5.5A2.5 2.5 0 019.5 10c0-.28.22-.5.5-.5h1c.28 0 .5.22.5.5v.5c0 .28-.22.5-.5.5A4.5 4.5 0 015.5 6.5c0-.28.22-.5.5-.5H6z" fill="#25D366"/></svg>
+                Open WhatsApp Chat
+              </a>
+              <div style="font-size:11px;color:var(--text-dim);text-align:center;">Opens WhatsApp with the number from the Client Identity card</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Doc Tracker -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-icon">📋</div>
+            <div><div class="card-header-title">Documents Sent</div><div class="card-header-sub">Track what you've shared</div></div>
+          </div>
+          <div class="card-body">
+            <div class="doc-tracker">
+              <div class="doc-track-item">
+                <span class="doc-track-icon">🧾</span>
+                <div class="doc-track-info"><div class="doc-track-name">Invoice</div><div class="doc-track-sub">Payment invoice sent</div></div>
+                <label class="doc-track-toggle"><input type="checkbox" id="dt_invoice" onchange="saveDocTracker()"/><span class="toggle-slider"></span></label>
+              </div>
+              <div class="doc-track-item">
+                <span class="doc-track-icon">📋</span>
+                <div class="doc-track-info"><div class="doc-track-name">SOW / Agreement</div><div class="doc-track-sub">Service agreement sent</div></div>
+                <label class="doc-track-toggle"><input type="checkbox" id="dt_sow" onchange="saveDocTracker()"/><span class="toggle-slider"></span></label>
+              </div>
+              <div class="doc-track-item">
+                <span class="doc-track-icon">🎉</span>
+                <div class="doc-track-info"><div class="doc-track-name">Welcome Packet</div><div class="doc-track-sub">Onboarding doc sent</div></div>
+                <label class="doc-track-toggle"><input type="checkbox" id="dt_welcome" onchange="saveDocTracker()"/><span class="toggle-slider"></span></label>
+              </div>
+              <div class="doc-track-item">
+                <span class="doc-track-icon">📊</span>
+                <div class="doc-track-info"><div class="doc-track-name">Proposal</div><div class="doc-track-sub">Project proposal sent</div></div>
+                <label class="doc-track-toggle"><input type="checkbox" id="dt_proposal" onchange="saveDocTracker()"/><span class="toggle-slider"></span></label>
+              </div>
+            </div>
+            <div style="margin-top:12px;">
+              <a class="btn btn-secondary btn-sm" style="display:block;text-align:center;text-decoration:none;" href="docs.html" target="_blank">Open Doc Generator →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Generate -->
+        <div class="generate-section">
+          <div class="gen-title">Generate Client File</div>
+          <div class="gen-sub">After filling all fields above, generate the <code style="background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.2);border-radius:4px;padding:1px 6px;font-size:11px;color:var(--accent);font-family:monospace;">.html</code> file and push it to GitHub.</div>
+          <div class="gen-steps">
+            <div class="gen-step"><div class="gen-step-num">1</div><span>Click "Generate & Download File" (top right)</span></div>
+            <div class="gen-step"><div class="gen-step-num">2</div><span>Move it to your <code style="font-family:monospace;font-size:11px;color:var(--accent);">clients/</code> folder</span></div>
+            <div class="gen-step"><div class="gen-step-num">3</div><span>Run <code style="font-family:monospace;font-size:11px;color:var(--accent);">git add . && git commit -m "update" && git push</code></span></div>
+            <div class="gen-step"><div class="gen-step-num">4</div><span>Live in 60 seconds ✅</span></div>
+          </div>
+          <button class="btn btn-primary" style="width:100%;margin-bottom:8px;" onclick="generateAndDownload()">
+            ⬇ Generate & Download File
+          </button>
+          <button class="btn btn-secondary" style="width:100%;" onclick="saveCurrentTicket()">
+            💾 Save to Admin Panel
+          </button>
+        </div>
+
+        <!-- Referral Quick Actions -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-icon">🎁</div>
+            <div><div class="card-header-title">Referral & Earn</div><div class="card-header-sub">Quick actions for this client</div></div>
+          </div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:8px;">
+            <button class="btn btn-secondary btn-sm" style="width:100%;justify-content:center;" onclick="quickCreateVoucher()">
+              🎟 Create Voucher for This Client
+            </button>
+            <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;" onclick="showPage('referrals')">
+              🎁 Go to Referrals →
+            </button>
+            <div id="clientReferralInfo" style="font-size:11px;color:var(--text-dim);text-align:center;"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ PAGE: NEW TICKET ════ -->
+  <div class="page-view" id="page-newticket" style="padding:28px;">
+    <div style="max-width:600px;">
+      <div style="margin-bottom:22px;">
+        <div class="page-title">Create New Ticket</div>
+        <div class="page-sub">Fill in basics — you can add full details after creating.</div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <div class="field-grid" style="gap:14px;">
+            <div class="field">
+              <label>Ticket ID</label>
+              <input id="new_ticketId" placeholder="SE-003" oninput="this.value=this.value.toUpperCase()"/>
+            </div>
+            <div class="field">
+              <label>Client Name</label>
+              <input id="new_clientName" placeholder="Priya Sharma"/>
+            </div>
+            <div class="field full">
+              <label>Project Name</label>
+              <input id="new_projectName" placeholder="Website Redesign"/>
+            </div>
+            <div class="field">
+              <label>Start Date</label>
+              <input id="new_startDate" placeholder="May 1, 2025"/>
+            </div>
+            <div class="field">
+              <label>Deadline</label>
+              <input id="new_deadline" placeholder="May 10, 2025"/>
+            </div>
+            <div class="field">
+              <label>WhatsApp Number</label>
+              <input id="new_whatsapp" placeholder="+91 98765 43210"/>
+            </div>
+            <div class="field">
+              <label>Client Email</label>
+              <input id="new_clientEmail" placeholder="client@email.com"/>
+            </div>
+            <div class="field">
+              <label>Total Amount (₹)</label>
+              <input id="new_totalAmt" placeholder="12999"/>
+            </div>
+            <div class="field">
+              <label>Status</label>
+              <select id="new_status">
+                <option>Not Started</option>
+                <option>In Progress</option>
+                <option>Completed</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;">
+        <div class="howto">
+          <div class="howto-title">📌 After creating this ticket</div>
+          <ol>
+            <li>You'll land on the full editor to add deliverables, timeline, files, payment stages etc.</li>
+            <li>Click <strong>"Generate & Download File"</strong> — save as <code>SE-00X.html</code> in your <code>clients/</code> folder.</li>
+            <li>In <code>index.html</code> find <code>const validTickets = [...]</code> and add <code>'SE-00X'</code> to the array.</li>
+            <li>Push to GitHub. Done!</li>
+          </ol>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;display:flex;gap:10px;">
+        <button class="btn btn-ghost" onclick="showPage('tickets')">Cancel</button>
+        <button class="btn btn-primary" onclick="createTicket()">Create Ticket & Open Editor →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ PAGE: REFERRALS ════ -->
+  <div class="page-view" id="page-referrals" style="padding:28px;">
+    <div class="referral-header">
+      <div>
+        <div class="page-title">Referral Vouchers</div>
+        <div class="page-sub" style="margin-top:4px;">Generate & track refer-and-earn codes</div>
+      </div>
+      <button class="btn btn-primary" onclick="openCreateVoucherModal()">+ Create Voucher</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="referral-grid">
+      <div class="ref-stat"><div class="ref-stat-label">Total Vouchers</div><div class="ref-stat-val" id="ref-stat-total">0</div></div>
+      <div class="ref-stat"><div class="ref-stat-label">Active</div><div class="ref-stat-val" id="ref-stat-active" style="color:var(--green);">0</div></div>
+      <div class="ref-stat"><div class="ref-stat-label">Used / Redeemed</div><div class="ref-stat-val" id="ref-stat-used" style="color:var(--gold);">0</div></div>
+      <div class="ref-stat"><div class="ref-stat-label">Total Discount Given</div><div class="ref-stat-val" id="ref-stat-discount" style="color:var(--accent);font-size:18px;">₹0</div></div>
+    </div>
+
+    <!-- Voucher list -->
+    <div style="margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">All Vouchers</div>
+      <button class="btn btn-secondary btn-sm" onclick="openRedeemModal('')">🎟 Redeem a Code</button>
+    </div>
+    <div class="voucher-list" id="voucherList">
+      <div class="empty-state"><div class="es-icon">🎁</div><div class="es-text">No vouchers yet. Create your first referral voucher!</div></div>
+    </div>
+
+    <!-- How it works -->
+    <div style="margin-top:24px;">
+      <div class="howto">
+        <div class="howto-title">🎁 How Referral & Earn Works</div>
+        <ol>
+          <li>Create a <strong>Referral Voucher</strong> and assign it to an existing client (the referrer). Set a discount % or flat amount.</li>
+          <li>The referrer shares their unique code (e.g. <code>SE-REF-ROHAN</code>) with friends.</li>
+          <li>When a new client signs up and mentions the code, enter it in the <strong>"Redeem Voucher"</strong> action below — both the new client and the referrer get credited.</li>
+          <li>Both referrer's profile and new client ticket will show the discount applied automatically.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ PAGE: CLIENTS ════ -->
+  <div class="page-view" id="page-clients" style="padding:28px;">
+    <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px;">Clients</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:24px;">All clients onboarded via SparkEdge — quick overview and actions.</div>
+    <div id="clientsPageList">
+      <div class="empty-state"><div class="es-icon">👥</div><div class="es-text">No clients yet.</div></div>
+    </div>
+  </div>
+
+  <!-- ════ PAGE: FINANCE ════ -->
+  <div class="page-view" id="page-finance" style="padding:28px;">
+    <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px;">Finance</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:24px;">Revenue, payment status, and financial summary across all tickets.</div>
+    <div class="stats-row" id="financeStatsRow" style="margin-bottom:24px;"></div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-icon">💳</div>
+        <div><div class="card-header-title">Payment Status by Client</div></div>
+      </div>
+      <div class="card-body" id="financeClientRows">
+        <div class="empty-state"><div class="es-icon">📊</div><div class="es-text">No data yet.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ PAGE: TEAM ════ -->
+  <div class="page-view" id="page-team" style="padding:28px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:10px;">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;">Team & Access Management</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">Owner-only: Add members, set passwords and permissions.</div>
+      </div>
+      <div id="addMemberBtnWrap">
+        <button class="btn btn-primary" onclick="openAddMemberModal()">+ Invite Member</button>
+      </div>
+    </div>
+
+    <!-- Permission reference -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+      <div style="background:rgba(255,107,53,.06);border:1px solid rgba(255,107,53,.2);border-radius:var(--radius);padding:16px;">
+        <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--accent);margin-bottom:8px;">👑 Owner</div>
+        <div style="font-size:11px;color:var(--text-muted);line-height:1.8;">Full access to everything · Create/edit/delete tickets · Manage team members · Access settings · Export/Import data · View finance · Change passwords</div>
+      </div>
+      <div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:var(--radius);padding:16px;">
+        <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#3B82F6;margin-bottom:8px;">🧑‍💻 Team Member</div>
+        <div style="font-size:11px;color:var(--text-muted);line-height:1.8;">Access only what owner grants: View tickets · Edit tickets · Create tickets · Export data · View finance · View clients</div>
+      </div>
+    </div>
+
+    <div id="teamMemberList"></div>
+  </div>
+
+  <!-- ════ PAGE: WORKFLOW ════ -->
+  <div class="page-view" id="page-workflow" style="padding:28px;">
+    <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px;">Workflow Guide</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:24px;">Step-by-step: what to do when, which documents to send, and in what order. Follow this every time you onboard a new client.</div>
+
+    <div style="background:rgba(255,107,53,.06);border:1px solid rgba(255,107,53,.2);border-radius:var(--radius);padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;gap:14px;">
+      <div style="font-size:28px;">📋</div>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Total Documents in System: <span style="color:var(--accent);">4 Documents</span></div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">Invoice · SOW/Agreement · Welcome Packet · Client Proposal — all generated from the Doc Generator.</div>
+      </div>
+    </div>
+
+    <div class="workflow-step">
+      <div class="wf-num">1</div>
+      <div>
+        <div class="wf-title">🤝 Initial Contact & Lead Qualification</div>
+        <div class="wf-desc">Client reaches out via WhatsApp, Instagram, or referral. Understand their needs, budget, and timeline. Do a quick discovery call or chat. Confirm if they're a good fit. <strong style="color:var(--text);">Do NOT send any documents yet.</strong></div>
+        <div class="wf-timing">⏱ Day 0 — Before any commitment</div>
+      </div>
+    </div>
+
+    <div class="workflow-step">
+      <div class="wf-num">2</div>
+      <div>
+        <div class="wf-title">📊 Send Client Proposal</div>
+        <div class="wf-desc">Go to <strong style="color:var(--text);">Doc Generator → Client Proposal</strong>. Fill in client name, business, goals, package, price, and timeline. Download the HTML file. Open in browser → Print as PDF → Send via WhatsApp or email. This document outlines everything: what they get, timeline, and investment.</div>
+        <div class="wf-docs">
+          <span class="wf-doc-pill">📊 Document 1 of 4: Client Proposal</span>
+        </div>
+        <div class="wf-timing">⏱ Day 0–1 — After discovery call</div>
+      </div>
+    </div>
+
+    <div class="workflow-step">
+      <div class="wf-num">3</div>
+      <div>
+        <div class="wf-title">✅ Client Confirms — Collect Advance Payment</div>
+        <div class="wf-desc">Once the client agrees to the proposal, ask for the advance payment (typically 50%). Share your UPI ID: <code style="color:var(--accent);background:var(--bg-raised);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-family:monospace;">raunakkarn555-2@okhdfcbank</code>. Wait for payment confirmation screenshot. <strong style="color:var(--text);">Do not start work before advance is received.</strong></div>
+        <div class="wf-timing">⏱ Day 1 — Must receive before kickoff</div>
+      </div>
+    </div>
+
+    <div class="workflow-step">
+      <div class="wf-num">4</div>
+      <div>
+        <div class="wf-title">🧾 Send Invoice</div>
+        <div class="wf-desc">Go to <strong style="color:var(--text);">Doc Generator → Invoice</strong>. Fill in client info, services, amount, payment status (Advance Received), due date. Download and send PDF. This is your formal record of the transaction. Keep a copy for your records too.</div>
+        <div class="wf-docs">
+          <span class="wf-doc-pill">🧾 Document 2 of 4: Invoice</span>
+        </div>
+        <div class="wf-timing">⏱ Day 1 — Same day as advance payment</div>
+      </div>
+    </div>
+
+    <div class="workflow-step">
+      <div class="wf-num">5</div>
+      <div>
+        <div class="wf-title">📋 Send SOW / Agreement</div>
+        <div class="wf-desc">Go to <strong style="color:var(--text);">Doc Generator → SOW / Agreement</strong>. Fill in project scope, deliverables, timelines, revision policy, and payment terms. This is your legal protection document. Both parties agree to it before work starts. Send via WhatsApp or email and ask client to confirm receipt.</div>
+        <div class="wf-docs">
+          <span class="wf-doc-pill">📋 Document 3 of 4: SOW / Agreement</span>
+        </div>
+        <div class="wf-timing">⏱ Day 1 — Same day as invoice</div>
+      </div>
+    </div>
+
+    <div class="workflow-step">
+      <div class="wf-num">6</div>
+      <div>
+        <div class="wf-title">🎉 Send Welcome Packet + Create Ticket</div>
+        <div class="wf-desc">Go to <strong style="color:var(--text);">Doc Generator → Welcome Packet</strong>. Send a warm onboarding document explaining what happens next, response times, revision policy, and your contact info. <br><br>Also: Go to <strong style="color:var(--text);">New Ticket</strong> in Admin → Create the client's ticket → Add all details (deliverables, payment stages, timeline) → Click <strong style="color:var(--text);">"Generate & Download File"</strong> → Move to <code style="color:var(--accent);font-family:monospace;">clients/</code> folder → Push to GitHub. Share the client portal link with them.</div>
+        <div class="wf-docs">
+          <span class="wf-doc-pill">🎉 Document 4 of 4: Welcome Packet</span>
+        </div>
+        <div class="wf-timing">⏱ Day 1 — Kickoff confirmed</div>
+      </div>
+    </div>
+
+    <div class="workflow-step">
+      <div class="wf-num">7</div>
+      <div>
+        <div class="wf-title">🎨 Execute the Project</div>
+        <div class="wf-desc">Work on the project per the agreed scope. Update the ticket regularly — add timeline entries for each milestone (design phase, development, review sent, etc.). Update the progress bar. Toggle deliverables as they're completed. Save and regenerate the client file after each major update → push to GitHub. The client can see their live portal updating in real time.</div>
+        <div class="wf-timing">⏱ Day 1–7 (or per agreed timeline)</div>
+      </div>
+    </div>
+
+    <div class="workflow-step">
+      <div class="wf-num">8</div>
+      <div>
+        <div class="wf-title">🔄 Send Review & Collect Feedback</div>
+        <div class="wf-desc">Share the preview link with the client. Ask for consolidated feedback in one message (not back-and-forth). Update the timeline entry in the ticket. Make revisions per the SOW. Only 1 revision round is typically included — additional rounds are billable as per agreement.</div>
+        <div class="wf-timing">⏱ Day 5–6 of project</div>
+      </div>
+    </div>
+
+    <div class="workflow-step">
+      <div class="wf-num">9</div>
+      <div>
+        <div class="wf-title">🚀 Final Delivery & Collect Balance Payment</div>
+        <div class="wf-desc">Complete all revisions. Deliver final files. Collect the remaining balance payment. Update ticket status to <strong style="color:var(--green);">Completed</strong>, progress to 100%. Add a "Project Completed 🎉" timeline entry. Regenerate the client file and push to GitHub. Send a final invoice if needed.</div>
+        <div class="wf-timing">⏱ Day 7 — On delivery</div>
+      </div>
+    </div>
+
+    <div class="workflow-step">
+      <div class="wf-num">10</div>
+      <div>
+        <div class="wf-title">🎁 Referral & Follow-up</div>
+        <div class="wf-desc">Ask the client for a testimonial or referral. Go to <strong style="color:var(--text);">Referrals</strong> → Create a voucher for this client. Share their unique code — when a friend uses it, both get rewarded automatically. Stay in touch for future projects or retainers.</div>
+        <div class="wf-timing">⏱ Post delivery — Ongoing</div>
+      </div>
+    </div>
+
+    <div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:var(--radius);padding:18px 20px;margin-top:8px;">
+      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--green);margin-bottom:10px;">📋 Document Sending Order (Quick Reference)</div>
+      <div style="display:grid;grid-template-columns:auto 1fr auto;gap:8px 16px;font-size:12px;align-items:center;">
+        <span style="color:var(--accent);font-weight:700;">1st</span><span style="color:var(--text);">Client Proposal</span><span style="color:var(--text-muted);">Before advance — after discovery call</span>
+        <span style="color:var(--accent);font-weight:700;">2nd</span><span style="color:var(--text);">Invoice</span><span style="color:var(--text-muted);">After advance payment received</span>
+        <span style="color:var(--accent);font-weight:700;">3rd</span><span style="color:var(--text);">SOW / Agreement</span><span style="color:var(--text-muted);">Same day as invoice — before work begins</span>
+        <span style="color:var(--accent);font-weight:700;">4th</span><span style="color:var(--text);">Welcome Packet</span><span style="color:var(--text-muted);">On kickoff day — with portal link</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ PAGE: SYSTEM GUIDE ════ -->
+  <div class="page-view" id="page-guide" style="padding:28px;">
+    <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px;">System Guide</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:24px;">Complete explanation of how the SparkEdge Client Portal system works — from admin to client view.</div>
+
+    <div class="guide-section">
+      <div class="guide-section-hdr"><div style="font-size:18px;">🏗️</div><div><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">The Architecture</div></div></div>
+      <div class="guide-section-body">
+        The SparkEdge portal is a <strong>static HTML system hosted on GitHub Pages</strong> — no database, no server, no monthly fees. It consists of 3 core files and a client folder:<br><br>
+        • <code>index.html</code> — The login page where clients enter their ticket ID (e.g. SE-001) to access their dashboard.<br>
+        • <code>admin.html</code> — This file. Your private workspace for managing everything. Not hosted publicly (or password-protected).<br>
+        • <code>docs.html</code> — Document Generator. Creates Invoice, SOW, Welcome Packet, and Proposal as downloadable HTML/PDF files.<br>
+        • <code>clients/SE-001.html</code>, <code>SE-002.html</code> etc. — Individual client dashboards, generated from admin and pushed to GitHub.
+      </div>
+    </div>
+
+    <div class="guide-section">
+      <div class="guide-section-hdr"><div style="font-size:18px;">🎫</div><div><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">The Ticket System</div></div></div>
+      <div class="guide-section-body">
+        Each client has a <strong>unique Ticket ID</strong> (e.g. SE-001, SE-002). When a client enters this ID on the login page, they're redirected to their personal dashboard at <code>clients/SE-001.html</code>.<br><br>
+        The ticket stores: Client identity, project status & progress, payment stages, deliverables checklist, timeline updates, project files, and a note from the manager.<br><br>
+        <strong>To add a new client:</strong> Go to New Ticket → Fill details → Save → Generate & Download the file → Put it in <code>clients/</code> folder → Also add the ticket ID to the <code>validTickets</code> array in <code>index.html</code> → Push to GitHub.
+      </div>
+    </div>
+
+    <div class="guide-section">
+      <div class="guide-section-hdr"><div style="font-size:18px;">💾</div><div><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Data Storage</div></div></div>
+      <div class="guide-section-body">
+        Admin data (tickets, vouchers, team members, settings) is stored in your <strong>browser's localStorage</strong> on your device. This means:<br><br>
+        • ✅ Works offline, no server needed.<br>
+        • ✅ Fast, instant saves.<br>
+        • ⚠️ Data is per-device and per-browser. If you clear browser data, tickets may be lost — <strong>always generate & save the HTML files to GitHub as your backup.</strong><br>
+        • ⚠️ If you switch devices, re-create tickets or import from saved HTML files.<br><br>
+        Client-facing files (the <code>clients/SE-001.html</code> files) are the real source of truth once pushed to GitHub.
+      </div>
+    </div>
+
+    <div class="guide-section">
+      <div class="guide-section-hdr"><div style="font-size:18px;">💰</div><div><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Payment & Discount System</div></div></div>
+      <div class="guide-section-body">
+        <strong>Payment Stages:</strong> Add multiple stages (Advance, Milestone, Final) with amounts and statuses (paid / pending / upcoming). These show on the client's dashboard with visual indicators.<br><br>
+        <strong>Situational Discount:</strong> Applied manually by you when warranted (festival offer, repeat client, etc.). Set flat ₹ or percentage. The discounted total is shown in the client file.<br><br>
+        <strong>Referral Discount:</strong> Applied via the Referrals page. When a client's voucher code is redeemed by a new client, both get credited automatically. The new client's ticket shows a "Referral Discount Applied" banner, and the referrer's ticket shows a "Your Referral Rewards" section.
+      </div>
+    </div>
+
+    <div class="guide-section">
+      <div class="guide-section-hdr"><div style="font-size:18px;">📄</div><div><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Document Generator</div></div></div>
+      <div class="guide-section-body">
+        The Doc Generator creates 4 types of professional documents:<br><br>
+        <strong>1. Invoice</strong> — Formal payment document. Fill client info, services rendered, amounts, payment status, due date. Download → Open in browser → Print as PDF.<br><br>
+        <strong>2. SOW / Agreement</strong> — Scope of Work and legal agreement. Protects you from scope creep. Both parties "agree" by proceeding.<br><br>
+        <strong>3. Welcome Packet</strong> — Warm onboarding document explaining the process, your response times, revision policy, and contact info.<br><br>
+        <strong>4. Client Proposal</strong> — Sales document sent before a client commits. Covers what they get, timeline, investment, and a confirmation section.
+      </div>
+    </div>
+
+    <div class="guide-section">
+      <div class="guide-section-hdr"><div style="font-size:18px;">🎁</div><div><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Referral System</div></div></div>
+      <div class="guide-section-body">
+        <strong>How it works end-to-end:</strong><br><br>
+        1. You create a <strong>Referral Voucher</strong> in the Referrals page, assign it to a client (the referrer), set a discount for the new client, and specify the referrer's reward.<br>
+        2. The referrer shares their code (e.g. <code>SE-REF-ROHAN</code>) with friends.<br>
+        3. A new client signs up and gives you the code → You go to Referrals → Redeem Code → Enter the code and the new client's ticket ID → Confirm.<br>
+        4. Both are updated: new client gets the discount shown on their portal; referrer gets a timeline entry and reward note on their portal.<br>
+        5. You can also apply a referral discount directly in the ticket editor under Payment.
+      </div>
+    </div>
+
+    <div class="guide-section">
+      <div class="guide-section-hdr"><div style="font-size:18px;">🔗</div><div><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">How to Edit the Doc Generator Button Link</div></div></div>
+      <div class="guide-section-body">
+        The <strong>Doc Generator ↗</strong> button in the sidebar currently opens <code>docs.html</code>. If your file is hosted on GitHub Pages or at a different URL, you may need to update this link.<br><br>
+        <strong>To change the link:</strong><br>
+        1. Open <code>admin.html</code> in any text editor (VS Code, Notepad, etc.).<br>
+        2. Press <strong>Ctrl+F</strong> (Cmd+F on Mac) and search for: <code>docs.html</code><br>
+        3. You will find this line in the sidebar navigation section:<br>
+        <code>window.open('docs.html','_blank')</code><br>
+        4. Replace <code>docs.html</code> with your full URL, for example:<br>
+        <code>window.open('https://yourusername.github.io/yourrepo/docs.html','_blank')</code><br>
+        5. Save the file. The button will now open the correct URL.<br><br>
+        Similarly, the <strong>Client Portal ↗</strong> button uses <code>index.html</code> — update it the same way if you move to a custom domain or different path.
+      </div>
+    </div>
+
+    <div class="guide-section">
+      <div class="guide-section-hdr"><div style="font-size:18px;">🚀</div><div><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Deploying to GitHub Pages</div></div></div>
+      <div class="guide-section-body">
+        1. Make sure your repository has all files: <code>index.html</code>, <code>admin.html</code>, <code>docs.html</code>, <code>assets/</code> folder, and <code>clients/</code> folder.<br>
+        2. Go to GitHub → Repository Settings → Pages → Source: Deploy from branch → Branch: main → Folder: / (root).<br>
+        3. Your site is live at <code>https://yourusername.github.io/yourrepo/</code>.<br>
+        4. Every time you generate a new client file: move it to <code>clients/</code>, run <code>git add . && git commit -m "update" && git push</code>. Live within 60 seconds.<br>
+        5. Share <code>https://yourusername.github.io/yourrepo/</code> as the portal link. Clients enter their SE-00X ticket ID to access their dashboard.
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ PAGE: SETTINGS ════ -->
+  <div class="page-view" id="page-settings" style="padding:28px;">
+    <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px;">Settings</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:24px;">Manage your agency details, payment info, and preferences.</div>
+
+    <!-- Settings lock (shown to non-owners or non-unlocked) -->
+    <div id="settingsLockScreen" style="display:none;max-width:400px;margin:60px auto;text-align:center;">
+      <div style="font-size:40px;margin-bottom:14px;">🔒</div>
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:8px;">Settings Locked</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">Enter the Settings password to make changes.</div>
+      <div style="position:relative;margin-bottom:12px;">
+        <input type="password" id="settingsUnlockPwd" placeholder="Settings password" style="width:100%;background:var(--bg-raised);border:1px solid var(--border);border-radius:10px;padding:12px 44px 12px 16px;font-size:14px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;" onkeydown="if(event.key==='Enter')unlockSettings()"/>
+      </div>
+      <button class="btn btn-primary" style="width:100%;" onclick="unlockSettings()">Unlock Settings →</button>
+      <div id="settingsUnlockError" style="display:none;color:var(--red);font-size:12px;margin-top:8px;">⚠ Wrong settings password.</div>
+    </div>
+
+    <div id="settingsContent" style="max-width:680px;">
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header"><div class="card-header-icon">🏢</div><div><div class="card-header-title">Agency Details</div></div></div>
+        <div class="card-body">
+          <div class="settings-row"><div><div class="settings-label">Agency Name</div><div class="settings-sub">Shown on documents and portal</div></div><input class="settings-input" id="s_agencyName" value="SparkEdge"/></div>
+          <div class="settings-row"><div><div class="settings-label">Owner Name</div><div class="settings-sub">Your name on invoices & proposals</div></div><input class="settings-input" id="s_ownerName" value="Raunak Karn"/></div>
+          <div class="settings-row"><div><div class="settings-label">Email</div><div class="settings-sub">Contact email for clients</div></div><input class="settings-input" id="s_email" value="sparkedge555@gmail.com"/></div>
+          <div class="settings-row"><div><div class="settings-label">Phone / WhatsApp</div><div class="settings-sub">+91 format</div></div><input class="settings-input" id="s_phone" value="+91 91424 50715"/></div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header"><div class="card-header-icon">💳</div><div><div class="card-header-title">Payment Details</div></div></div>
+        <div class="card-body">
+          <div class="settings-row"><div><div class="settings-label">UPI ID</div><div class="settings-sub">Shown on invoices & payment modal</div></div><input class="settings-input" id="s_upiId" value="raunakkarn555-2@okhdfcbank"/></div>
+          <div class="settings-row"><div><div class="settings-label">Account Holder</div><div class="settings-sub">Bank account name</div></div><input class="settings-input" id="s_bankHolder" value="Raunak Kumar"/></div>
+          <div class="settings-row"><div><div class="settings-label">Bank Name</div></div><input class="settings-input" id="s_bankName" value="Canara Bank, Samastipur"/></div>
+          <div class="settings-row"><div><div class="settings-label">Account Number</div></div><input class="settings-input" id="s_bankAcc" value="110281513266"/></div>
+          <div class="settings-row"><div><div class="settings-label">IFSC Code</div></div><input class="settings-input" id="s_ifsc" value="CNRB0017535"/></div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header"><div class="card-header-icon">🔐</div><div><div class="card-header-title">Security</div></div></div>
+        <div class="card-body">
+          <div class="settings-row"><div><div class="settings-label">Admin Password</div><div class="settings-sub">Current session password</div></div>
+          <div style="display:flex;gap:8px;">
+            <input class="settings-input" id="s_newPwd" type="password" placeholder="New password" style="width:160px;"/>
+            <button class="btn btn-primary btn-sm" onclick="changeAdminPwd()">Update</button>
+          </div>
+          </div>
+          <div class="settings-row"><div><div class="settings-label">Log Out</div><div class="settings-sub">Clears session — will ask for password again</div></div>
+            <button class="btn btn-red btn-sm" onclick="adminLogout()">Log Out</button>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:8px;">
+        <button class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button>
+        <span style="font-size:11px;color:var(--text-dim);margin-left:12px;">Settings saved to browser localStorage.</span>
+      </div>
+
+      <!-- Settings Password Change (owner only) -->
+      <div class="card" style="margin-top:16px;" id="settingsPwdCard">
+        <div class="card-header"><div class="card-header-icon">🔑</div><div><div class="card-header-title">Settings Password</div><div class="card-header-sub">Separate password to access Settings page</div></div></div>
+        <div class="card-body">
+          <div class="settings-row">
+            <div><div class="settings-label">Change Settings Password</div><div class="settings-sub">Only owner can change this</div></div>
+            <div style="display:flex;gap:8px;">
+              <input class="settings-input" id="s_settingsPwd" type="password" placeholder="New settings password" style="width:180px;"/>
+              <button class="btn btn-primary btn-sm" onclick="changeSettingsPwd()">Update</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════ MODAL: DELETE TICKET ══════════ -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <div class="modal-title">Delete Ticket?</div>
+      <button class="modal-close" onclick="closeModal('deleteModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--text-muted);font-size:13px;line-height:1.7;">This will remove the ticket from this admin panel. <strong style="color:var(--text);">It will NOT delete the client's HTML file from GitHub</strong> — you need to manually remove that file if needed.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('deleteModal')">Cancel</button>
+      <button class="btn btn-red" onclick="confirmDelete()">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MODAL: PAYMENT DETAILS ══════════ -->
+<div class="modal-overlay" id="paymentModal">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-header">
+      <div class="modal-title">💳 Pay Online</div>
+      <button class="modal-close" onclick="closeModal('paymentModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:rgba(255,107,53,.06);border:1px solid rgba(255,107,53,.2);border-radius:var(--radius-sm);padding:16px;text-align:center;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">UPI — Tap to Open Payment App</div>
+        <button onclick="openUPI()" style="background:linear-gradient(135deg,#FF6B35,#FF3CAC);border:none;border-radius:10px;padding:13px 28px;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#fff;cursor:pointer;width:100%;letter-spacing:.5px;">📲 Pay via UPI App</button>
+        <div style="margin-top:10px;font-family:monospace;font-size:13px;color:var(--accent);background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;">
+          <span>raunakkarn555-2@okhdfcbank</span>
+          <button onclick="copyUPI()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;">📋 Copy</button>
+        </div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:6px;">Works with GPay, PhonePe, Paytm, BHIM & all UPI apps</div>
+      </div>
+      <div style="background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;">🏦 Bank Transfer (NEFT/IMPS/RTGS)</div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:12px;">
+          <span style="color:var(--text-dim);font-weight:600;">Account Holder</span>
+          <span style="color:var(--text);font-weight:700;">Raunak Kumar</span>
+          <span style="color:var(--text-dim);font-weight:600;">Bank</span>
+          <span style="color:var(--text);">Canara Bank, Samastipur</span>
+          <span style="color:var(--text-dim);font-weight:600;">Account No.</span>
+          <span style="color:var(--accent);font-family:monospace;font-weight:700;">110281513266</span>
+          <span style="color:var(--text-dim);font-weight:600;">IFSC Code</span>
+          <span style="color:var(--accent);font-family:monospace;font-weight:700;">CNRB0017535</span>
+        </div>
+        <button onclick="copyBankDetails()" style="margin-top:12px;width:100%;background:var(--bg);border:1px dashed var(--border-bright);border-radius:8px;padding:8px;font-size:12px;color:var(--text-muted);cursor:pointer;">📋 Copy All Bank Details</button>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);text-align:center;line-height:1.7;">After payment, share the screenshot on WhatsApp or email to <strong style="color:var(--text-muted);">sparkedge555@gmail.com</strong></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('paymentModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MODAL: CREATE VOUCHER ══════════ -->
+<div class="modal-overlay" id="createVoucherModal">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <div class="modal-title">🎁 Create Referral Voucher</div>
+      <button class="modal-close" onclick="closeModal('createVoucherModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-grid" style="gap:12px;">
+        <div class="field">
+          <label>Voucher Code</label>
+          <input id="vc_code" placeholder="SE-REF-ROHAN" oninput="this.value=this.value.toUpperCase()"/>
+        </div>
+        <div class="field">
+          <label>Referrer Ticket ID</label>
+          <input id="vc_referrer" placeholder="SE-001" oninput="this.value=this.value.toUpperCase()"/>
+        </div>
+        <div class="field">
+          <label>Discount Type</label>
+          <select id="vc_discType">
+            <option value="percent">Percentage (%)</option>
+            <option value="flat">Flat Amount (₹)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Discount Value</label>
+          <input id="vc_discValue" placeholder="10" type="number"/>
+        </div>
+        <div class="field full">
+          <label>Referrer Reward (note/credit for the one who referred)</label>
+          <input id="vc_referrerReward" placeholder="e.g. ₹500 wallet credit or free 1-month support"/>
+        </div>
+        <div class="field full">
+          <label>Expiry Date (optional)</label>
+          <input id="vc_expiry" type="date"/>
+        </div>
+      </div>
+      <div style="margin-top:8px;">
+        <button class="btn btn-ghost btn-sm" onclick="autoGenCode()">🔀 Auto-Generate Code</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('createVoucherModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveVoucher()">Create Voucher</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MODAL: REDEEM VOUCHER ══════════ -->
+<div class="modal-overlay" id="redeemVoucherModal">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <div class="modal-title">🎟 Redeem Referral Voucher</div>
+      <button class="modal-close" onclick="closeModal('redeemVoucherModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Voucher Code</label>
+        <input id="rd_code" placeholder="SE-REF-ROHAN" oninput="this.value=this.value.toUpperCase()"/>
+      </div>
+      <div class="field" style="margin-top:10px;">
+        <label>New Client Ticket ID (who is using this code)</label>
+        <input id="rd_newClient" placeholder="SE-003" oninput="this.value=this.value.toUpperCase()"/>
+      </div>
+      <div id="redeemPreview" style="display:none;margin-top:10px;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('redeemVoucherModal')">Cancel</button>
+      <button class="btn btn-secondary" onclick="previewRedeem()">Preview</button>
+      <button class="btn btn-primary" onclick="confirmRedeem()">Confirm Redeem</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ TOAST ══════════ -->
+<div class="toast" id="toast">✅ Saved!</div>
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
+<script>
+
+/* ══════════════════════
+   DATA LAYER — localStorage
+══════════════════════ */
+const STORE_KEY = 'sparkedge_admin_tickets';
+const TRACKER_KEY = 'sparkedge_doc_tracker';
+
+function loadTickets() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || defaultTickets(); }
+  catch { return defaultTickets(); }
+}
+function saveTickets(tickets) {
+  localStorage.setItem(STORE_KEY, JSON.stringify(tickets));
+}
+
+/* ── Pre-loaded with your existing 2 clients ── */
+function defaultTickets() {
+  return [
+    {
+      ticketId:'SE-001', clientName:'Rohan Mehta', projectName:'Brand Identity & Logo Design',
+      startDate:'Jan 15, 2025', deadline:'Feb 28, 2025', status:'In Progress', progress:65,
+      whatsapp:'+919142450715', clientEmail:'rohan@example.com',
+      payment:{ total:45000, stages:[
+        {name:'Advance (50%)',amount:22500,status:'paid'},
+        {name:'Mid-point (25%)',amount:11250,status:'paid'},
+        {name:'Final delivery (25%)',amount:11250,status:'pending'}
+      ]},
+      files:[
+        {name:'Brand Brief Document',type:'pdf',url:'https://drive.google.com/your-link-here'},
+        {name:'Logo Concepts v1 (Figma)',type:'figma',url:'https://figma.com/your-link-here'}
+      ],
+      deliverables:[
+        {name:'Brand discovery & questionnaire',done:true},
+        {name:'Moodboard & direction approval',done:true},
+        {name:'Logo concepts (3 directions)',done:true},
+        {name:'Logo refinement & finalisation',done:false},
+        {name:'Brand guidelines document (PDF)',done:false},
+        {name:'Source files handover (AI/SVG)',done:false}
+      ],
+      timeline:[
+        {date:'Feb 5, 2025',text:'Logo concepts v2 shared for review.',tag:'Design'},
+        {date:'Jan 28, 2025',text:'Feedback call completed. Direction B selected.',tag:'Review'},
+        {date:'Jan 15, 2025',text:'Project kicked off. Advance payment received.',tag:'Kickoff'}
+      ],
+      managerNote:`Hi Rohan! Please review the v2 logo concepts and drop feedback by Feb 10. Reach us at <a href="mailto:hello@sparkedge.in">hello@sparkedge.in</a> 🚀`,
+      docsSent:{invoice:false,sow:false,welcome:false,proposal:false}
+    },
+    {
+      ticketId:'SE-002', clientName:'Priya Sharma', projectName:'Social Media Strategy & Content Calendar',
+      startDate:'Feb 1, 2025', deadline:'Feb 25, 2025', status:'Completed', progress:100,
+      whatsapp:'', clientEmail:'priya@example.com',
+      payment:{ total:28000, stages:[
+        {name:'Advance (50%)',amount:14000,status:'paid'},
+        {name:'On delivery (50%)',amount:14000,status:'paid'}
+      ]},
+      files:[
+        {name:'Social Media Strategy Deck',type:'pdf',url:'https://drive.google.com/your-link-here'}
+      ],
+      deliverables:[
+        {name:'Brand audit & competitor analysis',done:true},
+        {name:'Platform strategy (IG + LinkedIn)',done:true},
+        {name:'Content pillars & brand voice doc',done:true},
+        {name:'30-day content calendar (March)',done:true},
+        {name:'5 Canva post templates',done:true},
+        {name:'100 caption templates',done:true}
+      ],
+      timeline:[
+        {date:'Feb 25, 2025',text:'All deliverables handed over. Project completed! 🎉',tag:'Completed'},
+        {date:'Feb 1, 2025',text:'Project started. Kick-off call done.',tag:'Kickoff'}
+      ],
+      managerNote:`Hi Priya! Your project is <strong>fully completed</strong>. Thank you for trusting SparkEdge! 🙏`,
+      docsSent:{invoice:true,sow:true,welcome:true,proposal:false}
+    }
+  ];
+}
+
+let tickets = loadTickets();
+let currentTicketId = null;
+
+/* ══════════════════════
+   NAVIGATION
+══════════════════════ */
+function showPage(page) {
+  document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(v => v.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  const navEl = document.getElementById('nav-'+page);
+  if(navEl) navEl.classList.add('active');
+
+  const titles = {
+    dashboard:{title:'Dashboard',sub:'SparkEdge internal workspace'},
+    tickets:{title:'All Tickets',sub:'Manage your client tickets'},
+    editor:{title:'Edit Ticket',sub:'Update and generate client file'},
+    newticket:{title:'New Ticket',sub:'Onboard a new client'},
+    referrals:{title:'Referrals',sub:'Generate & track refer-and-earn vouchers'},
+    clients:{title:'Clients',sub:'All onboarded clients'},
+    finance:{title:'Finance',sub:'Revenue & payment overview'},
+    team:{title:'Team',sub:'Your team members'},
+    workflow:{title:'Workflow',sub:'Step-by-step process guide'},
+    guide:{title:'System Guide',sub:'How this portal works'},
+    settings:{title:'Settings',sub:'Agency details & preferences'},
+  };
+  if(titles[page]) {
+    document.getElementById('topbarTitle').textContent = titles[page].title;
+    document.getElementById('topbarSub').textContent = titles[page].sub;
+  }
+
+  if(page==='dashboard') renderDashboard();
+  if(page==='tickets') renderTicketList();
+  if(page==='referrals') renderReferrals();
+  if(page==='clients') renderClientsPage();
+  if(page==='finance') renderFinancePage();
+  if(page==='team') renderTeamPage();
+  if(page==='settings') loadSettings();
+
+  // Auto-close sidebar on mobile after navigation
+  if(window.innerWidth <= 900) {
+    const sb = document.querySelector('.sidebar');
+    const ov = document.getElementById('sidebarOverlay');
+    if(sb) sb.classList.remove('open');
+    if(ov) ov.classList.remove('open');
+  }
+}
+
+/* ══════════════════════
+   DASHBOARD
+══════════════════════ */
+function renderDashboard() {
+  const total = tickets.length;
+  const inprog = tickets.filter(t=>t.status==='In Progress').length;
+  const done = tickets.filter(t=>t.status==='Completed').length;
+  const rev = tickets.reduce((s,t)=>s+(parseInt(t.payment?.total)||0),0);
+
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-inprogress').textContent = inprog;
+  document.getElementById('stat-completed').textContent = done;
+  document.getElementById('stat-revenue').textContent = '₹'+rev.toLocaleString('en-IN');
+  document.getElementById('ticketCountBadge').textContent = total;
+
+  const list = document.getElementById('dashTicketList');
+  if(!tickets.length) {
+    list.innerHTML = '<div class="empty-state"><div class="es-icon">📭</div><div class="es-text">No tickets yet. Create your first one!</div></div>';
+    return;
+  }
+  list.innerHTML = tickets.map(t => ticketCardHTML(t)).join('');
+}
+
+function renderTicketList() {
+  const list = document.getElementById('allTicketList');
+  if(!tickets.length) {
+    list.innerHTML = '<div class="empty-state"><div class="es-icon">📭</div><div class="es-text">No tickets yet.</div></div>';
+    return;
+  }
+  list.innerHTML = tickets.map(t => ticketCardHTML(t)).join('');
+}
+
+function ticketCardHTML(t) {
+  const sClass = {
+    'Not Started':'not-started','In Progress':'in-progress','Completed':'completed'
+  }[t.status]||'not-started';
+  const sentCount = Object.values(t.docsSent||{}).filter(Boolean).length;
+  return `
+  <div class="ticket-card" onclick="openEditor('${t.ticketId}')">
+    <div class="ticket-id">${t.ticketId}</div>
+    <div class="ticket-info">
+      <div class="ti-name">${t.clientName}</div>
+      <div class="ti-project">${t.projectName}</div>
+    </div>
+    <div class="ticket-progress-wrap">
+      <div class="ticket-progress-pct">${t.progress}%</div>
+      <div class="ticket-progress-bar"><div class="ticket-progress-fill" style="width:${t.progress}%"></div></div>
+    </div>
+    <div class="status-pill ${sClass}"><span class="status-dot"></span>${t.status}</div>
+    <div class="ticket-actions">
+      <span style="font-size:11px;color:var(--text-dim);">📋 ${sentCount}/4 docs</span>
+      ${t.whatsapp ? `<a href="https://wa.me/${t.whatsapp.replace(/[^0-9]/g,'')}" target="_blank" class="btn btn-ghost btn-sm" onclick="event.stopPropagation()" style="color:#25D366;border-color:rgba(37,211,102,.3);">WhatsApp</a>` : ''}
+      <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openEditor('${t.ticketId}')" style="cursor:pointer;">✏️ Edit</button>
+    </div>
+  </div>`;
+}
+
+/* ══════════════════════
+   EDITOR
+══════════════════════ */
+function openEditor(ticketId) {
+  currentTicketId = ticketId;
+  const t = tickets.find(x=>x.ticketId===ticketId);
+  if(!t) return;
+
+  document.getElementById('editorTicketId').textContent = 'Editing '+t.ticketId;
+  document.getElementById('editorClientName').textContent = t.clientName;
+
+  // Basic fields
+  setV('e_ticketId',t.ticketId);
+  setV('e_clientName',t.clientName);
+  setV('e_projectName',t.projectName);
+  setV('e_whatsapp',t.whatsapp||'');
+  setV('e_clientEmail',t.clientEmail||'');
+  setV('e_startDate',t.startDate);
+  setV('e_deadline',t.deadline);
+  setV('e_status',t.status);
+  document.getElementById('e_progress').value = t.progress;
+  document.getElementById('progressLabel').textContent = t.progress+'%';
+  setV('e_payTotal',t.payment?.total||0);
+  setV('e_managerNote',t.managerNote||'');
+
+  // Payment stages
+  renderStages(t.payment?.stages||[]);
+  // Files
+  renderFiles(t.files||[]);
+  // Deliverables
+  renderDeliverables(t.deliverables||[]);
+  // Timeline
+  renderTimeline(t.timeline||[]);
+  // Doc tracker
+  const ds = t.docsSent||{};
+  document.getElementById('dt_invoice').checked = !!ds.invoice;
+  document.getElementById('dt_sow').checked = !!ds.sow;
+  document.getElementById('dt_welcome').checked = !!ds.welcome;
+  document.getElementById('dt_proposal').checked = !!ds.proposal;
+
+  // Discount fields
+  loadDiscountFields(t);
+
+  // Referral discount status
+  const rdStatus = document.getElementById('refDiscountStatus');
+  if(rdStatus) {
+    if(t.referralDiscount) {
+      rdStatus.innerHTML = `<span style="color:var(--green);">✅ Voucher <strong style="color:var(--text);">${t.referralDiscount.code}</strong> applied — ₹${(t.referralDiscount.discount||0).toLocaleString('en-IN')} discount · ${t.referralDiscount.appliedAt}</span>`;
+      document.getElementById('e_refVoucherCode').value = t.referralDiscount.code||'';
+    } else {
+      rdStatus.textContent = 'No referral discount applied to this ticket.';
+      document.getElementById('e_refVoucherCode').value = '';
+    }
+  }
+
+  // WA link
+  updateWALink();
+  document.getElementById('e_whatsapp').addEventListener('input', updateWALink);
+  document.getElementById('wa_message').addEventListener('input', updateWALink);
+
+  showPage('editor');
+  document.getElementById('topbarTitle').textContent = 'Editing '+t.ticketId;
+  document.getElementById('topbarSub').textContent = t.clientName + ' · ' + t.projectName;
+
+  // Show referral info for this client
+  const vouchers = loadVouchers();
+  const clientVouchers = vouchers.filter(v => v.referrer === t.ticketId);
+  const usedVouchers = clientVouchers.filter(v => v.status === 'used');
+  const infoEl = document.getElementById('clientReferralInfo');
+  if(infoEl) {
+    if(clientVouchers.length) {
+      infoEl.innerHTML = `<span style="color:var(--text-muted);">${clientVouchers.length} voucher(s) issued · ${usedVouchers.length} redeemed</span>`;
+    } else {
+      infoEl.innerHTML = `<span>No vouchers yet for this client</span>`;
+    }
+  }
+}
+
+function updateWALink() {
+  const num = (document.getElementById('e_whatsapp')?.value||'').replace(/[^0-9]/g,'');
+  const msg = encodeURIComponent(document.getElementById('wa_message')?.value||'');
+  const link = document.getElementById('waLink');
+  if(link) link.href = num ? `https://wa.me/${num}?text=${msg}` : '#';
+}
+
+function setV(id,val) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  if(el.tagName==='SELECT') { for(let o of el.options) if(o.value===val) { o.selected=true; break; } }
+  else el.value = val;
+}
+
+/* ── STAGES ── */
+function renderStages(stages) {
+  const list = document.getElementById('stagesList');
+  list.innerHTML = stages.map((s,i) => stageRowHTML(s,i)).join('');
+}
+function stageRowHTML(s,i) {
+  return `<div class="stage-row" id="stage_${i}">
+    <input class="sr-name" placeholder="Stage name e.g. Advance (50%)" value="${esc(s.name||'')}"/>
+    <input style="width:100px;" placeholder="Amount ₹" value="${s.amount||''}"/>
+    <select class="stage-status-select">
+      <option ${s.status==='paid'?'selected':''}>paid</option>
+      <option ${s.status==='pending'?'selected':''}>pending</option>
+      <option ${s.status==='upcoming'?'selected':''}>upcoming</option>
+    </select>
+    <button class="btn-remove" onclick="this.closest('.stage-row').remove()">✕</button>
+  </div>`;
+}
+function addStage() {
+  const list = document.getElementById('stagesList');
+  const div = document.createElement('div');
+  const i = Date.now();
+  div.className='stage-row';div.id='stage_'+i;
+  div.innerHTML = stageRowHTML({name:'',amount:'',status:'pending'},i);
+  list.appendChild(div);
+}
+
+/* ── FILES ── */
+function renderFiles(files) {
+  const list = document.getElementById('filesList');
+  list.innerHTML = files.map((f,i) => fileRowHTML(f,i)).join('');
+}
+function fileRowHTML(f,i) {
+  const types = ['pdf','figma','drive','doc','sheet','zip','video','image'];
+  return `<div class="file-row" id="file_${i}">
+    <input placeholder="File name" value="${esc(f.name||'')}"/>
+    <select>${types.map(t=>`<option ${f.type===t?'selected':''}>${t}</option>`).join('')}</select>
+    <input placeholder="URL https://..." value="${esc(f.url||'')}"/>
+    <button class="btn-remove" onclick="this.closest('.file-row').remove()">✕</button>
+  </div>`;
+}
+function addFile() {
+  const list = document.getElementById('filesList');
+  const div = document.createElement('div');
+  div.innerHTML = fileRowHTML({name:'',type:'pdf',url:''},Date.now());
+  list.appendChild(div.firstElementChild);
+}
+
+/* ── DELIVERABLES ── */
+function renderDeliverables(delivs) {
+  const list = document.getElementById('delivList');
+  list.innerHTML = delivs.map((d,i) => delivRowHTML(d,i)).join('');
+}
+function delivRowHTML(d,i) {
+  return `<div class="deliv-row" id="deliv_${i}">
+    <input placeholder="Deliverable name" value="${esc(d.name||'')}"/>
+    <label class="done-toggle"><input type="checkbox" ${d.done?'checked':''}/> Done</label>
+    <button class="btn-remove" onclick="this.closest('.deliv-row').remove()">✕</button>
+  </div>`;
+}
+function addDeliverable() {
+  const list = document.getElementById('delivList');
+  const div = document.createElement('div');
+  div.innerHTML = delivRowHTML({name:'',done:false},Date.now());
+  list.appendChild(div.firstElementChild);
+}
+
+/* ── TIMELINE ── */
+function renderTimeline(items) {
+  const list = document.getElementById('timelineList');
+  list.innerHTML = items.map((t,i) => tlRowHTML(t,i)).join('');
+}
+const tlTags = ['Kickoff','Milestone','Design','Review','Delivered','Approved','Completed','Started','Revised',''];
+function tlRowHTML(t,i) {
+  return `<div class="tl-row" id="tl_${i}">
+    <div class="tl-row-top">
+      <input placeholder="Date e.g. Feb 5, 2025" value="${esc(t.date||'')}"/>
+      <select>${tlTags.map(tag=>`<option ${t.tag===tag?'selected':''}>${tag}</option>`).join('')}</select>
+      <button class="btn-remove" onclick="this.closest('.tl-row').remove()">✕</button>
+    </div>
+    <div class="tl-row-bottom">
+      <input placeholder="What happened / update description" value="${esc(t.text||'')}"/>
+    </div>
+  </div>`;
+}
+function addTimeline() {
+  const list = document.getElementById('timelineList');
+  const div = document.createElement('div');
+  div.innerHTML = tlRowHTML({date:'',text:'',tag:''},Date.now());
+  list.insertBefore(div.firstElementChild, list.firstChild);
+}
+
+/* ══════════════════════
+   COLLECT FORM DATA
+══════════════════════ */
+function collectFormData() {
+  const stages = [...document.querySelectorAll('#stagesList .stage-row')].map(row => {
+    const inputs = row.querySelectorAll('input');
+    const sel = row.querySelector('select');
+    return { name:inputs[0].value.trim(), amount:parseInt(inputs[1].value)||0, status:sel.value };
+  });
+  const files = [...document.querySelectorAll('#filesList .file-row')].map(row => {
+    const inputs = row.querySelectorAll('input');
+    const sel = row.querySelector('select');
+    return { name:inputs[0].value.trim(), type:sel.value, url:inputs[1].value.trim() };
+  }).filter(f=>f.name);
+  const delivs = [...document.querySelectorAll('#delivList .deliv-row')].map(row => ({
+    name: row.querySelector('input').value.trim(),
+    done: row.querySelector('input[type=checkbox]').checked
+  })).filter(d=>d.name);
+  const timeline = [...document.querySelectorAll('#timelineList .tl-row')].map(row => {
+    const inputs = row.querySelectorAll('input');
+    const sel = row.querySelector('select');
+    return { date:inputs[0].value.trim(), text:inputs[1].value.trim(), tag:sel.value||null };
+  }).filter(t=>t.text);
+
+  return {
+    ticketId: document.getElementById('e_ticketId').value,
+    clientName: document.getElementById('e_clientName').value.trim(),
+    projectName: document.getElementById('e_projectName').value.trim(),
+    startDate: document.getElementById('e_startDate').value.trim(),
+    deadline: document.getElementById('e_deadline').value.trim(),
+    status: document.getElementById('e_status').value,
+    progress: parseInt(document.getElementById('e_progress').value)||0,
+    whatsapp: document.getElementById('e_whatsapp').value.trim(),
+    clientEmail: document.getElementById('e_clientEmail').value.trim(),
+    payment: { total: parseInt(document.getElementById('e_payTotal').value)||0, stages },
+    discount: collectDiscount(),
+    files, deliverables:delivs, timeline,
+    managerNote: document.getElementById('e_managerNote').value.trim(),
+    docsSent: {
+      invoice: document.getElementById('dt_invoice').checked,
+      sow: document.getElementById('dt_sow').checked,
+      welcome: document.getElementById('dt_welcome').checked,
+      proposal: document.getElementById('dt_proposal').checked,
+    },
+    referralDiscount: (() => {
+      const idx = tickets.findIndex(t=>t.ticketId===currentTicketId);
+      return idx>=0 ? (tickets[idx].referralDiscount||null) : null;
+    })(),
+    referralRewards: (() => {
+      const idx = tickets.findIndex(t=>t.ticketId===currentTicketId);
+      return idx>=0 ? (tickets[idx].referralRewards||null) : null;
+    })()
+  };
+}
+
+/* ══════════════════════
+   SAVE DOC TRACKER
+══════════════════════ */
+function saveDocTracker() {
+  if(!currentTicketId) return;
+  const idx = tickets.findIndex(t=>t.ticketId===currentTicketId);
+  if(idx<0) return;
+  tickets[idx].docsSent = {
+    invoice: document.getElementById('dt_invoice').checked,
+    sow: document.getElementById('dt_sow').checked,
+    welcome: document.getElementById('dt_welcome').checked,
+    proposal: document.getElementById('dt_proposal').checked,
+  };
+  saveTickets(tickets);
+  showToast('Doc tracker saved!');
+}
+
+/* ══════════════════════
+   SAVE TICKET (to localStorage)
+══════════════════════ */
+function saveCurrentTicket() {
+  const data = collectFormData();
+  const idx = tickets.findIndex(t=>t.ticketId===currentTicketId);
+  if(idx>=0) tickets[idx] = data;
+  saveTickets(tickets);
+  showToast('Ticket saved!');
+}
+
+/* ══════════════════════
+   GENERATE HTML FILE
+══════════════════════ */
+function generateAndDownload() {
+  const data = collectFormData();
+  // Also save to localStorage
+  const idx = tickets.findIndex(t=>t.ticketId===currentTicketId);
+  if(idx>=0) tickets[idx] = data;
+  saveTickets(tickets);
+
+  const html = buildClientHTML(data);
+  const blob = new Blob([html], {type:'text/html;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = data.ticketId + '.html';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('File downloaded! → Move to clients/ folder → Push to GitHub');
+}
+
+/* ══════════════════════
+   BUILD CLIENT HTML
+   (matches your existing portal format exactly)
+══════════════════════ */
+function buildClientHTML(t) {
+  // Check if referral discount applied to this ticket
+  const refDiscount = t.referralDiscount ? `
+  <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+    <span style="font-size:20px;">🎟</span>
+    <div>
+      <div style="font-size:13px;font-weight:700;color:#22C55E;">Referral Discount Applied!</div>
+      <div style="font-size:12px;color:#7A7A9A;margin-top:2px;">Code <strong style="color:#F0F0FA;">${t.referralDiscount.code}</strong> — You saved <strong style="color:#22C55E;">₹${(t.referralDiscount.discount||0).toLocaleString('en-IN')}</strong> · Applied ${t.referralDiscount.appliedAt}</div>
+    </div>
+  </div>` : '';
+
+  // Referral rewards section (for the referrer)
+  const refRewards = (t.referralRewards && t.referralRewards.length) ? `
+  <div style="background:rgba(255,179,71,.06);border:1px solid rgba(255,179,71,.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;">
+    <div style="font-size:12px;font-weight:700;color:#FFB347;margin-bottom:10px;">🎁 Your Referral Rewards</div>
+    ${t.referralRewards.map(r=>`<div style="font-size:12px;color:#7A7A9A;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);">Code <strong style="color:#F0F0FA;">${r.code}</strong> used by client ${r.usedBy} on ${r.date} — Reward: <strong style="color:#FFB347;">${r.reward||'—'}</strong></div>`).join('')}
+  </div>` : '';
+
+  // Situational discount banner
+  const sitDiscount = (t.discount && t.discount.type && t.discount.type !== 'none' && t.discount.value) ? (() => {
+    const total = t.payment?.total || 0;
+    const discAmt = t.discount.type === 'flat' ? t.discount.value : Math.round(total * t.discount.value / 100);
+    const finalAmt = total - discAmt;
+    return `
+  <div style="background:rgba(255,179,71,.07);border:1px solid rgba(255,179,71,.25);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+    <span style="font-size:20px;">🏷️</span>
+    <div>
+      <div style="font-size:13px;font-weight:700;color:#FFB347;">Special Discount Applied!</div>
+      <div style="font-size:12px;color:#7A7A9A;margin-top:2px;">${t.discount.reason ? t.discount.reason + ' — ' : ''}You save <strong style="color:#FFB347;">₹${discAmt.toLocaleString('en-IN')}</strong>. Final amount: <strong style="color:#F0F0FA;">₹${finalAmt.toLocaleString('en-IN')}</strong></div>
+    </div>
+  </div>`;
+  })() : '';
+
+  const clientDataJS = JSON.stringify({
+    ticketId: t.ticketId,
+    clientName: t.clientName,
+    projectName: t.projectName,
+    startDate: t.startDate,
+    deadline: t.deadline,
+    status: t.status,
+    progress: t.progress,
+    payment: t.payment,
+    discount: t.discount || null,
+    files: t.files,
+    deliverables: t.deliverables,
+    timeline: t.timeline,
+    managerNote: t.managerNote || null
+  }, null, 2);
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>${t.ticketId} — SparkEdge Client Portal</title>
+  <link rel="stylesheet" href="../assets/css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    .pay-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:999;align-items:center;justify-content:center;padding:20px;}
+    .pay-modal-overlay.open{display:flex;}
+    .pay-modal{background:#0E0E1A;border:1px solid #1E1E30;border-radius:16px;width:100%;max-width:420px;overflow:hidden;animation:pmIn .2s ease;}
+    @keyframes pmIn{from{transform:scale(.94);opacity:0;}to{transform:scale(1);opacity:1;}}
+    .pay-modal-hdr{padding:18px 22px;border-bottom:1px solid #1E1E30;display:flex;align-items:center;justify-content:space-between;}
+    .pay-modal-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#F0F0FA;}
+    .pay-modal-close{background:none;border:none;color:#7A7A9A;font-size:20px;cursor:pointer;padding:2px 6px;border-radius:6px;}
+    .pay-modal-close:hover{background:#141422;color:#F0F0FA;}
+    .pay-modal-body{padding:20px;display:flex;flex-direction:column;gap:14px;}
+    .pay-modal-footer{padding:14px 22px;border-top:1px solid #1E1E30;display:flex;justify-content:flex-end;}
+  </style>
+</head>
+<body class="dashboard-page">
+  <div id="app">Loading...</div>
+
+  <!-- Payment Modal -->
+  <div class="pay-modal-overlay" id="payModal">
+    <div class="pay-modal">
+      <div class="pay-modal-hdr">
+        <div class="pay-modal-title">💳 Pay Online</div>
+        <button class="pay-modal-close" onclick="document.getElementById('payModal').classList.remove('open')">✕</button>
+      </div>
+      <div class="pay-modal-body">
+        <div style="background:rgba(255,107,53,.06);border:1px solid rgba(255,107,53,.2);border-radius:10px;padding:16px;text-align:center;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#7A7A9A;margin-bottom:10px;">UPI — Tap to Open Payment App</div>
+          <button onclick="doUpiPay()" style="background:linear-gradient(135deg,#FF6B35,#FF3CAC);border:none;border-radius:10px;padding:13px 28px;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#fff;cursor:pointer;width:100%;">📲 Pay via UPI App</button>
+          <div style="margin-top:10px;font-size:13px;color:#FF6B35;background:#141422;border:1px solid #1E1E30;border-radius:6px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-family:monospace;">raunakkarn555-2@okhdfcbank</span>
+            <button onclick="copyUpiId()" style="background:none;border:none;color:#7A7A9A;cursor:pointer;font-size:11px;">📋 Copy</button>
+          </div>
+          <div style="font-size:11px;color:#3A3A5A;margin-top:6px;">Works with GPay, PhonePe, Paytm, BHIM & all UPI apps</div>
+        </div>
+        <div style="background:#141422;border:1px solid #1E1E30;border-radius:10px;padding:16px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#7A7A9A;margin-bottom:12px;">🏦 Bank Transfer (NEFT/IMPS/RTGS)</div>
+          <div style="display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:12px;">
+            <span style="color:#3A3A5A;font-weight:600;">Account Holder</span><span style="color:#F0F0FA;font-weight:700;">Raunak Kumar</span>
+            <span style="color:#3A3A5A;font-weight:600;">Bank</span><span style="color:#F0F0FA;">Canara Bank, Samastipur</span>
+            <span style="color:#3A3A5A;font-weight:600;">Account No.</span><span style="color:#FF6B35;font-family:monospace;font-weight:700;">110281513266</span>
+            <span style="color:#3A3A5A;font-weight:600;">IFSC Code</span><span style="color:#FF6B35;font-family:monospace;font-weight:700;">CNRB0017535</span>
+          </div>
+          <button onclick="copyBank()" style="margin-top:12px;width:100%;background:#080810;border:1px dashed #2A2A40;border-radius:8px;padding:8px;font-size:12px;color:#7A7A9A;cursor:pointer;">📋 Copy All Bank Details</button>
+        </div>
+        <div style="font-size:11px;color:#3A3A5A;text-align:center;line-height:1.7;">After payment, share the screenshot on WhatsApp or email to <strong style="color:#7A7A9A;">sparkedge555@gmail.com</strong></div>
+      </div>
+      <div class="pay-modal-footer">
+        <button onclick="document.getElementById('payModal').classList.remove('open')" style="background:#141422;border:1px solid #1E1E30;border-radius:8px;padding:8px 18px;font-size:13px;color:#7A7A9A;cursor:pointer;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/portal.js"><\/script>
+  <script>
+    /* Generated by SparkEdge Admin Panel — ${new Date().toLocaleString()} */
+    const clientData = ${clientDataJS};
+
+    // Inject referral banners after render
+    const _origRender = window.renderDashboard;
+    window.renderDashboard = function(d) {
+      if(_origRender) _origRender(d);
+      setTimeout(()=>{
+        const container = document.querySelector('.payment-section, .pay-section, [data-section="payment"], .card-body') || document.querySelector('#app');
+        if(container) {
+          const banner = document.createElement('div');
+          banner.innerHTML = \`${sitDiscount}${refDiscount}${refRewards}\`;
+          container.prepend(banner);
+        }
+        // Patch pay button
+        document.querySelectorAll('button, a').forEach(el=>{
+          const t = (el.textContent||'').toLowerCase();
+          if(t.includes('pay online')||t.includes('pay now')) {
+            el.addEventListener('click', e=>{ e.preventDefault(); e.stopPropagation(); document.getElementById('payModal').classList.add('open'); });
+          }
+        });
+      }, 400);
+    };
+
+    renderDashboard(clientData);
+
+    function doUpiPay() {
+      const upiLink = 'upi://pay?pa=raunakkarn555-2@okhdfcbank&pn=Raunak%20Kumar&tn=SparkEdge%20Payment&cu=INR';
+      window.location.href = upiLink;
+      setTimeout(()=>{ if(document.hasFocus()) alert('Open GPay / PhonePe / Paytm manually and pay to:\\n\\nraunakkarn555-2@okhdfcbank'); }, 1500);
+    }
+    function copyUpiId() {
+      navigator.clipboard.writeText('raunakkarn555-2@okhdfcbank').then(()=>alert('UPI ID copied!')).catch(()=>{const e=document.createElement('textarea');e.value='raunakkarn555-2@okhdfcbank';document.body.appendChild(e);e.select();document.execCommand('copy');document.body.removeChild(e);alert('Copied!');});
+    }
+    function copyBank() {
+      const d='Account Holder: Raunak Kumar\\nBank: Canara Bank, Samastipur\\nAccount Number: 110281513266\\nIFSC: CNRB0017535';
+      navigator.clipboard.writeText(d).then(()=>alert('Bank details copied!')).catch(()=>{const e=document.createElement('textarea');e.value=d;document.body.appendChild(e);e.select();document.execCommand('copy');document.body.removeChild(e);alert('Copied!');});
+    }
+  <\/script>
+<!-- ══════════ MODAL: IMPORT DATA ══════════ -->
+<div class="modal-overlay" id="importOverlay">
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-header">
+      <div class="modal-title">⬆ Import Data</div>
+      <button class="modal-close" onclick="closeImportModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--text-muted);font-size:13px;line-height:1.7;">Paste exported JSON from another device or team member. Tickets will be merged (duplicates updated, new ones added). Vouchers merged without duplicates.</p>
+      <div class="field full" style="margin-top:10px;">
+        <label>Paste JSON Data</label>
+        <textarea id="importDataText" style="min-height:160px;font-family:monospace;font-size:11px;" placeholder='{"tickets":[...],"vouchers":[...],"exportedAt":"..."}' ></textarea>
+      </div>
+      <p style="font-size:11px;color:#EF4444;margin-top:8px;">⚠️ Existing tickets with same ID will be overwritten. New tickets will be added. Your data is NOT deleted.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeImportModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="doImport()">Import & Merge</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MODAL: ADD/EDIT MEMBER ══════════ -->
+<div class="modal-overlay" id="memberModal">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-header">
+      <div class="modal-title" id="memberModalTitle">Invite Team Member</div>
+      <button class="modal-close" onclick="closeMemberModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="memberModalEditIdx" value="-1"/>
+
+      <div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:12px 16px;margin-bottom:4px;">
+        <div style="font-size:12px;font-weight:700;color:#3B82F6;margin-bottom:4px;">🔐 Authentication Info</div>
+        <div style="font-size:11px;color:var(--text-muted);line-height:1.6;">The member uses their <strong style="color:var(--text);">unique password</strong> to log into this admin panel. Make sure it's different from the owner password and at least 6 characters.</div>
+      </div>
+
+      <div class="field-grid" style="gap:12px;">
+        <div class="field"><label>Full Name *</label><input id="mm_name" placeholder="e.g. Priya Sharma"/></div>
+        <div class="field"><label>Role / Designation</label>
+          <select id="mm_role">
+            <option>Designer</option>
+            <option>Developer</option>
+            <option>Marketing Manager</option>
+            <option>Project Manager</option>
+            <option>Sales Executive</option>
+            <option>Content Writer</option>
+            <option>Intern</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field"><label>Email</label><input id="mm_email" placeholder="member@sparkedge.in"/></div>
+        <div class="field"><label>WhatsApp</label><input id="mm_wa" placeholder="+91 98765 43210"/></div>
+        <div class="field full">
+          <label>Login Password * (min 6 chars, must be unique)</label>
+          <input id="mm_password" type="text" placeholder="e.g. Priya@2025" autocomplete="new-password"/>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--border);margin:14px 0;"></div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;">Permissions</div>
+
+      <div class="field" style="margin-bottom:12px;">
+        <label>Quick Preset</label>
+        <select id="mm_preset" onchange="applyPermissionPreset(this.value)">
+          <option value="member_full">Full Member (all permissions)</option>
+          <option value="member_basic" selected>Basic Member (view + edit)</option>
+          <option value="member_view">View Only</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <label style="display:flex;align-items:flex-start;gap:8px;background:var(--bg-raised);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;">
+          <input type="checkbox" id="perm_view_tickets" style="accent-color:var(--accent);margin-top:2px;flex-shrink:0;" onchange="document.getElementById('mm_preset').value='custom'"/>
+          <div><div style="font-size:12px;font-weight:600;">👁 View Tickets</div><div style="font-size:10px;color:var(--text-muted);">Can see all client tickets</div></div>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:8px;background:var(--bg-raised);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;">
+          <input type="checkbox" id="perm_edit_tickets" style="accent-color:var(--accent);margin-top:2px;flex-shrink:0;" onchange="document.getElementById('mm_preset').value='custom'"/>
+          <div><div style="font-size:12px;font-weight:600;">✏️ Edit Tickets</div><div style="font-size:10px;color:var(--text-muted);">Can save changes to tickets</div></div>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:8px;background:var(--bg-raised);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;">
+          <input type="checkbox" id="perm_create_tickets" style="accent-color:var(--accent);margin-top:2px;flex-shrink:0;" onchange="document.getElementById('mm_preset').value='custom'"/>
+          <div><div style="font-size:12px;font-weight:600;">➕ Create Tickets</div><div style="font-size:10px;color:var(--text-muted);">Can create new tickets</div></div>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:8px;background:var(--bg-raised);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;">
+          <input type="checkbox" id="perm_delete_tickets" style="accent-color:var(--accent);margin-top:2px;flex-shrink:0;" onchange="document.getElementById('mm_preset').value='custom'"/>
+          <div><div style="font-size:12px;font-weight:600;">🗑 Delete Tickets</div><div style="font-size:10px;color:var(--text-muted);">Can permanently delete tickets</div></div>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:8px;background:var(--bg-raised);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;">
+          <input type="checkbox" id="perm_view_finance" style="accent-color:var(--accent);margin-top:2px;flex-shrink:0;" onchange="document.getElementById('mm_preset').value='custom'"/>
+          <div><div style="font-size:12px;font-weight:600;">💰 View Finance</div><div style="font-size:10px;color:var(--text-muted);">Can access Finance page</div></div>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:8px;background:var(--bg-raised);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;">
+          <input type="checkbox" id="perm_view_clients" style="accent-color:var(--accent);margin-top:2px;flex-shrink:0;" onchange="document.getElementById('mm_preset').value='custom'"/>
+          <div><div style="font-size:12px;font-weight:600;">👥 View Clients</div><div style="font-size:10px;color:var(--text-muted);">Can access Clients page</div></div>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:8px;background:var(--bg-raised);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;">
+          <input type="checkbox" id="perm_export" style="accent-color:var(--accent);margin-top:2px;flex-shrink:0;" onchange="document.getElementById('mm_preset').value='custom'"/>
+          <div><div style="font-size:12px;font-weight:600;">⬇ Export / Import</div><div style="font-size:10px;color:var(--text-muted);">Can export and import data</div></div>
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeMemberModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveMember()">💾 Save Member</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>`;
+}
+
+/* ══════════════════════
+   CREATE NEW TICKET
+══════════════════════ */
+function createTicket() {
+  const id = document.getElementById('new_ticketId').value.trim().toUpperCase();
+  if(!id) { alert('Please enter a Ticket ID (e.g. SE-003)'); return; }
+  if(tickets.find(t=>t.ticketId===id)) { alert('Ticket '+id+' already exists!'); return; }
+
+  const newTicket = {
+    ticketId: id,
+    clientName: document.getElementById('new_clientName').value.trim() || 'New Client',
+    projectName: document.getElementById('new_projectName').value.trim() || 'New Project',
+    startDate: document.getElementById('new_startDate').value.trim() || '',
+    deadline: document.getElementById('new_deadline').value.trim() || '',
+    status: document.getElementById('new_status').value,
+    progress: 0,
+    whatsapp: document.getElementById('new_whatsapp').value.trim() || '',
+    clientEmail: document.getElementById('new_clientEmail').value.trim() || '',
+    payment:{ total: parseInt(document.getElementById('new_totalAmt').value)||0, stages:[] },
+    files:[], deliverables:[], timeline:[{
+      date: document.getElementById('new_startDate').value.trim() || new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}),
+      text:`Project kicked off. Welcome aboard, ${document.getElementById('new_clientName').value.trim() || 'Client'}!`,
+      tag:'Kickoff'
+    }],
+    managerNote:`Hi ${document.getElementById('new_clientName').value.trim() || 'there'}! We're excited to work with you. This portal will keep you updated on your project's progress in real time. Reach us anytime at <a href="mailto:sparkedge555@gmail.com">sparkedge555@gmail.com</a>.`,
+    docsSent:{invoice:false,sow:false,welcome:false,proposal:false}
+  };
+  tickets.push(newTicket);
+  saveTickets(tickets);
+  document.getElementById('ticketCountBadge').textContent = tickets.length;
+  showToast('Ticket '+id+' created!');
+  // clear form
+  ['new_ticketId','new_clientName','new_projectName','new_startDate','new_deadline','new_whatsapp','new_clientEmail','new_totalAmt'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  openEditor(newTicket.ticketId);
+}
+
+/* ══════════════════════
+   DELETE TICKET
+══════════════════════ */
+function deleteTicket() {
+  document.getElementById('deleteModal').classList.add('open');
+}
+function confirmDelete() {
+  tickets = tickets.filter(t=>t.ticketId!==currentTicketId);
+  saveTickets(tickets);
+  closeModal('deleteModal');
+  showToast('Ticket deleted');
+  showPage('tickets');
+  renderTicketList();
+  document.getElementById('ticketCountBadge').textContent = tickets.length;
+}
+
+/* ══════════════════════
+   UTILS
+══════════════════════ */
+function esc(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = '✅ ' + msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3500);
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+/* ══════════════════════
+   PAYMENT MODAL
+══════════════════════ */
+function openPaymentModal() {
+  document.getElementById('paymentModal').classList.add('open');
+}
+
+function quickCreateVoucher() {
+  if(!currentTicketId) { showToast('Please open a ticket first.'); return; }
+  document.getElementById('vc_code').value = 'SE-REF-'+currentTicketId.replace('SE-','');
+  document.getElementById('vc_referrer').value = currentTicketId;
+  document.getElementById('vc_discValue').value = '10';
+  document.getElementById('vc_referrerReward').value = '₹500 credit on next project';
+  document.getElementById('vc_expiry').value = '';
+  document.getElementById('createVoucherModal').classList.add('open');
+}
+function openUPI() {
+  const upiId = 'raunakkarn555-2@okhdfcbank';
+  const name = encodeURIComponent('Raunak Kumar');
+  const note = encodeURIComponent('SparkEdge Payment');
+  // Try UPI deep link first (opens GPay/PhonePe/Paytm directly)
+  const upiLink = `upi://pay?pa=${upiId}&pn=${name}&tn=${note}&cu=INR`;
+  window.location.href = upiLink;
+  // Fallback: after 1.5s if no app opened, show instructions
+  setTimeout(() => {
+    if(document.hasFocus()) {
+      alert('No UPI app detected on this device.\n\nPlease manually open GPay / PhonePe / Paytm and send to:\n\nraunakkarn555-2@okhdfcbank');
+    }
+  }, 1500);
+}
+function copyUPI() {
+  navigator.clipboard.writeText('raunakkarn555-2@okhdfcbank').then(()=>showToast('UPI ID copied!')).catch(()=>{
+    const el = document.createElement('textarea');
+    el.value = 'raunakkarn555-2@okhdfcbank';
+    document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+    showToast('UPI ID copied!');
+  });
+}
+function copyBankDetails() {
+  const details = `Account Holder: Raunak Kumar\nBank: Canara Bank, Samastipur\nAccount Number: 110281513266\nIFSC: CNRB0017535`;
+  navigator.clipboard.writeText(details).then(()=>showToast('Bank details copied!')).catch(()=>{
+    const el = document.createElement('textarea');
+    el.value = details;
+    document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+    showToast('Bank details copied!');
+  });
+}
+
+/* ══════════════════════
+   REFERRAL SYSTEM
+══════════════════════ */
+const VOUCHER_KEY = 'sparkedge_vouchers';
+function loadVouchers() {
+  try { return JSON.parse(localStorage.getItem(VOUCHER_KEY)) || []; }
+  catch { return []; }
+}
+function saveVouchers(v) { localStorage.setItem(VOUCHER_KEY, JSON.stringify(v)); }
+
+function renderReferrals() {
+  const vouchers = loadVouchers();
+  const active = vouchers.filter(v => v.status === 'active').length;
+  const used = vouchers.filter(v => v.status === 'used').length;
+  const totalDisc = vouchers.filter(v=>v.status==='used').reduce((s,v)=>s+(v.discountGiven||0),0);
+  document.getElementById('ref-stat-total').textContent = vouchers.length;
+  document.getElementById('ref-stat-active').textContent = active;
+  document.getElementById('ref-stat-used').textContent = used;
+  document.getElementById('ref-stat-discount').textContent = '₹'+totalDisc.toLocaleString('en-IN');
+
+  const list = document.getElementById('voucherList');
+  if(!vouchers.length) {
+    list.innerHTML = '<div class="empty-state"><div class="es-icon">🎁</div><div class="es-text">No vouchers yet. Create your first referral voucher!</div></div>';
+    return;
+  }
+  list.innerHTML = vouchers.map((v,i) => voucherCardHTML(v,i)).join('');
+}
+
+function voucherCardHTML(v, i) {
+  const status = v.status || 'active';
+  const discLabel = v.discType === 'percent' ? v.discValue+'%' : '₹'+v.discValue;
+  const referrerTicket = tickets.find(t=>t.ticketId===v.referrer);
+  const referrerName = referrerTicket ? referrerTicket.clientName : v.referrer;
+  const usedByTicket = v.usedBy ? tickets.find(t=>t.ticketId===v.usedBy) : null;
+  return `<div class="voucher-card ${status==='used'?'used':''}">
+    <div>
+      <div class="vc-code">${v.code}</div>
+      <div class="vc-meta">Referrer: <strong style="color:var(--text);">${referrerName}</strong> (${v.referrer})${v.expiry ? ' · Expires: '+v.expiry : ''}</div>
+      ${v.referrerReward ? `<div class="vc-meta" style="color:var(--gold);">🎁 Referrer reward: ${v.referrerReward}</div>` : ''}
+      ${v.usedBy ? `<div class="vc-meta" style="color:var(--green);">✅ Used by: ${usedByTicket?usedByTicket.clientName:v.usedBy} (${v.usedBy})</div>` : ''}
+    </div>
+    <div style="text-align:center;">
+      <div class="vc-discount">${discLabel} OFF</div>
+      <div class="vc-meta">${v.discType==='percent'?'Percentage':'Flat'}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+      <span class="vc-pill ${status}">${status.charAt(0).toUpperCase()+status.slice(1)}</span>
+      <div class="vc-actions">
+        ${status==='active' ? `<button class="btn btn-green btn-sm" onclick="openRedeemModal('${v.code}')">Redeem</button>` : ''}
+        <button class="btn btn-secondary btn-sm" onclick="copyVoucherCode('${v.code}')">📋</button>
+        <button class="btn btn-red btn-sm" onclick="deleteVoucher(${i})">✕</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function openCreateVoucherModal() {
+  document.getElementById('vc_code').value = '';
+  document.getElementById('vc_referrer').value = '';
+  document.getElementById('vc_discValue').value = '';
+  document.getElementById('vc_referrerReward').value = '';
+  document.getElementById('vc_expiry').value = '';
+  document.getElementById('createVoucherModal').classList.add('open');
+}
+
+function autoGenCode() {
+  const referrer = document.getElementById('vc_referrer').value.trim();
+  const suffix = referrer || Math.random().toString(36).substring(2,6).toUpperCase();
+  document.getElementById('vc_code').value = 'SE-REF-'+suffix;
+}
+
+function saveVoucher() {
+  const code = document.getElementById('vc_code').value.trim().toUpperCase();
+  const referrer = document.getElementById('vc_referrer').value.trim().toUpperCase();
+  const discType = document.getElementById('vc_discType').value;
+  const discValue = parseFloat(document.getElementById('vc_discValue').value)||0;
+  const referrerReward = document.getElementById('vc_referrerReward').value.trim();
+  const expiry = document.getElementById('vc_expiry').value;
+
+  if(!code) { alert('Please enter a voucher code.'); return; }
+  if(!referrer) { alert('Please enter the referrer ticket ID.'); return; }
+  if(!discValue) { alert('Please enter a discount value.'); return; }
+
+  const vouchers = loadVouchers();
+  if(vouchers.find(v=>v.code===code)) { alert('Voucher code "'+code+'" already exists!'); return; }
+
+  vouchers.push({ code, referrer, discType, discValue, referrerReward, expiry: expiry||null, status:'active', usedBy:null, discountGiven:0, createdAt: new Date().toLocaleDateString('en-IN') });
+  saveVouchers(vouchers);
+  closeModal('createVoucherModal');
+  renderReferrals();
+  showToast('Voucher '+code+' created!');
+}
+
+function deleteVoucher(i) {
+  if(!confirm('Delete this voucher?')) return;
+  const vouchers = loadVouchers();
+  vouchers.splice(i,1);
+  saveVouchers(vouchers);
+  renderReferrals();
+  showToast('Voucher deleted.');
+}
+
+function copyVoucherCode(code) {
+  navigator.clipboard.writeText(code).then(()=>showToast('Code "'+code+'" copied!')).catch(()=>{
+    const el = document.createElement('textarea'); el.value=code; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+    showToast('Code copied!');
+  });
+}
+
+function openRedeemModal(code) {
+  document.getElementById('rd_code').value = code||'';
+  document.getElementById('rd_newClient').value = '';
+  document.getElementById('redeemPreview').style.display='none';
+  document.getElementById('redeemVoucherModal').classList.add('open');
+}
+
+function previewRedeem() {
+  const code = document.getElementById('rd_code').value.trim().toUpperCase();
+  const newClientId = document.getElementById('rd_newClient').value.trim().toUpperCase();
+  const vouchers = loadVouchers();
+  const v = vouchers.find(x=>x.code===code);
+  const preview = document.getElementById('redeemPreview');
+
+  if(!v) { preview.style.display='block'; preview.innerHTML=`<div style="color:var(--red);font-size:12px;">❌ Voucher code "${code}" not found.</div>`; return; }
+  if(v.status==='used') { preview.style.display='block'; preview.innerHTML=`<div style="color:var(--red);font-size:12px;">❌ This voucher has already been used by ${v.usedBy}.</div>`; return; }
+  if(v.expiry && new Date(v.expiry) < new Date()) { preview.style.display='block'; preview.innerHTML=`<div style="color:var(--red);font-size:12px;">❌ Voucher expired on ${v.expiry}.</div>`; return; }
+
+  const referrerTicket = tickets.find(t=>t.ticketId===v.referrer);
+  const newClientTicket = tickets.find(t=>t.ticketId===newClientId);
+  const discLabel = v.discType==='percent' ? v.discValue+'% off' : '₹'+v.discValue+' off';
+  const discAmt = newClientTicket && v.discType==='percent' ? Math.round((newClientTicket.payment?.total||0)*v.discValue/100) : (v.discType==='flat' ? v.discValue : null);
+
+  preview.style.display='block';
+  preview.innerHTML=`<div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:8px;padding:12px;font-size:12px;color:var(--text);">
+    <div style="font-weight:700;color:#22C55E;margin-bottom:6px;">✅ Valid Voucher — Preview</div>
+    <div>Discount: <strong>${discLabel}</strong>${discAmt?' (≈ ₹'+discAmt+')':''}</div>
+    <div>Referrer: <strong>${referrerTicket?referrerTicket.clientName:v.referrer}</strong> — will be credited: <strong style="color:var(--gold);">${v.referrerReward||'—'}</strong></div>
+    ${newClientTicket ? `<div>New Client: <strong>${newClientTicket.clientName}</strong> (${newClientId})</div>` : `<div style="color:var(--yellow);">⚠ Ticket ${newClientId} not found — redemption will still log.</div>`}
+  </div>`;
+}
+
+function confirmRedeem() {
+  const code = document.getElementById('rd_code').value.trim().toUpperCase();
+  const newClientId = document.getElementById('rd_newClient').value.trim().toUpperCase();
+  if(!code||!newClientId) { alert('Please fill both fields.'); return; }
+
+  const vouchers = loadVouchers();
+  const idx = vouchers.findIndex(v=>v.code===code);
+  if(idx<0) { alert('Voucher not found.'); return; }
+  const v = vouchers[idx];
+  if(v.status==='used') { alert('Already used!'); return; }
+
+  // Calculate discount given
+  const newClientTicket = tickets.find(t=>t.ticketId===newClientId);
+  const discGiven = newClientTicket && v.discType==='percent' ? Math.round((newClientTicket.payment?.total||0)*v.discValue/100) : (v.discType==='flat' ? v.discValue : 0);
+
+  // Mark voucher as used
+  vouchers[idx].status = 'used';
+  vouchers[idx].usedBy = newClientId;
+  vouchers[idx].discountGiven = discGiven;
+  vouchers[idx].redeemedAt = new Date().toLocaleDateString('en-IN');
+  saveVouchers(vouchers);
+
+  // Add a note to referrer's ticket timeline
+  const referrerIdx = tickets.findIndex(t=>t.ticketId===v.referrer);
+  if(referrerIdx>=0) {
+    if(!tickets[referrerIdx].timeline) tickets[referrerIdx].timeline = [];
+    tickets[referrerIdx].timeline.unshift({
+      date: new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}),
+      text: `🎁 Referral reward unlocked! Your code ${code} was used by client ${newClientId}. Reward: ${v.referrerReward||'—'}`,
+      tag:'Milestone'
+    });
+    if(!tickets[referrerIdx].referralRewards) tickets[referrerIdx].referralRewards = [];
+    tickets[referrerIdx].referralRewards.push({ code, usedBy: newClientId, reward: v.referrerReward, date: new Date().toLocaleDateString('en-IN') });
+    saveTickets(tickets);
+  }
+
+  // Add note to new client's ticket
+  const newIdx = tickets.findIndex(t=>t.ticketId===newClientId);
+  if(newIdx>=0) {
+    if(!tickets[newIdx].timeline) tickets[newIdx].timeline = [];
+    tickets[newIdx].timeline.unshift({
+      date: new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}),
+      text: `🎟 Referral discount applied! Code ${code} — ${v.discType==='percent'?v.discValue+'%':'₹'+v.discValue} off (₹${discGiven} saved).`,
+      tag:'Milestone'
+    });
+    if(!tickets[newIdx].referralDiscount) tickets[newIdx].referralDiscount = { code, discount: discGiven, appliedAt: new Date().toLocaleDateString('en-IN') };
+    saveTickets(tickets);
+  }
+
+  closeModal('redeemVoucherModal');
+  renderReferrals();
+  showToast(`Voucher redeemed! ₹${discGiven} discount applied to ${newClientId}.`);
+}
+
+/* ══════════════════════
+   CLIENTS PAGE
+══════════════════════ */
+function renderClientsPage() {
+  const list = document.getElementById('clientsPageList');
+  if(!tickets.length){list.innerHTML='<div class="empty-state"><div class="es-icon">👥</div><div class="es-text">No clients yet.</div></div>';return;}
+  list.innerHTML = `<div class="card"><div class="card-body" style="padding:0;">` +
+    tickets.map(t=>{
+      const paidAmt = (t.payment?.stages||[]).filter(s=>s.status==='paid').reduce((a,s)=>a+s.amount,0);
+      const totalAmt = t.payment?.total||0;
+      const sClass = {'Not Started':'not-started','In Progress':'in-progress','Completed':'completed'}[t.status]||'not-started';
+      return `<div class="client-row" style="padding:14px 20px;">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:12px;font-weight:800;color:#fff;">${(t.clientName||'?').charAt(0)}</div>
+          <div>
+            <div style="font-size:14px;font-weight:700;">${t.clientName}</div>
+            <div style="font-size:12px;color:var(--text-muted);">${t.ticketId} · ${t.projectName}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="text-align:right;font-size:12px;color:var(--text-muted);">₹${paidAmt.toLocaleString('en-IN')} / ₹${totalAmt.toLocaleString('en-IN')}</div>
+          <span class="status-pill ${sClass}"><span class="status-dot"></span>${t.status}</span>
+          <button class="btn btn-secondary btn-sm" onclick="openEditor('${t.ticketId}')">Edit →</button>
+        </div>
+      </div>`;
+    }).join('') + `</div></div>`;
+}
+
+/* ══════════════════════
+   FINANCE PAGE
+══════════════════════ */
+function renderFinancePage() {
+  const totalRev = tickets.reduce((s,t)=>s+(t.payment?.total||0),0);
+  const collected = tickets.reduce((s,t)=>s+(t.payment?.stages||[]).filter(st=>st.status==='paid').reduce((a,st)=>a+st.amount,0),0);
+  const pending = tickets.reduce((s,t)=>s+(t.payment?.stages||[]).filter(st=>st.status==='pending').reduce((a,st)=>a+st.amount,0),0);
+  const upcoming = tickets.reduce((s,t)=>s+(t.payment?.stages||[]).filter(st=>st.status==='upcoming').reduce((a,st)=>a+st.amount,0),0);
+
+  document.getElementById('financeStatsRow').innerHTML = `
+    <div class="stat-card"><div class="stat-card-label">Total Revenue</div><div class="stat-card-val" style="color:var(--gold);font-size:22px;">₹${totalRev.toLocaleString('en-IN')}</div><div class="stat-card-sub">All projects combined</div></div>
+    <div class="stat-card"><div class="stat-card-label">Collected</div><div class="stat-card-val" style="color:var(--green);font-size:22px;">₹${collected.toLocaleString('en-IN')}</div><div class="stat-card-sub">Payments received</div></div>
+    <div class="stat-card"><div class="stat-card-label">Pending</div><div class="stat-card-val" style="color:var(--accent);font-size:22px;">₹${pending.toLocaleString('en-IN')}</div><div class="stat-card-sub">Due from clients</div></div>
+    <div class="stat-card"><div class="stat-card-label">Upcoming</div><div class="stat-card-val" style="color:var(--blue);font-size:22px;">₹${upcoming.toLocaleString('en-IN')}</div><div class="stat-card-sub">Future milestones</div></div>`;
+
+  const rows = document.getElementById('financeClientRows');
+  if(!tickets.length){rows.innerHTML='<div class="empty-state"><div class="es-icon">📊</div><div class="es-text">No data yet.</div></div>';return;}
+  rows.innerHTML = tickets.map(t=>{
+    const paid = (t.payment?.stages||[]).filter(s=>s.status==='paid').reduce((a,s)=>a+s.amount,0);
+    const total = t.payment?.total||0;
+    const pct = total ? Math.round(paid/total*100) : 0;
+    return `<div class="client-row" style="padding:14px 0;">
+      <div>
+        <div style="font-size:13px;font-weight:700;">${t.clientName} <span style="color:var(--text-muted);font-weight:400;">— ${t.ticketId}</span></div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${t.projectName}</div>
+        <div class="finance-bar" style="width:180px;margin-top:6px;"><div class="finance-bar-fill" style="width:${pct}%"></div></div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:14px;font-weight:700;color:var(--green);">₹${paid.toLocaleString('en-IN')}</div>
+        <div style="font-size:11px;color:var(--text-muted);">of ₹${total.toLocaleString('en-IN')} · ${pct}%</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════
+   TEAM PAGE
+══════════════════════ */
+const TEAM_KEY = 'sparkedge_team';
+function loadTeam(){ try{return JSON.parse(localStorage.getItem(TEAM_KEY))||defaultTeam();}catch{return defaultTeam();}}
+function saveTeam(t){ localStorage.setItem(TEAM_KEY,JSON.stringify(t)); }
+function defaultTeam(){
+  return [{name:'Raunak Karn',role:'Founder & Lead Designer',email:'sparkedge555@gmail.com',wa:'+91 91424 50715'}];
+}
+/* renderTeamPage moved to new member management system */
+function addTeamMember(){
+  const name=document.getElementById('tm_name').value.trim();
+  if(!name){alert('Enter a name.');return;}
+  const team=loadTeam();
+  team.push({name,role:document.getElementById('tm_role').value.trim(),email:document.getElementById('tm_email').value.trim(),wa:document.getElementById('tm_wa').value.trim()});
+  saveTeam(team);
+  ['tm_name','tm_role','tm_email','tm_wa'].forEach(id=>document.getElementById(id).value='');
+  renderTeamPage();
+  showToast('Team member added!');
+}
+function deleteTeamMember(i){
+  if(!confirm('Remove this team member?'))return;
+  const team=loadTeam();team.splice(i,1);saveTeam(team);renderTeamPage();
+}
+
+/* ══════════════════════
+   SETTINGS
+══════════════════════ */
+const SETTINGS_KEY = 'sparkedge_settings';
+function loadSettingsData(){ try{return JSON.parse(localStorage.getItem(SETTINGS_KEY))||{};}catch{return {};}}
+function loadSettings(){
+  const s=loadSettingsData();
+  if(s.agencyName) document.getElementById('s_agencyName').value=s.agencyName;
+  if(s.ownerName) document.getElementById('s_ownerName').value=s.ownerName;
+  if(s.email) document.getElementById('s_email').value=s.email;
+  if(s.phone) document.getElementById('s_phone').value=s.phone;
+  if(s.upiId) document.getElementById('s_upiId').value=s.upiId;
+  if(s.bankHolder) document.getElementById('s_bankHolder').value=s.bankHolder;
+  if(s.bankName) document.getElementById('s_bankName').value=s.bankName;
+  if(s.bankAcc) document.getElementById('s_bankAcc').value=s.bankAcc;
+  if(s.ifsc) document.getElementById('s_ifsc').value=s.ifsc;
+}
+function saveSettings(){
+  const s={
+    agencyName:document.getElementById('s_agencyName').value,
+    ownerName:document.getElementById('s_ownerName').value,
+    email:document.getElementById('s_email').value,
+    phone:document.getElementById('s_phone').value,
+    upiId:document.getElementById('s_upiId').value,
+    bankHolder:document.getElementById('s_bankHolder').value,
+    bankName:document.getElementById('s_bankName').value,
+    bankAcc:document.getElementById('s_bankAcc').value,
+    ifsc:document.getElementById('s_ifsc').value,
+  };
+  localStorage.setItem(SETTINGS_KEY,JSON.stringify(s));
+  showToast('Settings saved!');
+}
+function changeAdminPwd(){
+  const newPwd=document.getElementById('s_newPwd').value.trim();
+  if(!newPwd){alert('Enter a new password.');return;}
+  sessionStorage.setItem('se_admin_pwd',newPwd);
+  document.getElementById('s_newPwd').value='';
+  showToast('Password updated for this session!');
+}
+function adminLogout(){
+  sessionStorage.removeItem('se_session');
+  sessionStorage.removeItem('se_admin_auth');
+  window.SE_USER = null;
+  location.reload();
+}
+
+/* ══════════════════════
+   DISCOUNT SYSTEM
+══════════════════════ */
+let _discType = 'none';
+function setDiscType(type){
+  _discType = type;
+  ['none','flat','percent'].forEach(t=>{
+    const el = document.getElementById('discType'+t.charAt(0).toUpperCase()+t.slice(1));
+    if(el) el.classList.toggle('active', t===type);
+  });
+  const wrap = document.getElementById('discValueWrap');
+  const preview = document.getElementById('discountTotalPreview');
+  if(wrap) wrap.style.display = type==='none' ? 'none' : 'block';
+  if(type==='none'){ if(preview) preview.style.display='none'; }
+  else {
+    document.getElementById('discValueLabel').textContent = type==='flat' ? 'Discount Amount (₹)' : 'Discount Percentage (%)';
+    recalcDiscountedTotal();
+  }
+}
+function recalcDiscountedTotal(){
+  if(_discType==='none') return;
+  const total = parseInt(document.getElementById('e_payTotal').value)||0;
+  const val = parseFloat(document.getElementById('e_discountValue')?.value)||0;
+  const preview = document.getElementById('discountTotalPreview');
+  const orig = document.getElementById('discOrigAmt');
+  const final = document.getElementById('discFinalAmt');
+  const saved = document.getElementById('discSavedLabel');
+  if(!total||!val){if(preview)preview.style.display='none';return;}
+  const discAmt = _discType==='flat' ? val : Math.round(total*val/100);
+  const finalAmt = total - discAmt;
+  if(orig) orig.textContent = '₹'+total.toLocaleString('en-IN');
+  if(final) final.textContent = '₹'+finalAmt.toLocaleString('en-IN');
+  if(saved) saved.textContent = '(Save ₹'+discAmt.toLocaleString('en-IN')+')';
+  if(preview) preview.style.display='block';
+}
+
+/* ── Load discount fields when opening editor ── */
+function loadDiscountFields(t){
+  const disc = t.discount||{};
+  setDiscType(disc.type||'none');
+  if(disc.type && disc.type!=='none'){
+    setTimeout(()=>{
+      const el=document.getElementById('e_discountValue');
+      if(el) el.value=disc.value||'';
+      const re=document.getElementById('e_discountReason');
+      if(re) re.value=disc.reason||'';
+      recalcDiscountedTotal();
+    },50);
+  }
+}
+
+/* ── Collect discount from form ── */
+function collectDiscount(){
+  if(_discType==='none') return null;
+  return {
+    type: _discType,
+    value: parseFloat(document.getElementById('e_discountValue')?.value)||0,
+    reason: document.getElementById('e_discountReason')?.value.trim()||''
+  };
+}
+
+/* ── Apply referral discount from the ticket editor ── */
+function applyRefDiscountToTicket(){
+  if(!currentTicketId) return;
+  const code = document.getElementById('e_refVoucherCode').value.trim().toUpperCase();
+  if(!code){alert('Enter a voucher code.');return;}
+  const vouchers = loadVouchers();
+  const v = vouchers.find(x=>x.code===code);
+  if(!v){showToast('Voucher not found!');return;}
+  if(v.status==='used'){showToast('Voucher already used!');return;}
+
+  const idx = tickets.findIndex(t=>t.ticketId===currentTicketId);
+  if(idx<0) return;
+  const total = tickets[idx].payment?.total||0;
+  const discAmt = v.discType==='percent' ? Math.round(total*v.discValue/100) : v.discValue;
+  tickets[idx].referralDiscount = { code, discount: discAmt, appliedAt: new Date().toLocaleDateString('en-IN') };
+  saveTickets(tickets);
+  document.getElementById('refDiscountStatus').innerHTML = `<span style="color:var(--green);">✅ Voucher <strong style="color:var(--text);">${code}</strong> applied — ₹${discAmt.toLocaleString('en-IN')} discount.</span>`;
+  showToast(`Referral discount ₹${discAmt.toLocaleString('en-IN')} applied!`);
+}
+function removeRefDiscountFromTicket(){
+  if(!currentTicketId) return;
+  const idx = tickets.findIndex(t=>t.ticketId===currentTicketId);
+  if(idx<0) return;
+  delete tickets[idx].referralDiscount;
+  saveTickets(tickets);
+  document.getElementById('refDiscountStatus').textContent = 'No referral discount applied to this ticket.';
+  document.getElementById('e_refVoucherCode').value='';
+  showToast('Referral discount removed.');
+}
+
+/* ══════════════════════
+   INIT
+══════════════════════ */
+renderDashboard();
+
+/* ══════════════════════════════════════════════════════
+   IMPORT / EXPORT SYSTEM
+══════════════════════════════════════════════════════ */
+function exportData(){
+  const data = {
+    tickets: loadTickets(),
+    vouchers: loadVouchers(),
+    team: getMembers(),
+    settings: loadSettingsData(),
+    exportedAt: new Date().toISOString(),
+    exportedBy: window.SE_USER ? window.SE_USER.name : 'Unknown'
+  };
+  const json = JSON.stringify(data, null, 2);
+  const date = new Date().toISOString().slice(0,10);
+  const blob = new Blob([json], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'sparkedge-admin-' + date + '.json'; a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ Data exported successfully!');
+}
+
+function openImportModal(){
+  if(!canDo('export')){ showToast('⛔ You do not have export/import permission.'); return; }
+  document.getElementById('importOverlay').classList.add('open');
+}
+
+function doImport(){
+  const raw = document.getElementById('importDataText').value.trim();
+  if(!raw){ alert('Paste JSON data first!'); return; }
+  try{
+    const data = JSON.parse(raw);
+    let msg = [];
+    if(data.tickets && Array.isArray(data.tickets)){
+      const existing = loadTickets();
+      let added=0, updated=0;
+      data.tickets.forEach(t => {
+        const idx = existing.findIndex(x=>x.ticketId===t.ticketId);
+        if(idx>=0){ existing[idx]={...existing[idx],...t}; updated++; }
+        else{ existing.push(t); added++; }
+      });
+      saveTickets(existing);
+      tickets = existing;
+      msg.push(added+' tickets added, '+updated+' updated');
+    }
+    if(data.vouchers && Array.isArray(data.vouchers)){
+      const ev = loadVouchers();
+      data.vouchers.forEach(v => {
+        if(!ev.find(x=>x.code===v.code)) ev.push(v);
+      });
+      saveVouchers(ev);
+      msg.push(data.vouchers.length+' vouchers merged');
+    }
+    closeImportModal();
+    showToast('✅ Import done: ' + msg.join(' · '));
+    renderDashboard();
+    renderTicketBadge();
+  } catch(e){
+    alert('Error parsing JSON: ' + e.message);
+  }
+}
+
+function closeImportModal(){
+  document.getElementById('importOverlay').classList.remove('open');
+  document.getElementById('importDataText').value = '';
+}
+
+/* ══════════════════════════════════════════════════════
+   PERMISSION SYSTEM
+══════════════════════════════════════════════════════ */
+const PERM_DEFS = {
+  owner: ['all'],
+  member_full: ['view_tickets','edit_tickets','create_tickets','delete_tickets','view_finance','view_clients','export'],
+  member_basic: ['view_tickets','edit_tickets','view_clients'],
+  member_view: ['view_tickets','view_clients']
+};
+
+function canDo(action){
+  if(!window.SE_USER) return false;
+  if(window.SE_USER.role === 'owner') return true;
+  const perms = window.SE_USER.permissions || [];
+  return perms.includes(action);
+}
+
+function isOwner(){
+  return window.SE_USER && window.SE_USER.role === 'owner';
+}
+
+function applyPermissions(){
+  updateUserBadge();
+  if(!isOwner()){
+    // Hide add member button on team page
+    const addBtn = document.getElementById('addMemberBtnWrap');
+    if(addBtn) addBtn.style.display = 'none';
+    // Show settings lock
+    showSettingsLock();
+    // Restrict new ticket
+    if(!canDo('create_tickets')){
+      const nb = document.getElementById('newTicketBtn');
+      if(nb){ nb.style.opacity='.4'; nb.onclick=()=>showToast('⛔ No permission to create tickets'); }
+    }
+    // Restrict export
+    if(!canDo('export')){
+      const eb = document.getElementById('exportBtn');
+      const ib = document.getElementById('importBtn');
+      if(eb){ eb.style.opacity='.4'; eb.onclick=()=>showToast('⛔ No permission to export'); }
+      if(ib){ ib.style.opacity='.4'; ib.onclick=()=>showToast('⛔ No permission to import'); }
+    }
+  } else {
+    // Owner: show settings unlocked
+    hideSettingsLock();
+  }
+}
+
+function updateUserBadge(){
+  const u = window.SE_USER;
+  if(!u) return;
+  const nameEl = document.getElementById('userNameDisplay');
+  const roleEl = document.getElementById('userRoleBadge');
+  if(nameEl) nameEl.textContent = u.name;
+  if(roleEl) roleEl.textContent = u.role === 'owner' ? 'Owner' : 'Member';
+}
+
+/* ══════════════════════════════════════════════════════
+   SETTINGS LOCK
+══════════════════════════════════════════════════════ */
+function showSettingsLock(){
+  const lock = document.getElementById('settingsLockScreen');
+  const content = document.getElementById('settingsContent');
+  if(lock) lock.style.display = 'block';
+  if(content) content.style.display = 'none';
+}
+function hideSettingsLock(){
+  const lock = document.getElementById('settingsLockScreen');
+  const content = document.getElementById('settingsContent');
+  if(lock) lock.style.display = 'none';
+  if(content) content.style.display = 'block';
+}
+function unlockSettings(){
+  const pwd = document.getElementById('settingsUnlockPwd').value;
+  const err = document.getElementById('settingsUnlockError');
+  if(pwd === getSettingsPwd()){
+    hideSettingsLock();
+    err.style.display = 'none';
+    document.getElementById('settingsUnlockPwd').value = '';
+    loadSettings();
+  } else {
+    err.style.display = 'block';
+  }
+}
+function changeSettingsPwd(){
+  if(!isOwner()){ showToast('⛔ Only owner can change settings password.'); return; }
+  const newPwd = document.getElementById('s_settingsPwd').value.trim();
+  if(!newPwd){ alert('Enter a new password.'); return; }
+  localStorage.setItem(SETTINGS_AUTH_KEY, newPwd);
+  document.getElementById('s_settingsPwd').value = '';
+  showToast('🔑 Settings password updated!');
+}
+
+/* Override showPage to apply settings lock each time */
+const _origShowPage = showPage;
+window.showPage = function(page){
+  _origShowPage(page);
+  if(page === 'settings'){
+    if(!isOwner()){
+      // Always show lock for non-owners
+      showSettingsLock();
+    } else {
+      hideSettingsLock();
+      loadSettings();
+    }
+  }
+  if(page === 'team'){
+    renderTeamPage();
+  }
+};
+
+/* ══════════════════════════════════════════════════════
+   TEAM / MEMBER MANAGEMENT (FULL REWRITE)
+══════════════════════════════════════════════════════ */
+function renderTeamPage(){
+  const members = getMembers();
+  const list = document.getElementById('teamMemberList');
+  const addBtn = document.getElementById('addMemberBtnWrap');
+
+  // Only owner can see add/delete buttons
+  if(addBtn) addBtn.style.display = isOwner() ? 'block' : 'none';
+
+  if(!members.length){
+    list.innerHTML = `<div class="empty-state"><div class="es-icon">🧑‍💻</div><div class="es-text">No team members yet. Invite your first member!</div></div>`;
+    return;
+  }
+
+  list.innerHTML = members.map((m,i) => {
+    const permLabels = {
+      'view_tickets':'👁 View Tickets',
+      'edit_tickets':'✏️ Edit Tickets',
+      'create_tickets':'➕ Create Tickets',
+      'delete_tickets':'🗑 Delete Tickets',
+      'view_finance':'💰 View Finance',
+      'view_clients':'👥 View Clients',
+      'export':'⬇ Export/Import'
+    };
+    const permTags = (m.permissions||[]).map(p => `<span style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);border-radius:5px;padding:2px 8px;font-size:10px;font-weight:600;color:#3B82F6;margin:2px;">${permLabels[p]||p}</span>`).join('');
+    return `<div class="team-card" style="margin-bottom:10px;">
+      <div class="team-avatar" style="font-size:18px;">${(m.name||'?').charAt(0).toUpperCase()}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:14px;font-weight:700;">${m.name}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${m.role||'Team Member'} · ${m.email||'—'} ${m.wa?'· '+m.wa:''}</div>
+        <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:2px;">${permTags||'<span style="font-size:11px;color:var(--text-dim);">No permissions assigned</span>'}</div>
+        <div style="margin-top:6px;">
+          <span style="font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;${m.status==='active'?'background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#22C55E;':'background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#EF4444;'}">${m.status==='active'?'✅ Active':'⛔ Suspended'}</span>
+        </div>
+      </div>
+      ${isOwner()?`<div style="display:flex;flex-direction:column;gap:6px;">
+        <button class="btn btn-secondary btn-sm" onclick="openEditMemberModal(${i})">✏️ Edit</button>
+        <button class="btn btn-sm" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#EF4444;" onclick="toggleMemberStatus(${i})">${m.status==='active'?'⛔ Suspend':'✅ Activate'}</button>
+        <button class="btn btn-sm" style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);color:#EF4444;font-size:10px;" onclick="deleteMember(${i})">🗑 Remove</button>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function openAddMemberModal(){
+  if(!isOwner()){ showToast('⛔ Only owner can add members.'); return; }
+  document.getElementById('memberModalTitle').textContent = 'Invite Team Member';
+  document.getElementById('mm_name').value = '';
+  document.getElementById('mm_role').value = 'Designer';
+  document.getElementById('mm_email').value = '';
+  document.getElementById('mm_wa').value = '';
+  document.getElementById('mm_password').value = '';
+  document.getElementById('mm_preset').value = 'member_basic';
+  applyPermissionPreset('member_basic');
+  document.getElementById('memberModalEditIdx').value = '-1';
+  document.getElementById('memberModal').classList.add('open');
+}
+
+function openEditMemberModal(idx){
+  if(!isOwner()){ return; }
+  const members = getMembers();
+  const m = members[idx];
+  if(!m) return;
+  document.getElementById('memberModalTitle').textContent = 'Edit Member: ' + m.name;
+  document.getElementById('mm_name').value = m.name||'';
+  document.getElementById('mm_role').value = m.role||'Designer';
+  document.getElementById('mm_email').value = m.email||'';
+  document.getElementById('mm_wa').value = m.wa||'';
+  document.getElementById('mm_password').value = m.password||'';
+  document.getElementById('mm_preset').value = 'custom';
+  // Restore checkboxes
+  ['view_tickets','edit_tickets','create_tickets','delete_tickets','view_finance','view_clients','export'].forEach(p => {
+    const cb = document.getElementById('perm_'+p);
+    if(cb) cb.checked = (m.permissions||[]).includes(p);
+  });
+  document.getElementById('memberModalEditIdx').value = idx;
+  document.getElementById('memberModal').classList.add('open');
+}
+
+function applyPermissionPreset(preset){
+  const presets = {
+    'member_full': ['view_tickets','edit_tickets','create_tickets','delete_tickets','view_finance','view_clients','export'],
+    'member_basic': ['view_tickets','edit_tickets','view_clients'],
+    'member_view': ['view_tickets','view_clients'],
+    'custom': []
+  };
+  const perms = presets[preset] || [];
+  ['view_tickets','edit_tickets','create_tickets','delete_tickets','view_finance','view_clients','export'].forEach(p => {
+    const cb = document.getElementById('perm_'+p);
+    if(cb) cb.checked = perms.includes(p);
+  });
+}
+
+function saveMember(){
+  if(!isOwner()){ showToast('⛔ Only owner can manage members.'); return; }
+  const name = document.getElementById('mm_name').value.trim();
+  const pwd = document.getElementById('mm_password').value.trim();
+  if(!name){ alert('Name is required.'); return; }
+  if(!pwd){ alert('Password is required for member login.'); return; }
+  if(pwd === 'RAUNAK@1'){ alert('Member cannot use the owner password.'); return; }
+  if(pwd.length < 6){ alert('Password must be at least 6 characters.'); return; }
+
+  const perms = ['view_tickets','edit_tickets','create_tickets','delete_tickets','view_finance','view_clients','export'].filter(p => {
+    const cb = document.getElementById('perm_'+p);
+    return cb && cb.checked;
+  });
+
+  const members = getMembers();
+  const editIdx = parseInt(document.getElementById('memberModalEditIdx').value);
+
+  // Check password uniqueness
+  const isDup = members.some((m,i) => m.password === pwd && i !== editIdx);
+  if(isDup){ alert('This password is already used by another member. Use a unique password.'); return; }
+
+  const memberData = {
+    id: (editIdx >= 0 && members[editIdx]) ? members[editIdx].id : ('mem_'+Date.now()),
+    name,
+    role: document.getElementById('mm_role').value,
+    email: document.getElementById('mm_email').value.trim(),
+    wa: document.getElementById('mm_wa').value.trim(),
+    password: pwd,
+    permissions: perms,
+    status: (editIdx >= 0 && members[editIdx]) ? members[editIdx].status : 'active',
+    addedAt: (editIdx >= 0 && members[editIdx]) ? members[editIdx].addedAt : new Date().toLocaleDateString('en-IN')
+  };
+
+  if(editIdx >= 0 && members[editIdx]){
+    members[editIdx] = memberData;
+    showToast('✅ Member updated!');
+  } else {
+    members.push(memberData);
+    showToast('✅ Member added! They can now login with their password.');
+  }
+  saveMembers(members);
+  document.getElementById('memberModal').classList.remove('open');
+  renderTeamPage();
+}
+
+function toggleMemberStatus(idx){
+  if(!isOwner()) return;
+  const members = getMembers();
+  if(!members[idx]) return;
+  members[idx].status = members[idx].status === 'active' ? 'suspended' : 'active';
+  saveMembers(members);
+  renderTeamPage();
+  showToast(members[idx].status==='active' ? '✅ Member activated.' : '⛔ Member suspended.');
+}
+
+function deleteMember(idx){
+  if(!isOwner()) return;
+  if(!confirm('Remove this team member? They will lose login access immediately.')) return;
+  const members = getMembers();
+  members.splice(idx, 1);
+  saveMembers(members);
+  renderTeamPage();
+  showToast('🗑 Member removed.');
+}
+
+function closeMemberModal(){
+  document.getElementById('memberModal').classList.remove('open');
+}
+
+/* ══════════════════════════════════════════════════════
+   TICKET EDIT FIX — ensure edit always works
+══════════════════════════════════════════════════════ */
+// Patch the ticket card click to check permissions
+const _origOpenEditor = openEditor;
+window.openEditorSafe = function(ticketId){
+  if(!canDo('edit_tickets') && !canDo('all') && !isOwner()){
+    showToast('⛔ You do not have permission to edit tickets.');
+    return;
+  }
+  _origOpenEditor(ticketId);
+  showPage('editor');
+};
+
+// Patch saveCurrentTicket to check permissions
+const _origSave = saveCurrentTicket;
+window.saveCurrentTicket = function(){
+  if(!canDo('edit_tickets') && !isOwner()){
+    showToast('⛔ You do not have permission to save tickets.');
+    return;
+  }
+  _origSave();
+};
+
+// Patch deleteTicket check
+const _origDelete = deleteTicket;
+window.deleteTicket = function(){
+  if(!canDo('delete_tickets') && !isOwner()){
+    showToast('⛔ You do not have permission to delete tickets.');
+    return;
+  }
+  _origDelete();
+};
+
+/* ── Call applyPermissions on load if user already in session ── */
+if(window.SE_USER){ applyPermissions(); }
+
+</script>
+<!-- ══════════ MODAL: IMPORT DATA ══════════ -->
+<div class="modal-overlay" id="importOverlay">
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-header">
+      <div class="modal-title">⬆ Import Data</div>
+      <button class="modal-close" onclick="closeImportModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--text-muted);font-size:13px;line-height:1.7;">Paste exported JSON from another device or team member. Tickets will be merged (duplicates updated, new ones added). Vouchers merged without duplicates.</p>
+      <div class="field full" style="margin-top:10px;">
+        <label>Paste JSON Data</label>
+        <textarea id="importDataText" style="min-height:160px;font-family:monospace;font-size:11px;" placeholder='{"tickets":[...],"vouchers":[...],"exportedAt":"..."}' ></textarea>
+      </div>
+      <p style="font-size:11px;color:#EF4444;margin-top:8px;">⚠️ Existing tickets with same ID will be overwritten. New tickets will be added. Your data is NOT deleted.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeImportModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="doImport()">Import & Merge</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MODAL: ADD/EDIT MEMBER ══════════ -->
+<div class="modal-overlay" id="memberModal">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-header">
+      <div class="modal-title" id="memberModalTitle">Invite Team Member</div>
+      <button class="modal-close" onclick="closeMemberModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="memberModalEditIdx" value="-1"/>
+
+      <div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:12px 16px;margin-bottom:4px;">
+        <div style="font-size:12px;font-weight:700;color:#3B82F6;margin-bottom:4px;">🔐 Authentication Info</div>
+        <div style="font-size:11px;color:var(--text-muted);line-height:1.6;">The member uses their <strong style="color:var(--text);">unique password</strong> to log into this admin panel. Make sure it's different from the owner password and at least 6 characters.</div>
+      </div>
+
+      <div class="field-grid" style="gap:12px;">
+        <div class="field"><label>Full Name *</label><input id="mm_name" placeholder="e.g. Priya Sharma"/></div>
+        <div class="field"><label>Role / Designation</label>
+          <select id="mm_role">
+            <option>Designer</option>
+            <option>Developer</option>
+            <option>Marketing Manager</option>
+            <option>Project Manager</option>
+            <option>Sales Executive</option>
+            <option>Content Writer</option>
+            <option>Intern</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field"><label>Email</label><input id="mm_email" placeholder="member@sparkedge.in"/></div>
+        <div class="field"><label>WhatsApp</label><input id="mm_wa" placeholder="+91 98765 43210"/></div>
+        <div class="field full">
+          <label>Login Password * (min 6 chars, must be unique)</label>
+          <input id="mm_password" type="text" placeholder="e.g. Priya@2025" autocomplete="new-password"/>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--border);margin:14px 0;"></div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;">Permissions</div>
+
+      <div class="field" style="margin-bottom:12px;">
+        <label>Quick Preset</label>
+        <select id="mm_preset" onchange="applyPermissionPreset(this.value)">
+          <option value="member_full">Full Member (all permissions)</option>
+          <option value="member_basic" selected>Basic Member (view + edit)</option>
+          <option value="member_view">View Only</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <label style="display:flex;align-items:flex-start;gap:8px;background:var(--bg-raised);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;">
+          <input type="checkbox" id="perm_view_tickets" style="accent-color:var(--accent);margin-top:2px;flex-shrink:0;" onchange="document.getElementById('mm_preset').value='custom'"/>
+          <div><div style="font-size:12px;font-weight:600;">👁 View Tickets</div><div style="font-size:10px;color:var(--text-muted);">Can see all client tickets</div></div>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:8px;background:var(--bg-raised);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;">
+          <input type="checkbox" id="perm_edit_tickets" style="accent-color:var(--accent);margin-top:2px;flex-shrink:0;" onchange="document.getElementById('mm_preset').value='custom'"/>
+          <div><div style="font-size:12px;font-weight:600;">✏️ Edit Tickets</div><div style="font-size:10px;color:var(--text-muted);">Can save changes to tickets</div></div>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:8px;background:var(--bg-raised);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;">
+          <input type="checkbox" id="perm_create_tickets" style="accent-color:var(--accent);margin-top:2px;flex-shrink:0;" onchange="document.getElementById('mm_preset').value='custom'"/>
+          <div><div style="font-size:12px;font-weight:600;">➕ Create Tickets</div><div style="font-size:10px;color:var(--text-muted);">Can create new tickets</div></div>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:8px;background:var(--bg-raised);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;">
+          <input type="checkbox" id="perm_delete_tickets" style="accent-color:var(--accent);margin-top:2px;flex-shrink:0;" onchange="document.getElementById('mm_preset').value='custom'"/>
+          <div><div style="font-size:12px;font-weight:600;">🗑 Delete Tickets</div><div style="font-size:10px;color:var(--text-muted);">Can permanently delete tickets</div></div>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:8px;background:var(--bg-raised);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;">
+          <input type="checkbox" id="perm_view_finance" style="accent-color:var(--accent);margin-top:2px;flex-shrink:0;" onchange="document.getElementById('mm_preset').value='custom'"/>
+          <div><div style="font-size:12px;font-weight:600;">💰 View Finance</div><div style="font-size:10px;color:var(--text-muted);">Can access Finance page</div></div>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:8px;background:var(--bg-raised);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;">
+          <input type="checkbox" id="perm_view_clients" style="accent-color:var(--accent);margin-top:2px;flex-shrink:0;" onchange="document.getElementById('mm_preset').value='custom'"/>
+          <div><div style="font-size:12px;font-weight:600;">👥 View Clients</div><div style="font-size:10px;color:var(--text-muted);">Can access Clients page</div></div>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:8px;background:var(--bg-raised);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;">
+          <input type="checkbox" id="perm_export" style="accent-color:var(--accent);margin-top:2px;flex-shrink:0;" onchange="document.getElementById('mm_preset').value='custom'"/>
+          <div><div style="font-size:12px;font-weight:600;">⬇ Export / Import</div><div style="font-size:10px;color:var(--text-muted);">Can export and import data</div></div>
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeMemberModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveMember()">💾 Save Member</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

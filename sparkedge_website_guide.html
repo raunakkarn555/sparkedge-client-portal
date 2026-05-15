@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SparkEdge — Website Management Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --spark-dark:   #0A0A0F;
+    --spark-navy:   #0D1117;
+    --spark-orange: #FF6B2B;
+    --spark-orange-glow: #FF6B2B33;
+    --spark-gold:   #FFB347;
+    --spark-light:  #F5F5F7;
+    --spark-muted:  #8A8A9A;
+    --spark-border: #1E1E2E;
+    --spark-card:   #12121C;
+    --spark-card2:  #161622;
+    --spark-green:  #34D399;
+    --spark-red:    #F87171;
+    --spark-purple: #A78BFA;
+    --radius:    16px;
+    --radius-sm: 8px;
+    --radius-xs: 6px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--spark-dark);
+    color: var(--spark-light);
+    line-height: 1.6;
+    padding: 40px 16px 80px;
+  }
+
+  .guide-wrapper {
+    width: 860px;
+    max-width: 100%;
+    margin: 0 auto;
+    background: var(--spark-navy);
+    border: 1px solid var(--spark-border);
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 40px 120px rgba(255,107,43,0.10), 0 0 0 1px rgba(255,107,43,0.06);
+  }
+
+  .guide-wrapper::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 360px; height: 360px;
+    background: radial-gradient(circle, rgba(255,107,43,0.14) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .guide-wrapper::after {
+    content: '';
+    position: absolute;
+    bottom: 80px; left: -70px;
+    width: 260px; height: 260px;
+    background: radial-gradient(circle, rgba(255,179,71,0.07) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ────── HERO HEADER ────── */
+  .hero {
+    padding: 44px 52px 40px;
+    border-bottom: 1px solid var(--spark-border);
+    position: relative;
+    z-index: 1;
+  }
+
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 36px;
+  }
+
+  .logo-icon {
+    width: 52px; height: 52px;
+    background: linear-gradient(135deg, var(--spark-orange), var(--spark-gold));
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 8px 24px rgba(255,107,43,0.35);
+  }
+
+  .brand-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #fff 0%, var(--spark-gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+  }
+
+  .brand-tagline {
+    font-size: 11px;
+    color: var(--spark-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 5px;
+    font-weight: 500;
+  }
+
+  .doc-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--spark-orange-glow);
+    border: 1px solid rgba(255,107,43,0.28);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--spark-orange);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1.18;
+    color: #fff;
+    margin-bottom: 14px;
+  }
+
+  .hero h1 span {
+    background: linear-gradient(90deg, var(--spark-orange), var(--spark-gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 15px;
+    color: var(--spark-muted);
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+
+  .hero-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: rgba(52,211,153,0.07);
+    border: 1px solid rgba(52,211,153,0.2);
+    border-radius: var(--radius-sm);
+    padding: 16px 20px;
+    font-size: 14px;
+    color: #a7f3d0;
+    line-height: 1.65;
+  }
+
+  .hero-note svg { flex-shrink: 0; margin-top: 1px; }
+
+  /* ────── TABLE OF CONTENTS ────── */
+  .toc {
+    padding: 32px 52px;
+    border-bottom: 1px solid var(--spark-border);
+    position: relative; z-index: 1;
+  }
+
+  .toc-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--spark-muted);
+    margin-bottom: 18px;
+  }
+
+  .toc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .toc-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--spark-card);
+    border: 1px solid var(--spark-border);
+    border-radius: var(--radius-sm);
+    padding: 11px 15px;
+    text-decoration: none;
+    transition: border-color 0.2s;
+  }
+
+  .toc-item:hover { border-color: rgba(255,107,43,0.35); }
+
+  .toc-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--spark-orange);
+    min-width: 22px;
+  }
+
+  .toc-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--spark-light);
+  }
+
+  /* ────── CONTENT AREA ────── */
+  .content {
+    padding: 0 52px 52px;
+    position: relative; z-index: 1;
+  }
+
+  /* ────── SECTION ────── */
+  .section {
+    margin-top: 52px;
+    scroll-margin-top: 32px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--spark-border);
+  }
+
+  .section-icon-wrap {
+    width: 46px; height: 46px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .si-orange { background: rgba(255,107,43,0.13); border: 1px solid rgba(255,107,43,0.25); }
+  .si-gold   { background: rgba(255,179,71,0.12);  border: 1px solid rgba(255,179,71,0.25); }
+  .si-green  { background: rgba(52,211,153,0.10);  border: 1px solid rgba(52,211,153,0.22); }
+  .si-purple { background: rgba(167,139,250,0.11); border: 1px solid rgba(167,139,250,0.24); }
+  .si-red    { background: rgba(248,113,113,0.10); border: 1px solid rgba(248,113,113,0.22); }
+  .si-blue   { background: rgba(96,165,250,0.10);  border: 1px solid rgba(96,165,250,0.22); }
+
+  .section-meta { flex: 1; }
+
+  .section-num {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--spark-orange);
+    margin-bottom: 4px;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.4px;
+  }
+
+  .section-intro {
+    font-size: 14px;
+    color: var(--spark-muted);
+    margin-top: 4px;
+    line-height: 1.6;
+  }
+
+  /* ────── STEP CARD ────── */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .step-card {
+    display: flex;
+    gap: 16px;
+    background: var(--spark-card);
+    border: 1px solid var(--spark-border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .step-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: linear-gradient(180deg, var(--spark-orange), transparent);
+    border-radius: 3px 0 0 3px;
+  }
+
+  .step-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--spark-orange);
+    background: var(--spark-orange-glow);
+    border: 1px solid rgba(255,107,43,0.25);
+    border-radius: 8px;
+    width: 34px; height: 34px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .step-body { flex: 1; }
+
+  .step-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 5px;
+  }
+
+  .step-desc {
+    font-size: 13px;
+    color: #b0aec8;
+    line-height: 1.65;
+  }
+
+  /* ────── CODE BLOCK ────── */
+  .code-block {
+    background: #080810;
+    border: 1px solid rgba(255,107,43,0.18);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    margin: 10px 0 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: #e2d9f3;
+    line-height: 1.7;
+    overflow-x: auto;
+  }
+
+  .code-block .hl-orange { color: var(--spark-orange); font-weight: 600; }
+  .code-block .hl-gold   { color: var(--spark-gold); }
+  .code-block .hl-green  { color: var(--spark-green); }
+  .code-block .hl-muted  { color: var(--spark-muted); }
+  .code-block .hl-white  { color: #fff; font-weight: 600; }
+
+  .code-caption {
+    font-size: 11px;
+    color: var(--spark-muted);
+    margin-top: 6px;
+    letter-spacing: 0.3px;
+  }
+
+  /* ────── CALLOUT BOXES ────── */
+  .callout {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    margin: 14px 0;
+    font-size: 13.5px;
+    line-height: 1.65;
+  }
+
+  .callout svg { flex-shrink: 0; margin-top: 1px; }
+
+  .callout-tip {
+    background: rgba(255,179,71,0.08);
+    border: 1px solid rgba(255,179,71,0.22);
+    color: #fde68a;
+  }
+
+  .callout-safe {
+    background: rgba(52,211,153,0.07);
+    border: 1px solid rgba(52,211,153,0.20);
+    color: #a7f3d0;
+  }
+
+  .callout-warn {
+    background: rgba(248,113,113,0.07);
+    border: 1px solid rgba(248,113,113,0.22);
+    color: #fca5a5;
+  }
+
+  .callout-info {
+    background: rgba(96,165,250,0.08);
+    border: 1px solid rgba(96,165,250,0.22);
+    color: #bfdbfe;
+  }
+
+  /* ────── DANGER / DO-NOT ZONE ────── */
+  .danger-zone {
+    background: linear-gradient(135deg, rgba(248,113,113,0.06) 0%, rgba(239,68,68,0.03) 100%);
+    border: 1px solid rgba(248,113,113,0.25);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-top: 16px;
+  }
+
+  .danger-zone-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--spark-red);
+    margin-bottom: 16px;
+  }
+
+  .danger-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(248,113,113,0.1);
+  }
+
+  .danger-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+  .danger-tag {
+    background: rgba(248,113,113,0.12);
+    border: 1px solid rgba(248,113,113,0.2);
+    color: var(--spark-red);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 100px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .danger-text {
+    font-size: 13px;
+    color: #f0b8b8;
+    line-height: 1.6;
+  }
+
+  .danger-text strong { color: #fff; font-weight: 600; }
+
+  /* ────── WHEN TO CALL ────── */
+  .help-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .help-card {
+    background: var(--spark-card);
+    border: 1px solid var(--spark-border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+  }
+
+  .help-card-icon {
+    width: 36px; height: 36px;
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 12px;
+  }
+
+  .help-situation {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 5px;
+  }
+
+  .help-example {
+    font-size: 12px;
+    color: var(--spark-muted);
+    line-height: 1.6;
+  }
+
+  /* ────── CONTACT FOOTER ────── */
+  .contact-banner {
+    background: linear-gradient(135deg, #1a0e05 0%, #100d1a 100%);
+    border: 1px solid rgba(255,107,43,0.25);
+    border-radius: var(--radius);
+    padding: 28px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+
+  .contact-left { flex: 1; min-width: 220px; }
+
+  .contact-banner-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .contact-detail {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13.5px;
+    color: #c4bce8;
+    margin-bottom: 8px;
+  }
+
+  .contact-detail:last-child { margin-bottom: 0; }
+
+  .contact-detail a {
+    color: var(--spark-orange);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .wa-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #25d366, #128c50);
+    border: none;
+    border-radius: 10px;
+    padding: 14px 24px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+    box-shadow: 0 6px 20px rgba(37,211,102,0.28);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  /* ────── BACKUP STEPS ────── */
+  .backup-visual {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 20px 0;
+    overflow-x: auto;
+  }
+
+  .bv-step {
+    flex: 1;
+    min-width: 100px;
+    background: var(--spark-card);
+    border: 1px solid var(--spark-border);
+    border-radius: var(--radius-sm);
+    padding: 16px 14px;
+    text-align: center;
+    position: relative;
+  }
+
+  .bv-icon {
+    font-size: 22px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .bv-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--spark-light);
+    line-height: 1.4;
+  }
+
+  .bv-arrow {
+    color: var(--spark-orange);
+    padding: 0 4px;
+    font-size: 18px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  /* ────── INLINE TAG ────── */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 100px;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+
+  .tag-safe   { background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.25); color: var(--spark-green); }
+  .tag-caution{ background: rgba(255,179,71,0.1); border: 1px solid rgba(255,179,71,0.25); color: var(--spark-gold); }
+  .tag-danger { background: rgba(248,113,113,0.1);border: 1px solid rgba(248,113,113,0.25);color: var(--spark-red); }
+
+  /* ────── DIVIDER ────── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--spark-border) 30%, var(--spark-border) 70%, transparent);
+    margin: 12px 0;
+  }
+
+  /* ────── FOOTER STRIP ────── */
+  .footer-strip {
+    background: var(--spark-card);
+    border-top: 1px solid var(--spark-border);
+    padding: 20px 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative; z-index: 1;
+  }
+
+  .fs-sig { display: flex; flex-direction: column; }
+  .fs-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .fs-title { font-size: 11px; color: var(--spark-muted); margin-top: 2px; }
+
+  .fs-brand {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--spark-orange);
+  }
+
+  .fs-note {
+    font-size: 11px;
+    color: #3a3850;
+    text-align: center;
+  }
+
+  /* print */
+  @media print {
+    body { background: #fff; padding: 0; }
+    .guide-wrapper { box-shadow: none; border-radius: 0; }
+  }
+
+  /* ────── RESPONSIVE ────── */
+  @media (max-width: 700px) {
+    body { padding: 0 0 60px; }
+    .guide-wrapper { border-radius: 0; border-left: none; border-right: none; }
+
+    .hero { padding: 28px 20px 24px; }
+    .logo-row { margin-bottom: 24px; }
+    .logo-icon { width: 42px; height: 42px; }
+    .brand-name { font-size: 20px; }
+    .hero h1 { font-size: 24px; }
+    .hero-sub { font-size: 13px; }
+    .hero-note { font-size: 13px; }
+
+    .toc { padding: 24px 20px; }
+    .toc-grid { grid-template-columns: 1fr; gap: 6px; }
+
+    .content { padding: 0 20px 40px; }
+    .section { margin-top: 36px; }
+    .section-header { gap: 12px; }
+    .section-icon-wrap { width: 38px; height: 38px; }
+    .section-title { font-size: 18px; }
+
+    .step-card { padding: 16px 16px; }
+
+    .help-grid { grid-template-columns: 1fr; }
+
+    .contact-banner { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .wa-btn { width: 100%; justify-content: center; }
+
+    .backup-visual { gap: 2px; }
+    .bv-step { padding: 10px 8px; min-width: 70px; }
+    .bv-label { font-size: 10px; }
+    .bv-arrow { font-size: 14px; padding: 0 2px; }
+
+    .footer-strip { padding: 16px 20px; flex-direction: column; gap: 8px; text-align: center; }
+    .fs-note { font-size: 10px; }
+
+    .code-block { font-size: 11px; padding: 12px 14px; }
+  }
+
+  @media (max-width: 480px) {
+    .hero h1 { font-size: 20px; }
+    .hero { padding: 22px 16px 20px; }
+    .toc { padding: 20px 16px; }
+    .content { padding: 0 16px 32px; }
+    .section-title { font-size: 16px; }
+    .step-card { gap: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="guide-wrapper">
+
+  <!-- ══════ HERO ══════ -->
+  <div class="hero">
+    <div class="logo-row">
+      <div class="logo-icon">
+        <!-- Lightning bolt -->
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <polygon points="16,3 8,16 13,16 12,25 20,12 15,12" fill="white"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">SparkEdge</div>
+        <div class="brand-tagline">Design · Strategy · Conversion</div>
+      </div>
+    </div>
+
+    <div class="doc-badge">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+        <rect x="1" y="1" width="10" height="10" rx="2" stroke="#FF6B2B" stroke-width="1.2"/>
+        <path d="M3.5 6h5M3.5 4h3" stroke="#FF6B2B" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      Client Reference Guide
+    </div>
+
+    <h1>Your Website<br><span>Management Guide</span></h1>
+    <p class="hero-sub">
+      Everything you need to keep your SparkEdge website updated, running, and looking great — explained in plain English. No tech background needed.
+    </p>
+
+    <div class="hero-note">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="9" r="7.5" stroke="#34D399" stroke-width="1.4"/>
+        <path d="M9 8v4M9 6h.01" stroke="#34D399" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <span>
+        <strong style="color:#fff;">Before you start:</strong> Your website is built in pure HTML, CSS, and JavaScript, and hosted free on GitHub Pages. Think of it as a folder of organised text files. Most updates are as simple as changing a word in a document — you just need to know <em>which file</em> and <em>where to look</em>.
+      </span>
+    </div>
+  </div>
+
+  <!-- ══════ TABLE OF CONTENTS ══════ -->
+  <div class="toc">
+    <div class="toc-title">What's Inside</div>
+    <div class="toc-grid">
+      <a class="toc-item" href="#s1">
+        <span class="toc-num">01</span>
+        <span class="toc-label">How to update text content</span>
+      </a>
+      <a class="toc-item" href="#s2">
+        <span class="toc-num">02</span>
+        <span class="toc-label">How to replace an image</span>
+      </a>
+      <a class="toc-item" href="#s3">
+        <span class="toc-num">03</span>
+        <span class="toc-label">Update contact information</span>
+      </a>
+      <a class="toc-item" href="#s4">
+        <span class="toc-num">04</span>
+        <span class="toc-label">Check if your site is live</span>
+      </a>
+      <a class="toc-item" href="#s5">
+        <span class="toc-num">05</span>
+        <span class="toc-label">View basic traffic data</span>
+      </a>
+      <a class="toc-item" href="#s6">
+        <span class="toc-num">06</span>
+        <span class="toc-label">What NOT to touch</span>
+      </a>
+      <a class="toc-item" href="#s7">
+        <span class="toc-num">07</span>
+        <span class="toc-label">When to contact SparkEdge</span>
+      </a>
+      <a class="toc-item" href="#s8">
+        <span class="toc-num">08</span>
+        <span class="toc-label">How to take a backup</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ══════ CONTENT ══════ -->
+  <div class="content">
+
+    <!-- ── SECTION 01: UPDATE TEXT ── -->
+    <div class="section" id="s1">
+      <div class="section-header">
+        <div class="section-icon-wrap si-orange">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M4 17.5l2.5-1 9.5-9.5-1.5-1.5L5 15l-1 2.5z" stroke="#FF6B2B" stroke-width="1.4" stroke-linejoin="round"/>
+            <path d="M14 6.5l1.5-1.5a1 1 0 011.5 0l.5.5a1 1 0 010 1.5L16 8.5" stroke="#FF6B2B" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="section-meta">
+          <div class="section-num">Section 01</div>
+          <div class="section-title">How to Update Text Content</div>
+          <div class="section-intro">Change headings, paragraphs, phone numbers, service descriptions — any visible words on your site.</div>
+        </div>
+      </div>
+
+      <div class="steps">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Open your GitHub repository</div>
+            <div class="step-desc">
+              Go to <strong style="color:#fff;">github.com</strong> and sign in. Click on your repository (it will be named something like <code style="background:#0d0d1c;padding:2px 7px;border-radius:4px;font-size:12px;color:var(--spark-gold);">your-username/your-website</code>). SparkEdge would have shared this link with you at delivery.
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Find the right file</div>
+            <div class="step-desc">
+              Your website is made up of a few <code style="background:#0d0d1c;padding:2px 7px;border-radius:4px;font-size:12px;color:var(--spark-gold);">.html</code> files — one for each page. You'll see them listed in the file list. Common ones are:
+            </div>
+            <div class="code-block">
+              <span class="hl-orange">index.html</span>       <span class="hl-muted">← Home page</span><br>
+              <span class="hl-orange">about.html</span>       <span class="hl-muted">← About page</span><br>
+              <span class="hl-orange">services.html</span>    <span class="hl-muted">← Services page</span><br>
+              <span class="hl-orange">contact.html</span>     <span class="hl-muted">← Contact page</span>
+            </div>
+            <div class="code-caption">Click whichever page has the text you want to change.</div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Open the editor</div>
+            <div class="step-desc">
+              Once you've clicked the file, you'll see its contents. Click the <strong style="color:#fff;">pencil icon ✏️</strong> in the top-right of the file view. This opens a simple text editor right inside the browser — no downloads needed.
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Find your text using Ctrl+F (or Cmd+F on Mac)</div>
+            <div class="step-desc">
+              Use the browser's Find function to search for the exact words you see on your website. For example, if your site says <em>"We build websites for schools"</em>, search for that phrase. It'll highlight exactly where it lives in the code.
+            </div>
+            <div class="callout callout-tip">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#FFB347" stroke-width="1.3"/><path d="M8 5v3.5M8 10.5h.01" stroke="#FFB347" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <span><strong style="color:#fff;">Tip:</strong> The text you see on screen is always the same text in the file — it just has a little HTML around it, like <code style="background:#0d0d1c;padding:1px 5px;border-radius:3px;font-size:11px;">&lt;h1&gt;Your Heading&lt;/h1&gt;</code>. Only change the words between the tags — leave the &lt;angle brackets&gt; alone.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <div class="step-title">Change only the words — not the surrounding code</div>
+            <div class="step-desc">Here's an example of what safe editing looks like:</div>
+            <div class="code-block">
+              <span class="hl-muted">BEFORE:</span><br>
+              &lt;h1&gt;<span class="hl-white">We build websites for schools</span>&lt;/h1&gt;<br><br>
+              <span class="hl-muted">AFTER (safe ✓):</span><br>
+              &lt;h1&gt;<span class="hl-green">We build award-winning websites for schools</span>&lt;/h1&gt;<br><br>
+              <span class="hl-muted">AFTER (unsafe ✗ — don't remove the tags!):</span><br>
+              <span class="hl-orange">We build award-winning websites for schools</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">6</div>
+          <div class="step-body">
+            <div class="step-title">Save your changes</div>
+            <div class="step-desc">
+              Scroll to the bottom of the editor page. You'll see a green <strong style="color:#fff;">"Commit changes"</strong> button. Click it. Your site will update automatically within <strong style="color:#fff;">1–2 minutes</strong>. Refresh your website in a new tab to see the changes live.
+            </div>
+            <div class="callout callout-safe">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#34D399" stroke-width="1.3"/><path d="M5 8l2 2 4-4" stroke="#34D399" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Don't worry — if something looks wrong, just go back into the file and change it back. GitHub keeps a history of every version so nothing is permanently lost.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 02: REPLACE IMAGE ── -->
+    <div class="section" id="s2">
+      <div class="section-header">
+        <div class="section-icon-wrap si-gold">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <rect x="2.5" y="4.5" width="17" height="13" rx="2" stroke="#FFB347" stroke-width="1.4"/>
+            <circle cx="7.5" cy="9" r="1.5" stroke="#FFB347" stroke-width="1.2"/>
+            <path d="M2.5 15l4-4 3 3 3-3 4.5 4.5" stroke="#FFB347" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="section-meta">
+          <div class="section-num">Section 02</div>
+          <div class="section-title">How to Replace an Image</div>
+          <div class="section-intro">Swap out a photo, logo, or banner without breaking the layout.</div>
+        </div>
+      </div>
+
+      <div class="steps">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Prepare your new image file</div>
+            <div class="step-desc">
+              The most important rule: <strong style="color:#fff;">name your new image exactly the same as the old one.</strong> For example, if the current image is called <code style="background:#0d0d1c;padding:2px 7px;border-radius:4px;font-size:12px;color:var(--spark-gold);">banner.jpg</code>, your new file must also be saved as <code style="background:#0d0d1c;padding:2px 7px;border-radius:4px;font-size:12px;color:var(--spark-gold);">banner.jpg</code>.
+            </div>
+            <div class="callout callout-tip">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#FFB347" stroke-width="1.3"/><path d="M8 5v3.5M8 10.5h.01" stroke="#FFB347" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <span><strong style="color:#fff;">File naming rules:</strong> Use only lowercase letters, hyphens, and numbers. No spaces. No special characters.<br>
+              <span class="tag tag-safe" style="margin-top:6px;margin-right:6px;">✓ team-photo.jpg</span>
+              <span class="tag tag-danger">✗ Team Photo (final).JPG</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Find your images folder on GitHub</div>
+            <div class="step-desc">
+              Inside your repository, look for a folder called <code style="background:#0d0d1c;padding:2px 7px;border-radius:4px;font-size:12px;color:var(--spark-gold);">images</code> or <code style="background:#0d0d1c;padding:2px 7px;border-radius:4px;font-size:12px;color:var(--spark-gold);">assets</code> (SparkEdge will confirm which one your site uses). Click into it to open the folder.
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Upload your new image</div>
+            <div class="step-desc">
+              Inside the images folder, click the <strong style="color:#fff;">"Add file" → "Upload files"</strong> button. Drag your new image in, or click to browse. Then click the green <strong style="color:#fff;">"Commit changes"</strong> button to save.
+            </div>
+            <div class="callout callout-safe">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#34D399" stroke-width="1.3"/><path d="M5 8l2 2 4-4" stroke="#34D399" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Uploading a file with the same name automatically replaces the old one. Your website layout stays exactly the same — only the photo changes.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Recommended image sizes</div>
+            <div class="step-desc">Keep images web-optimised so your site stays fast.</div>
+            <div class="code-block">
+              <span class="hl-orange">Hero / Banner:</span>  <span class="hl-gold">1200 × 600 px</span>  <span class="hl-muted">· Under 300 KB</span><br>
+              <span class="hl-orange">Team / Profile:</span> <span class="hl-gold">600 × 600 px</span>   <span class="hl-muted">· Under 120 KB</span><br>
+              <span class="hl-orange">Logo:</span>           <span class="hl-gold">PNG with transparent bg</span>  <span class="hl-muted">· Under 80 KB</span><br>
+              <span class="hl-orange">Gallery photo:</span>  <span class="hl-gold">800 × 600 px</span>   <span class="hl-muted">· Under 200 KB</span>
+            </div>
+            <div class="code-caption">Use <strong>squoosh.app</strong> (free, in your browser) to compress images before uploading.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 03: CONTACT INFO ── -->
+    <div class="section" id="s3">
+      <div class="section-header">
+        <div class="section-icon-wrap si-green">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M11 2C6.58 2 3 5.58 3 10c0 1.42.37 2.76 1.02 3.92L3 19l5.25-1.38A8 8 0 1011 2z" stroke="#34D399" stroke-width="1.4" stroke-linejoin="round"/>
+            <path d="M14.5 12.5c-.3-.15-1.8-.88-2.07-.98-.28-.1-.48-.15-.68.15s-.78.98-.96 1.18c-.18.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.5-.9-.8-1.5-1.8-1.68-2.1-.18-.3-.02-.47.13-.62.14-.13.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.68-1.65-.93-2.25-.25-.6-.5-.52-.68-.53" stroke="#34D399" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="section-meta">
+          <div class="section-num">Section 03</div>
+          <div class="section-title">Update Contact Information</div>
+          <div class="section-intro">Change your phone number, email address, or WhatsApp link across the whole site.</div>
+        </div>
+      </div>
+
+      <div class="steps">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Phone numbers and email addresses</div>
+            <div class="step-desc">
+              Open your <code style="background:#0d0d1c;padding:2px 7px;border-radius:4px;font-size:12px;color:var(--spark-gold);">contact.html</code> file (and <code style="background:#0d0d1c;padding:2px 7px;border-radius:4px;font-size:12px;color:var(--spark-gold);">index.html</code> if the number also appears on the home page). Use Ctrl+F to search for your old number — e.g. search <strong style="color:#fff;">9876543210</strong>. Change every instance you find to your new number.
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">WhatsApp button link</div>
+            <div class="step-desc">
+              Your WhatsApp button looks like this in the code. Find it and update only the number (the 10 digits after the country code <strong style="color:#fff;">91</strong>):
+            </div>
+            <div class="code-block">
+              <span class="hl-muted">BEFORE:</span><br>
+              &lt;a href="<span class="hl-orange">https://wa.me/91</span><span class="hl-white">9876543210</span>"&gt;WhatsApp Us&lt;/a&gt;<br><br>
+              <span class="hl-muted">AFTER (new number):</span><br>
+              &lt;a href="<span class="hl-orange">https://wa.me/91</span><span class="hl-green">9999900000</span>"&gt;WhatsApp Us&lt;/a&gt;
+            </div>
+            <div class="code-caption">Always keep the <strong>https://wa.me/91</strong> part exactly as-is. Only change the 10-digit number after it.</div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Email address</div>
+            <div class="step-desc">
+              Email links in the code look like this — update both the <em>link target</em> and the <em>visible text</em>:
+            </div>
+            <div class="code-block">
+              &lt;a href="mailto:<span class="hl-orange">info@yourbusiness.com</span>"&gt;<span class="hl-gold">info@yourbusiness.com</span>&lt;/a&gt;
+            </div>
+            <div class="code-caption">Change the address in both places — inside the quotes AND between the tags.</div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Check all pages, not just one</div>
+            <div class="step-desc">
+              Contact details often appear in the footer, which is copied across every page. Make sure you update the phone/email in <strong style="color:#fff;">every .html file</strong> in your repository. A quick Ctrl+F across each file will confirm.
+            </div>
+            <div class="callout callout-tip">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#FFB347" stroke-width="1.3"/><path d="M8 5v3.5M8 10.5h.01" stroke="#FFB347" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <span>Not confident doing this yourself? Just message Raunak on WhatsApp with the old and new details — he'll update it for you within 24 hours.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 04: IS SITE LIVE ── -->
+    <div class="section" id="s4">
+      <div class="section-header">
+        <div class="section-icon-wrap si-purple">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <circle cx="11" cy="11" r="8" stroke="#A78BFA" stroke-width="1.4"/>
+            <path d="M11 3C11 3 8 7 8 11s3 8 3 8M11 3c0 0 3 4 3 8s-3 8-3 8M3 11h16" stroke="#A78BFA" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="section-meta">
+          <div class="section-num">Section 04</div>
+          <div class="section-title">How to Check if Your Site is Live</div>
+          <div class="section-intro">Quickly verify your website is accessible and loading correctly for visitors.</div>
+        </div>
+      </div>
+
+      <div class="steps">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Visit your website address</div>
+            <div class="step-desc">
+              Open any browser (Chrome, Safari, etc.) in a <strong style="color:#fff;">private/incognito window</strong> and type your website address. A private window ensures you're seeing the live site, not a saved version from cache.
+              <br><br>Your website URL will look like one of these:
+            </div>
+            <div class="code-block">
+              <span class="hl-muted">GitHub Pages (free hosting):</span><br>
+              <span class="hl-orange">https://</span><span class="hl-gold">your-username</span><span class="hl-orange">.github.io/</span><span class="hl-white">your-site-name</span><br><br>
+              <span class="hl-muted">Custom domain (if you purchased one):</span><br>
+              <span class="hl-orange">https://</span><span class="hl-white">yourbusiness.com</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Check the GitHub Pages status</div>
+            <div class="step-desc">
+              On GitHub, go to your repository → click <strong style="color:#fff;">"Settings"</strong> → scroll down to <strong style="color:#fff;">"Pages"</strong> in the left sidebar. You'll see a message like:
+            </div>
+            <div class="code-block">
+              <span class="hl-green">✓  Your site is live at https://username.github.io/site</span>
+            </div>
+            <div class="callout callout-safe">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#34D399" stroke-width="1.3"/><path d="M5 8l2 2 4-4" stroke="#34D399" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>After you make any change and commit it, the site can take <strong style="color:#fff;">1–3 minutes</strong> to update. If you don't see changes immediately, wait a moment and do a hard refresh (Ctrl+Shift+R or Cmd+Shift+R).</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Test on mobile too</div>
+            <div class="step-desc">
+              Open your website on your phone's browser to confirm it looks good on mobile. Your SparkEdge site is built mobile-first, so it should look great — but a quick check never hurts.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 05: TRAFFIC ── -->
+    <div class="section" id="s5">
+      <div class="section-header">
+        <div class="section-icon-wrap si-orange">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M3 17l4.5-5 3.5 3 4-5 4 4" stroke="#FF6B2B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M3 5v12h16" stroke="#FF6B2B" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="section-meta">
+          <div class="section-num">Section 05</div>
+          <div class="section-title">How to View Basic Traffic Data</div>
+          <div class="section-intro">See how many people are visiting, which pages they read, and where they come from.</div>
+        </div>
+      </div>
+
+      <div class="steps">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Google Analytics (if set up for you)</div>
+            <div class="step-desc">
+              If SparkEdge set up Google Analytics for your site, visit <strong style="color:#fff;">analytics.google.com</strong> and sign in with the Google account linked to your site. You'll land on a dashboard showing:
+            </div>
+            <div class="code-block">
+              <span class="hl-orange">Active users right now</span>   <span class="hl-muted">← real-time visitors</span><br>
+              <span class="hl-orange">Users (last 28 days)</span>     <span class="hl-muted">← total unique visitors</span><br>
+              <span class="hl-orange">Sessions</span>                  <span class="hl-muted">← total visits</span><br>
+              <span class="hl-orange">Top pages</span>                 <span class="hl-muted">← which pages get most views</span><br>
+              <span class="hl-orange">Traffic source</span>           <span class="hl-muted">← Google search, direct, social</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Google Search Console (for search rankings)</div>
+            <div class="step-desc">
+              Visit <strong style="color:#fff;">search.google.com/search-console</strong>. This shows you which keywords people typed to find your site, how many times your site appeared in search results, and whether Google has found any issues.
+            </div>
+            <div class="callout callout-info">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#60A5FA" stroke-width="1.3"/><path d="M8 5v3.5M8 10.5h.01" stroke="#60A5FA" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <span>If you don't have Analytics or Search Console set up yet, ask SparkEdge to add them — it takes about 15 minutes and is completely free.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Quick check without any tools</div>
+            <div class="step-desc">
+              Simply open your browser and type your business name into Google. If your website appears in the results, it's indexed and working. A result appearing in the <strong style="color:#fff;">top 10</strong> is a great sign your SEO is doing its job.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 06: DO NOT TOUCH ── -->
+    <div class="section" id="s6">
+      <div class="section-header">
+        <div class="section-icon-wrap si-red">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <circle cx="11" cy="11" r="8" stroke="#F87171" stroke-width="1.4"/>
+            <path d="M11 7v5M11 14.5h.01" stroke="#F87171" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="section-meta">
+          <div class="section-num">Section 06</div>
+          <div class="section-title">What NOT to Touch</div>
+          <div class="section-intro">These areas are the engine under the bonnet — safe to leave alone, easy to accidentally break.</div>
+        </div>
+      </div>
+
+      <div class="danger-zone">
+        <div class="danger-zone-title">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M9 2L1.5 15.5h15L9 2z" stroke="#F87171" stroke-width="1.4" stroke-linejoin="round"/>
+            <path d="M9 7v4M9 13h.01" stroke="#F87171" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+          Leave These Exactly As-Is
+        </div>
+
+        <div class="danger-item">
+          <span class="danger-tag">CSS Variables</span>
+          <div class="danger-text">
+            Lines that look like <code style="background:#0d0d1c;padding:1px 6px;border-radius:3px;font-size:11px;">--primary-color: #FF6B2B;</code> inside a <strong>&lt;style&gt;</strong> block. These control your entire colour scheme. Changing one number can shift every button, heading, and card colour on the site at once.
+          </div>
+        </div>
+
+        <div class="danger-item">
+          <span class="danger-tag">&lt;script&gt; tags</span>
+          <div class="danger-text">
+            Any code between <code style="background:#0d0d1c;padding:1px 6px;border-radius:3px;font-size:11px;">&lt;script&gt;</code> and <code style="background:#0d0d1c;padding:1px 6px;border-radius:3px;font-size:11px;">&lt;/script&gt;</code> tags. These power animations, menus, forms, and interactive features. Even one missing character can stop a form from working or break the mobile menu.
+          </div>
+        </div>
+
+        <div class="danger-item">
+          <span class="danger-tag">Structural HTML</span>
+          <div class="danger-text">
+            Tags like <code style="background:#0d0d1c;padding:1px 6px;border-radius:3px;font-size:11px;">&lt;head&gt;</code>, <code style="background:#0d0d1c;padding:1px 6px;border-radius:3px;font-size:11px;">&lt;nav&gt;</code>, <code style="background:#0d0d1c;padding:1px 6px;border-radius:3px;font-size:11px;">&lt;section&gt;</code>, <code style="background:#0d0d1c;padding:1px 6px;border-radius:3px;font-size:11px;">&lt;footer&gt;</code>. These are the skeleton of the page. Moving or deleting them will collapse the layout.
+          </div>
+        </div>
+
+        <div class="danger-item">
+          <span class="danger-tag">CSS Stylesheets</span>
+          <div class="danger-text">
+            Your <strong>.css files</strong> (e.g. <code style="background:#0d0d1c;padding:1px 6px;border-radius:3px;font-size:11px;">style.css</code>) contain hundreds of design rules. Don't edit these unless SparkEdge has specifically guided you on what to change.
+          </div>
+        </div>
+
+        <div class="danger-item">
+          <span class="danger-tag">Analytics codes</span>
+          <div class="danger-text">
+            Snippets that look like <code style="background:#0d0d1c;padding:1px 6px;border-radius:3px;font-size:11px;">G-XXXXXXXXXX</code> or long blocks of Google/Meta code in the &lt;head&gt;. These track your visitors. Removing them means losing all traffic data.
+          </div>
+        </div>
+
+        <div class="danger-item">
+          <span class="danger-tag">File / folder names</span>
+          <div class="danger-text">
+            <strong>Never rename</strong> any existing .html, .css, or .js file, and never rename the images folder. Other files reference each other by name — renaming one breaks the connection and causes 404 errors.
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-warn" style="margin-top:18px;">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L1 14h14L8 2z" stroke="#F87171" stroke-width="1.3" stroke-linejoin="round"/><path d="M8 6.5v3M8 11.5h.01" stroke="#F87171" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <span><strong style="color:#fff;">Golden rule:</strong> If you're not 100% sure what something does, don't touch it. When in doubt, take a backup first (see Section 08), then make the change. Or simply ask SparkEdge — there are no silly questions.</span>
+      </div>
+    </div>
+
+    <!-- ── SECTION 07: WHEN TO CONTACT ── -->
+    <div class="section" id="s7">
+      <div class="section-header">
+        <div class="section-icon-wrap si-green">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <rect x="2" y="5" width="18" height="13" rx="2.5" stroke="#34D399" stroke-width="1.4"/>
+            <path d="M2 8l9 6 9-6" stroke="#34D399" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="section-meta">
+          <div class="section-num">Section 07</div>
+          <div class="section-title">When to Contact SparkEdge</div>
+          <div class="section-intro">Some situations are best handled by Raunak directly — here's a clear guide on what to DIY vs. what to send over.</div>
+        </div>
+      </div>
+
+      <div class="help-grid">
+        <div class="help-card">
+          <div class="help-card-icon si-green" style="background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 9l3.5 3.5L14 5" stroke="#34D399" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="help-situation">You can do it yourself ✓</div>
+          <div class="help-example">Changing text, updating a phone number, swapping a photo with the same filename, checking if the site is live.</div>
+        </div>
+
+        <div class="help-card">
+          <div class="help-card-icon" style="background:rgba(255,107,43,0.1);border:1px solid rgba(255,107,43,0.2);width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="#FF6B2B" stroke-width="1.4"/><path d="M9 5v4.5l2.5 2" stroke="#FF6B2B" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </div>
+          <div class="help-situation">Contact SparkEdge for these</div>
+          <div class="help-example">Something looks broken, a link isn't working, you want a new section added, or you accidentally deleted something.</div>
+        </div>
+
+        <div class="help-card">
+          <div class="help-card-icon" style="background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.2);width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="3" width="14" height="12" rx="2" stroke="#A78BFA" stroke-width="1.4"/><path d="M6 7h6M6 10h4" stroke="#A78BFA" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </div>
+          <div class="help-situation">New page or feature request</div>
+          <div class="help-example">Want to add a new page, a gallery, an enquiry form, or a pricing table? Send the content and Raunak will build it.</div>
+        </div>
+
+        <div class="help-card">
+          <div class="help-card-icon" style="background:rgba(255,179,71,0.1);border:1px solid rgba(255,179,71,0.2);width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2L11 7h5l-4 3 1.5 5L9 12l-4.5 3L6 10 2 7h5z" stroke="#FFB347" stroke-width="1.3" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="help-situation">SEO or performance issues</div>
+          <div class="help-example">Site loading slowly, not appearing on Google, or you want to target new keywords — these need technical attention.</div>
+        </div>
+      </div>
+
+      <div class="contact-banner">
+        <div class="contact-left">
+          <div class="contact-banner-title">Ready to reach out? Here's how.</div>
+          <div class="contact-detail">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5C4.5 1.5 1.5 4.5 1.5 8c0 1.12.3 2.17.82 3.08L1.5 14.5l3.5-.9A6.5 6.5 0 108 1.5z" fill="#25d366" opacity=".2" stroke="#25d366" stroke-width="1.2"/><path d="M10.5 9.2c-.2-.1-1.2-.6-1.4-.66-.2-.07-.33-.1-.47.1-.14.2-.53.66-.65.8-.12.13-.24.15-.44.05-.2-.1-.86-.32-1.64-1.01-.6-.54-1.02-1.2-1.14-1.4-.12-.2-.01-.32.09-.42.09-.09.2-.23.3-.35.1-.12.13-.2.2-.34.07-.13.03-.26-.01-.36-.05-.1-.47-1.12-.64-1.53-.17-.4-.34-.35-.46-.35" stroke="#25d366" stroke-width="1.1" stroke-linecap="round"/></svg>
+            WhatsApp (fastest): <a href="https://wa.me/919142450715">+91 91424 50715</a>
+          </div>
+          <div class="contact-detail">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="10" rx="2" stroke="#FF6B2B" stroke-width="1.2"/><path d="M1.5 5.5l6.5 4 6.5-4" stroke="#FF6B2B" stroke-width="1.2" stroke-linecap="round"/></svg>
+            Email: <a href="mailto:sparkedge555@gmail.com">sparkedge555@gmail.com</a>
+          </div>
+          <div class="contact-detail">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#8A8A9A" stroke-width="1.2"/><path d="M8 5v3.5l2 1.5" stroke="#8A8A9A" stroke-width="1.2" stroke-linecap="round"/></svg>
+            <span style="color:var(--spark-muted);">Available Mon–Sat, 9:00 AM – 9:00 PM IST</span>
+          </div>
+        </div>
+        <a class="wa-btn" href="https://wa.me/919142450715?text=Hi%20Raunak!%20I%20need%20help%20with%20my%20website.">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 1.5C5.36 1.5 1.5 5.36 1.5 10c0 1.5.4 2.9 1.1 4.1L1.5 18.5l4.5-1.18A8.5 8.5 0 1010 1.5z" fill="white" opacity=".2"/><path d="M13.2 11.6c-.25-.13-1.5-.74-1.73-.82-.23-.08-.4-.13-.56.13-.17.25-.66.82-.81 1-.15.17-.3.19-.55.06-.25-.13-1.06-.39-2.02-1.25-.75-.67-1.25-1.5-1.4-1.75-.15-.25-.01-.38.11-.51.11-.12.25-.3.38-.45.12-.15.16-.25.25-.42.08-.17.04-.32-.02-.45-.06-.13-.56-1.35-.77-1.85-.2-.5-.41-.43-.56-.44" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Message Raunak
+        </a>
+      </div>
+    </div>
+
+    <!-- ── SECTION 08: BACKUP ── -->
+    <div class="section" id="s8">
+      <div class="section-header">
+        <div class="section-icon-wrap si-blue">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M11 14V5M8 11l3 3 3-3" stroke="#60A5FA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 17h10" stroke="#60A5FA" stroke-width="1.4" stroke-linecap="round"/>
+            <rect x="3" y="3" width="16" height="16" rx="3" stroke="#60A5FA" stroke-width="1.3" stroke-dasharray="3 2"/>
+          </svg>
+        </div>
+        <div class="section-meta">
+          <div class="section-num">Section 08</div>
+          <div class="section-title">How to Take a Backup</div>
+          <div class="section-intro">Download a complete copy of your website files to your computer — takes less than 2 minutes.</div>
+        </div>
+      </div>
+
+      <div class="backup-visual">
+        <div class="bv-step">
+          <span class="bv-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="3" y="3" width="22" height="22" rx="5" stroke="#60A5FA" stroke-width="1.5"/><path d="M8 10h12M8 14h8" stroke="#60A5FA" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </span>
+          <div class="bv-label">Open your repository</div>
+        </div>
+        <div class="bv-arrow">›</div>
+        <div class="bv-step">
+          <span class="bv-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="10" stroke="#FF6B2B" stroke-width="1.5"/><path d="M14 10v5M11 13l3 3 3-3" stroke="#FF6B2B" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <div class="bv-label">Click "Code" button</div>
+        </div>
+        <div class="bv-arrow">›</div>
+        <div class="bv-step">
+          <span class="bv-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M7 14l7 7 7-7M14 4v17" stroke="#FFB347" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <div class="bv-label">Download ZIP</div>
+        </div>
+        <div class="bv-arrow">›</div>
+        <div class="bv-step">
+          <span class="bv-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="5" y="7" width="18" height="15" rx="2" stroke="#34D399" stroke-width="1.5"/><path d="M10 7V5a2 2 0 014 0v2" stroke="#34D399" stroke-width="1.4"/><path d="M11 16l2 2 4-4" stroke="#34D399" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <div class="bv-label">Save to your computer</div>
+        </div>
+      </div>
+
+      <div class="steps">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Go to your GitHub repository</div>
+            <div class="step-desc">Open github.com, sign in, and click on your website repository to open it.</div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Click the green "Code" button</div>
+            <div class="step-desc">
+              Near the top-right of your file list, you'll see a green button that says <strong style="color:#fff;">"&lt;&gt; Code"</strong>. Click it to open a small dropdown menu.
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Click "Download ZIP"</div>
+            <div class="step-desc">
+              At the bottom of that dropdown, you'll see <strong style="color:#fff;">"Download ZIP"</strong>. Click it. Your browser will download a <code style="background:#0d0d1c;padding:2px 7px;border-radius:4px;font-size:12px;color:var(--spark-gold);">.zip</code> file containing every file in your website — images, HTML, CSS, everything.
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Save it somewhere safe and label it clearly</div>
+            <div class="step-desc">
+              Move the downloaded ZIP to a folder you'll remember — like Google Drive or a "Website Backups" folder. Rename it with today's date so you can tell versions apart.
+            </div>
+            <div class="code-block">
+              <span class="hl-orange">Good naming examples:</span><br>
+              <span class="hl-green">website-backup-jan-2025.zip</span><br>
+              <span class="hl-green">mysite-before-update-15feb2025.zip</span>
+            </div>
+            <div class="callout callout-tip">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#FFB347" stroke-width="1.3"/><path d="M8 5v3.5M8 10.5h.01" stroke="#FFB347" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <span>GitHub actually keeps a full version history of every change you've ever made — so you have a built-in backup already. But downloading a ZIP gives you an offline copy just in case. We recommend doing this once a month, or before any major change.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end content -->
+
+  <!-- ══════ FOOTER ══════ -->
+  <div class="footer-strip">
+    <div class="fs-sig">
+      <div class="fs-name">Raunak Karn</div>
+      <div class="fs-title">Founder & Lead Designer, SparkEdge</div>
+    </div>
+    <div class="fs-note">For queries: sparkedge555@gmail.com · +91 91424 50715</div>
+    <div class="fs-brand">SparkEdge</div>
+  </div>
+
+  <div style="background:#080810;padding:12px 52px;text-align:center;border-top:1px solid #13131f;position:relative;z-index:1;">
+    <span style="font-size:11px;color:#2a2850;">Confidential client document · Prepared by SparkEdge · sparkedge555.github.io/sparkedgeagency</span>
+  </div>
+
+</div>
+</body>
+</html>
