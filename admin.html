@@ -606,6 +606,7 @@ function toggleSidebar(){
   </nav>
   <div class="sidebar-footer">
     <a href="mailto:sparkedge555@gmail.com">✉ sparkedge555@gmail.com</a>
+    <button id="memberLogoutBtn" onclick="adminLogout()" style="display:none;width:100%;margin-top:8px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;color:#EF4444;cursor:pointer;text-align:left;">🚪 Log Out</button>
   </div>
 </aside>
 
@@ -3034,6 +3035,8 @@ function updateUserBadge(){
   const roleEl = document.getElementById('userRoleBadge');
   if(nameEl) nameEl.textContent = u.name;
   if(roleEl) roleEl.textContent = u.role === 'owner' ? 'Owner' : 'Member';
+  const logoutBtn = document.getElementById('memberLogoutBtn');
+  if(logoutBtn) logoutBtn.style.display = u.role === 'owner' ? 'none' : 'block';
 }
 
 /* ══════════════════════════════════════════════════════
