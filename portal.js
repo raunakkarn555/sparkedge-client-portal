@@ -24,9 +24,24 @@ function renderDashboard(client) {
   }[type] || '📎');
 
   /* ─── Payment Calculations ─────────────────────────────── */
+  // Support discount from both client.payment.discount and client.discount
+  const discountData  = client.payment.discount || client.discount || null;
   const originalTotal = client.payment.originalTotal || client.payment.total;
-  const discount      = client.payment.discount || null;
-  const finalTotal    = client.payment.total;
+
+  // Auto-calculate finalTotal after discount subtraction
+  let finalTotal = client.payment.total;
+  let discount   = null;
+  if (discountData) {
+    let discAmt = 0;
+    if (discountData.type === 'percent') {
+      discAmt = Math.round(originalTotal * discountData.value / 100);
+    } else {
+      discAmt = discountData.amount || discountData.value || 0;
+    }
+    discount   = { ...discountData, amount: discAmt };
+    finalTotal = originalTotal - discAmt;
+    // Re-scale pending stage amounts proportionally if stages still use originalTotal
+  }
 
   const paidAmt    = client.payment.stages
     .filter(s => s.status === 'paid')
@@ -227,27 +242,24 @@ function renderDashboard(client) {
         <div class="stages-list">${stagesHTML}</div>
 
         ${pendingAmt > 0 ? `
-        <div class="pay-now-block">
-          <div class="pay-now-meta">
-            <div class="pay-now-label">Amount Due Now</div>
-            <div class="pay-now-amt">${fmt(pendingAmt)}</div>
+        <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,.07);">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <div>
+              <div style="font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#7A7A9A;margin-bottom:4px;">Amount Due Now</div>
+              <div style="font-size:24px;font-weight:800;font-family:'Syne',sans-serif;color:#F59E0B;">${fmt(pendingAmt)}</div>
+            </div>
+            <button onclick="document.getElementById('payModal').classList.add('open')" style="background:linear-gradient(135deg,#FF6B35,#FF3CAC);border:none;border-radius:12px;padding:14px 28px;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(255,107,53,.35);">
+              Pay Now
+            </button>
           </div>
-          <button class="btn-pay-now" onclick="document.getElementById('payModal').classList.add('open')">
-            💳 Pay Now
-          </button>
-          <div class="pay-methods-row">
-            <span class="pay-method-chip">GPay</span>
-            <span class="pay-method-chip">PhonePe</span>
-            <span class="pay-method-chip">Paytm</span>
-            <span class="pay-method-chip">UPI</span>
-            <span class="pay-method-chip">Bank Transfer</span>
+          <div style="margin-top:12px;font-size:11px;color:#3A3A5A;">
+            Secure payment via UPI or Bank Transfer. After paying, share screenshot on WhatsApp or email <strong style="color:#7A7A9A;">sparkedge555@gmail.com</strong>
           </div>
         </div>` : `
-        <div class="all-paid-badge">
-          <span>✅</span>
-          <span>All payments received — Thank you!</span>
+        <div style="margin-top:20px;padding:14px 18px;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:10px;display:flex;align-items:center;gap:10px;">
+          <span style="font-size:20px;">&#10004;</span>
+          <div style="font-size:13px;font-weight:700;color:#22C55E;">All payments received - Thank you!</div>
         </div>`}
-
       </div>
 
       <!-- ══ FREE SERVICES & FREEBIES ══ -->

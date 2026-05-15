@@ -268,44 +268,6 @@ a:hover { text-decoration: underline; }
 .stage-status.pending { background:rgba(245,158,11,0.12); color:var(--warning); }
 .stage-status.upcoming{ background:rgba(122,122,154,0.1); color:var(--text-muted); }
 
-/* ── Pay Now block ── */
-.pay-now-block {
-  margin-top:20px;
-  background:linear-gradient(135deg,rgba(255,107,53,0.07),rgba(255,60,172,0.04));
-  border:1px solid rgba(255,107,53,0.25); border-radius:var(--radius);
-  padding:20px;
-}
-.pay-now-meta {
-  display:flex; align-items:center; justify-content:space-between;
-  margin-bottom:14px;
-}
-.pay-now-label { font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--text-muted); }
-.pay-now-amt { font-family:var(--font-display); font-size:24px; font-weight:800; color:var(--accent); letter-spacing:-0.5px; }
-.btn-pay-now {
-  width:100%; padding:14px 20px;
-  background:linear-gradient(135deg,#FF6B35,#FF3CAC);
-  border:none; border-radius:var(--radius-sm);
-  font-family:var(--font-display); font-size:16px; font-weight:800;
-  color:#fff; cursor:pointer; letter-spacing:0.3px;
-  transition:var(--transition); margin-bottom:14px;
-}
-.btn-pay-now:hover { opacity:0.9; transform:translateY(-2px); box-shadow:0 10px 32px rgba(255,107,53,0.4); }
-.btn-pay-now:active { transform:translateY(0); }
-.pay-methods-row { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; }
-.pay-method-chip {
-  font-size:11px; font-weight:600; padding:3px 10px; border-radius:12px;
-  background:var(--bg-raised); border:1px solid var(--border);
-  color:var(--text-dim); letter-spacing:0.3px;
-}
-
-/* ── All paid badge ── */
-.all-paid-badge {
-  margin-top:20px; display:flex; align-items:center; justify-content:center; gap:10px;
-  padding:14px 20px; border-radius:var(--radius-sm);
-  background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.2);
-  font-size:14px; font-weight:600; color:var(--success);
-}
-
 /* ═══════════════════════════════════════════════════════════
    FREEBIES / FREE SERVICES
 ═══════════════════════════════════════════════════════════ */
