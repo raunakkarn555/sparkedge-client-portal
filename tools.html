@@ -7,8 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <!-- Lucide Icons CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.383.0/umd/lucide.min.js"></script>
-<style>
+<script src="https://unpkg.com/lucide@latest"></script><style>
 :root {
   --bg:           #080810;
   --bg-card:      #0E0E1A;
@@ -602,12 +601,18 @@ body{
 </footer>
 
 <script>
-// Init Lucide icons
-lucide.createIcons();
+window.addEventListener('DOMContentLoaded', () => {
 
-// Footer year
-document.getElementById('footerRight').textContent =
-  `🔐 INTERNAL TOOLS HUB · NOT FOR CLIENT DISTRIBUTION · © ${new Date().getFullYear()} SPARKEDGE`;
+  // Init Lucide icons safely
+  if (window.lucide) {
+    lucide.createIcons();
+  }
+
+  // Footer year
+  document.getElementById('footerRight').textContent =
+    `🔐 INTERNAL TOOLS HUB · NOT FOR CLIENT DISTRIBUTION · © ${new Date().getFullYear()} SPARKEDGE`;
+
+});
 </script>
 </body>
 </html>
