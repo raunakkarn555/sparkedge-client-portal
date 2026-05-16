@@ -24,29 +24,34 @@ function renderDashboard(client) {
   }[type] || '📎');
 
   /* ─── Payment Calculations ─────────────────────────────── */
-  // Support discount from both client.payment.discount and client.discount
   const discountData  = client.payment.discount || client.discount || null;
   const originalTotal = client.payment.originalTotal || client.payment.total;
 
-  // Auto-calculate finalTotal after discount subtraction
-  let finalTotal = client.payment.total;
-  let discount   = null;
-  if (discountData) {
-    let discAmt = 0;
-    if (discountData.type === 'percent') {
-      discAmt = Math.round(originalTotal * discountData.value / 100);
-    } else {
-      discAmt = discountData.amount || discountData.value || 0;
-    }
-    discount   = { ...discountData, amount: discAmt };
-    finalTotal = originalTotal - discAmt;
-    // Re-scale pending stage amounts proportionally if stages still use originalTotal
+  // Situational discount
+  let sitDiscAmt = 0;
+  let sitDiscount = null;
+  if (discountData && discountData.type && discountData.type !== 'none' && discountData.value) {
+    sitDiscAmt = discountData.type === 'percent'
+      ? Math.round(originalTotal * discountData.value / 100)
+      : (discountData.amount || discountData.value || 0);
+    sitDiscount = { ...discountData, amount: sitDiscAmt };
   }
+
+  // Referral discount
+  const refDiscountData = client.referralDiscount || null;
+  const refDiscAmt      = refDiscountData ? (refDiscountData.discount || 0) : 0;
+
+  // Combined
+  const totalDiscountAmt = sitDiscAmt + refDiscAmt;
+  const finalTotal       = originalTotal - totalDiscountAmt;
+
+  // Keep legacy discount var for any existing code that uses it
+  const discount = sitDiscount;
 
   const paidAmt    = client.payment.stages
     .filter(s => s.status === 'paid')
     .reduce((sum, s) => sum + s.amount, 0);
-  const pendingAmt = finalTotal - paidAmt;
+  const pendingAmt = Math.max(0, finalTotal - paidAmt);
   const payPct     = finalTotal > 0 ? Math.round((paidAmt / finalTotal) * 100) : 0;
 
   /* ─── Payment Stages HTML ──────────────────────────────── */
@@ -201,30 +206,66 @@ function renderDashboard(client) {
           <div class="card-title">Payment Tracker</div>
         </div>
 
-        ${discount ? `
-        <div class="discount-banner">
-          <div class="discount-left">
-            <span class="discount-emoji">🎉</span>
-            <div>
-              <div class="discount-title">Discount Applied — <em>${discount.reason}</em></div>
-              <div class="discount-saved">You saved <strong>${fmt(discount.amount)}</strong> on this project!</div>
-            </div>
-          </div>
-          <div class="discount-pill">-${fmt(discount.amount)}</div>
-        </div>` : ''}
+        <!-- ── BILL DETAILS (Swiggy-style) ── -->
+        <div class="bill-box">
+          <div class="bill-title">🧾 Bill Details</div>
 
-        <div class="payment-summary-grid">
+          <!-- Base amount row -->
+          <div class="bill-row">
+            <span class="bill-label">Project Amount</span>
+            <span class="bill-value">${totalDiscountAmt > 0 ? `<s style="color:#3A3A5A;font-size:12px;margin-right:6px;">${fmt(originalTotal)}</s>` : ''}${fmt(totalDiscountAmt > 0 ? originalTotal : originalTotal)}</span>
+          </div>
+
+          <!-- Situational discount row -->
+          ${sitDiscAmt > 0 ? `
+          <div class="bill-row bill-row-discount">
+            <span class="bill-label">
+              🏷️ ${sitDiscount.reason ? sitDiscount.reason : (sitDiscount.type === 'percent' ? `Discount (${sitDiscount.value}%)` : 'Special Discount')}
+              <span class="bill-saved-badge">Saved ${fmt(sitDiscAmt)}</span>
+            </span>
+            <span class="bill-value bill-green">–${fmt(sitDiscAmt)}</span>
+          </div>` : ''}
+
+          <!-- Referral discount row -->
+          ${refDiscAmt > 0 ? `
+          <div class="bill-row bill-row-discount">
+            <span class="bill-label">
+              🎟️ Referral Code <strong style="color:#F0F0FA;">${refDiscountData.code}</strong>
+              <span class="bill-saved-badge">Saved ${fmt(refDiscAmt)}</span>
+            </span>
+            <span class="bill-value bill-green">–${fmt(refDiscAmt)}</span>
+          </div>` : ''}
+
+          <!-- Divider -->
+          <div class="bill-divider"></div>
+
+          <!-- Grand Total -->
+          <div class="bill-row bill-grand">
+            <span class="bill-label" style="font-size:14px;font-weight:800;color:#F0F0FA;">Grand Total</span>
+            <span class="bill-value" style="font-size:18px;font-weight:800;font-family:'Syne',sans-serif;color:#FF6B35;">${fmt(finalTotal)}</span>
+          </div>
+
+          <!-- Total savings strip -->
+          ${totalDiscountAmt > 0 ? `
+          <div class="bill-savings-strip">
+            <span>🎉 Your total savings</span>
+            <span style="font-weight:800;">${fmt(totalDiscountAmt)}</span>
+          </div>` : ''}
+        </div>
+
+        <!-- ── PAYMENT PROGRESS ── -->
+        <div class="payment-summary-grid" style="margin-top:16px;">
           <div class="pay-box">
-            <div class="pay-box-label">Project Total</div>
+            <div class="pay-box-label">💰 Project Total</div>
             <div class="pay-box-value">${fmt(finalTotal)}</div>
-            ${discount ? `<div class="pay-box-original"><s>${fmt(originalTotal)}</s> original</div>` : ''}
+            ${totalDiscountAmt > 0 ? `<div class="pay-box-original"><s>${fmt(originalTotal)}</s></div>` : ''}
           </div>
           <div class="pay-box green">
             <div class="pay-box-label">💚 Amount Paid</div>
             <div class="pay-box-value">${fmt(paidAmt)}</div>
           </div>
           <div class="pay-box ${pendingAmt > 0 ? 'amber' : 'green'}">
-            <div class="pay-box-label">🟡 Balance Due</div>
+            <div class="pay-box-label">${pendingAmt > 0 ? '🟡 Balance Due' : '✅ Fully Paid'}</div>
             <div class="pay-box-value">${fmt(pendingAmt)}</div>
           </div>
         </div>
@@ -246,10 +287,10 @@ function renderDashboard(client) {
           <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
             <div>
               <div style="font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#7A7A9A;margin-bottom:4px;">Amount Due Now</div>
-              <div style="font-size:24px;font-weight:800;font-family:'Syne',sans-serif;color:#F59E0B;">${fmt(pendingAmt)}</div>
+              <div style="font-size:28px;font-weight:800;font-family:'Syne',sans-serif;color:#F59E0B;">${fmt(pendingAmt)}</div>
             </div>
-            <button onclick="document.getElementById('payModal').classList.add('open')" style="background:linear-gradient(135deg,#FF6B35,#FF3CAC);border:none;border-radius:12px;padding:14px 28px;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(255,107,53,.35);">
-              Pay Now
+            <button onclick="openPayModal()" style="background:linear-gradient(135deg,#FF6B35,#FF3CAC);border:none;border-radius:12px;padding:14px 28px;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(255,107,53,.35);">
+              📲 Pay Now
             </button>
           </div>
           <div style="margin-top:12px;font-size:11px;color:#3A3A5A;">
@@ -258,7 +299,7 @@ function renderDashboard(client) {
         </div>` : `
         <div style="margin-top:20px;padding:14px 18px;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:10px;display:flex;align-items:center;gap:10px;">
           <span style="font-size:20px;">&#10004;</span>
-          <div style="font-size:13px;font-weight:700;color:#22C55E;">All payments received - Thank you!</div>
+          <div style="font-size:13px;font-weight:700;color:#22C55E;">All payments received — Thank you! 🎉</div>
         </div>`}
       </div>
 
@@ -444,6 +485,96 @@ function renderDashboard(client) {
     document.getElementById('progressFill').style.width = client.progress + '%';
     document.getElementById('pctDisplay').textContent   = client.progress + '%';
   }, 300);
+}
+
+/* ── Pay Modal — opens and pre-fills bill from clientData ── */
+function openPayModal() {
+  const data = window._clientData;
+  if (!data) { document.getElementById('payModal').classList.add('open'); return; }
+
+  const fmt = n => '₹' + Number(n).toLocaleString('en-IN');
+  const originalTotal = data.payment.originalTotal || data.payment.total;
+
+  // Situational discount
+  const disc = data.payment.discount || data.discount || null;
+  let sitAmt = 0;
+  if (disc && disc.type && disc.type !== 'none' && disc.value) {
+    sitAmt = disc.type === 'percent'
+      ? Math.round(originalTotal * disc.value / 100)
+      : (disc.amount || disc.value || 0);
+  }
+
+  // Referral discount
+  const refD    = data.referralDiscount || null;
+  const refAmt  = refD ? (refD.discount || 0) : 0;
+  const totalDisc = sitAmt + refAmt;
+  const finalTotal = originalTotal - totalDisc;
+
+  const paidAmt   = (data.payment.stages || [])
+    .filter(s => s.status === 'paid')
+    .reduce((a, s) => a + s.amount, 0);
+  const pendingAmt = Math.max(0, finalTotal - paidAmt);
+
+  // Build bill rows
+  let rows = '';
+  const billRow = (label, val, green, sub) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+      <div>
+        <span style="font-size:13px;color:#9A9ABA;">${label}</span>
+        ${sub ? `<span style="margin-left:8px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#22C55E;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;">${sub}</span>` : ''}
+      </div>
+      <span style="font-size:13px;font-weight:700;${green ? 'color:#22C55E;' : 'color:#F0F0FA;'}">${val}</span>
+    </div>`;
+
+  rows += billRow('Project Amount',
+    sitAmt + refAmt > 0 ? `<s style="color:#3A3A5A;font-size:12px;">${fmt(originalTotal)}</s> ${fmt(originalTotal)}` : fmt(originalTotal));
+
+  if (sitAmt > 0) {
+    const label = disc.reason || (disc.type === 'percent' ? `Discount (${disc.value}%)` : 'Special Discount');
+    rows += billRow(`🏷️ ${label}`, `– ${fmt(sitAmt)}`, true, `Saved ${fmt(sitAmt)}`);
+  }
+  if (refAmt > 0) {
+    rows += billRow(`🎟️ Referral Code <strong style="color:#F0F0FA">${refD.code}</strong>`, `– ${fmt(refAmt)}`, true, `Saved ${fmt(refAmt)}`);
+  }
+
+  const grandRow = `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0 10px;">
+      <span style="font-size:14px;font-weight:800;color:#F0F0FA;">Grand Total</span>
+      <div style="text-align:right;">
+        ${totalDisc > 0 ? `<div style="font-size:11px;color:#3A3A5A;text-decoration:line-through;margin-bottom:2px;">${fmt(originalTotal)}</div>` : ''}
+        <span style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#FF6B35;">${fmt(finalTotal)}</span>
+      </div>
+    </div>`;
+
+  const savingsStrip = totalDisc > 0 ? `
+    <div style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+      <span style="font-size:12px;color:#22C55E;font-weight:600;">🎉 Your total savings</span>
+      <span style="font-size:14px;font-weight:800;color:#22C55E;">${fmt(totalDisc)}</span>
+    </div>` : '';
+
+  const paidPendingRow = `
+    <div style="display:flex;gap:10px;margin-top:6px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06);">
+      <div style="flex:1;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-size:10px;font-weight:700;color:#22C55E;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">💚 Paid</div>
+        <div style="font-size:18px;font-weight:800;font-family:'Syne',sans-serif;color:#22C55E;">${fmt(paidAmt)}</div>
+      </div>
+      <div style="flex:1;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-size:10px;font-weight:700;color:#F59E0B;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">🟡 Due Now</div>
+        <div style="font-size:18px;font-weight:800;font-family:'Syne',sans-serif;color:#F59E0B;">${fmt(pendingAmt)}</div>
+      </div>
+    </div>`;
+
+  const billEl = document.getElementById('payBillRows');
+  const totalEl = document.getElementById('payBillTotal');
+  if (billEl) billEl.innerHTML = rows;
+  if (totalEl) totalEl.innerHTML = savingsStrip + grandRow + paidPendingRow;
+
+  // Update UPI button with amount
+  const upiBtn = document.getElementById('upiPayBtn');
+  if (upiBtn) upiBtn.innerHTML = `<span style="font-size:20px;">📲</span><span>Pay ${fmt(pendingAmt)} via UPI App</span>`;
+
+  window._pendingPayAmt = pendingAmt;
+  document.getElementById('payModal').classList.add('open');
 }
 
 /* ── Referral Popup Controls ── */
