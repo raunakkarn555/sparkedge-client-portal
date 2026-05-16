@@ -243,6 +243,70 @@ footer .f-copy{font-size:11px;color:var(--text-dim);}
 /* Edit button in preview area */
 .preview-edit-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.25);border-radius:8px;font-size:11px;font-weight:600;color:var(--accent);cursor:pointer;transition:all .2s;}
 .preview-edit-btn:hover{background:rgba(255,107,53,.2);}
+/* Sidebar drawer slide */
+#sidebarDrawer{transform:translateX(100%);transition:transform .22s ease;}
+#sidebarDrawer.open{display:flex!important;transform:translateX(0);}
+.sb-action{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;border:none;background:transparent;color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;text-align:left;transition:all .15s;}
+.sb-action:hover{background:var(--bg-raised);color:var(--text);}
+.sb-action.danger{color:#EF4444;}
+.sb-action.danger:hover{background:rgba(239,68,68,.08);}
+.sb-action.owner-only{color:var(--gold);}
+.sb-action.owner-only:hover{background:rgba(255,179,71,.08);}
+.sb-divider{height:1px;background:var(--border);margin:6px 0;}
+@keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-6px);}40%{transform:translateX(6px);}60%{transform:translateX(-4px);}80%{transform:translateX(4px);}}
+.shake{animation:shake .4s ease;}
+/* Team section styles */
+.team-section{max-width:980px;margin:0 auto;padding:0 28px 40px;}
+.team-section-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;padding-top:24px;}
+.team-stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.team-stat{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+.team-stat-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px;}
+.team-stat-val{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;line-height:1;}
+.team-stat-sub{font-size:11px;color:var(--text-muted);margin-top:4px;}
+.team-member-list{display:flex;flex-direction:column;gap:10px;}
+.team-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:flex-start;gap:14px;transition:border-color .15s;}
+.team-card:hover{border-color:rgba(255,107,53,.25);}
+.team-avatar{width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:#fff;flex-shrink:0;}
+.team-card-info{flex:1;min-width:0;}
+.team-card-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.team-card-role{font-size:11px;color:var(--text-muted);}
+.team-card-meta{font-size:11px;color:var(--text-dim);margin-top:2px;}
+.team-card-perms{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;}
+.perm-tag{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);color:#3B82F6;border-radius:5px;padding:2px 8px;font-size:10px;font-weight:600;}
+.status-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:10px;font-size:10px;font-weight:700;margin-top:6px;}
+.status-badge.active{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:#22C55E;}
+.status-badge.suspended{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#EF4444;}
+.team-card-actions{display:flex;flex-direction:column;gap:5px;flex-shrink:0;}
+.t-btn{padding:5px 11px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid;font-family:'DM Sans',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
+.t-btn-edit{background:var(--bg-raised);border-color:var(--border);color:var(--text-muted);}
+.t-btn-edit:hover{border-color:rgba(255,107,53,.4);color:var(--accent);}
+.t-btn-suspend{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.2);color:#EF4444;}
+.t-btn-activate{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.25);color:#22C55E;}
+.t-btn-config{background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.2);color:#22C55E;font-size:10px;}
+.t-btn-welcome{background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.25);color:#8B5CF6;font-size:10px;}
+.t-btn-del{background:rgba(239,68,68,.05);border-color:rgba(239,68,68,.15);color:#EF4444;font-size:10px;}
+.team-empty{text-align:center;padding:48px 20px;color:var(--text-dim);}
+/* Member modal */
+.member-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:600;align-items:center;justify-content:center;padding:20px;}
+.member-modal-overlay.open{display:flex;}
+.member-modal{background:var(--bg-card);border:1px solid var(--border);border-radius:18px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;animation:mmIn .2s ease;}
+@keyframes mmIn{from{transform:scale(.95);opacity:0;}to{transform:scale(1);opacity:1;}}
+.member-modal-header{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg-card);z-index:2;}
+.member-modal-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;}
+.mm-field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+.mm-field{display:flex;flex-direction:column;gap:5px;}
+.mm-field.full{grid-column:1/-1;}
+.mm-field label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);}
+.mm-field input,.mm-field select{background:var(--bg-raised);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color .15s;width:100%;}
+.mm-field input:focus,.mm-field select:focus{border-color:rgba(255,107,53,.5);}
+.perm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.perm-check{display:flex;align-items:flex-start;gap:9px;background:var(--bg-raised);border:1px solid var(--border);border-radius:8px;padding:9px 12px;cursor:pointer;transition:.15s;}
+.perm-check:hover{border-color:rgba(59,130,246,.35);}
+.perm-check input[type=checkbox]{accent-color:#3B82F6;width:14px;height:14px;cursor:pointer;flex-shrink:0;margin-top:1px;}
+.perm-check-label{font-size:11px;color:var(--text-muted);line-height:1.4;cursor:pointer;}
+.preset-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.preset-btn{padding:5px 13px;border-radius:7px;font-size:11px;font-weight:600;border:1px solid var(--border);background:var(--bg-raised);color:var(--text-muted);cursor:pointer;transition:.15s;font-family:'DM Sans',sans-serif;}
+.preset-btn:hover,.preset-btn.sel{background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.35);color:#3B82F6;}
 </style>
 </head>
 <body>
@@ -282,14 +346,34 @@ footer .f-copy{font-size:11px;color:var(--text-dim);}
     <span class="nav-brand-name">SparkEdge</span>
   </a>
   <div class="nav-right">
-    <span class="nav-tag" id="userNameNav" style="color:var(--gold);border-color:rgba(255,179,71,.3);">Loading…</span>
-    <span class="nav-tag">Doc Generator v3</span>
-    <button class="nav-btn" style="background:rgba(255,179,71,.1);border:1px solid rgba(255,179,71,.3);color:var(--gold);" onclick="openFixedContentEditor()">⚙️ Edit Fixed Defaults</button>
-    <button class="nav-btn btn-export" onclick="exportAllDrafts()">⬇ Export</button>
-    <button class="nav-btn btn-import" onclick="openImportModal()">⬆ Import</button>
+    <!-- User badge: name + designation -->
+    <div id="userNavBadge" style="display:flex;align-items:center;gap:7px;background:var(--bg-raised);border:1px solid var(--border);border-radius:9px;padding:5px 12px;cursor:default;">
+      <div style="width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:11px;font-weight:800;color:#fff;" id="userAvatarNav">R</div>
+      <div style="line-height:1.3;">
+        <div style="font-size:12px;font-weight:700;color:var(--text);" id="userNameNav">—</div>
+        <div style="font-size:10px;color:var(--text-dim);" id="userRoleNav">—</div>
+      </div>
+    </div>
+    <!-- Sidebar toggle (hamburger) -->
+    <button class="nav-btn" id="sidebarToggleBtn" onclick="toggleSidebar()" title="Open menu" style="padding:7px 10px;font-size:16px;background:var(--bg-raised);border:1px solid var(--border);">☰</button>
+    <!-- Lock always visible -->
     <button class="nav-btn btn-logout" onclick="doLogout()">🔒 Lock</button>
   </div>
 </nav>
+
+<!-- ════════ SIDEBAR DRAWER ════════ -->
+<div id="sidebarOverlay" onclick="closeSidebar()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:450;"></div>
+<div id="sidebarDrawer" style="display:none;position:fixed;top:0;right:0;width:270px;height:100%;background:var(--bg-card);border-left:1px solid var(--border);z-index:460;flex-direction:column;overflow-y:auto;">
+  <!-- Sidebar header -->
+  <div style="padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+    <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--text);">Menu</div>
+    <button onclick="closeSidebar()" style="background:var(--bg-raised);border:1px solid var(--border);border-radius:7px;width:28px;height:28px;color:var(--text-muted);cursor:pointer;font-size:14px;">✕</button>
+  </div>
+  <!-- User info panel -->
+  <div id="sidebarUserPanel" style="padding:16px 20px;border-bottom:1px solid var(--border);"></div>
+  <!-- Actions list -->
+  <div style="padding:12px 12px;display:flex;flex-direction:column;gap:4px;" id="sidebarActions"></div>
+</div>
 
 <!-- HERO -->
 <div class="hero">
@@ -732,8 +816,102 @@ function unlockDocs(){
 }
 
 function updateUserBadge(){
-  const el = document.getElementById('userNameNav');
-  if(el && window.DOCS_USER) el.textContent = window.DOCS_USER.name;
+  const u = window.DOCS_USER;
+  if(!u) return;
+  // Nav badge
+  const nameEl = document.getElementById('userNameNav');
+  const roleEl = document.getElementById('userRoleNav');
+  const avatarEl = document.getElementById('userAvatarNav');
+  if(nameEl) nameEl.textContent = u.name;
+  if(roleEl) roleEl.textContent = u.role === 'owner' ? '👑 Owner' : (u.role || 'Team Member');
+  if(avatarEl) avatarEl.textContent = (u.name||'?').charAt(0).toUpperCase();
+  buildSidebar();
+}
+
+function buildSidebar(){
+  const u = window.DOCS_USER;
+  if(!u) return;
+  const owner = u.role === 'owner';
+
+  // Sidebar user panel
+  const panel = document.getElementById('sidebarUserPanel');
+  if(panel){
+    panel.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <div style="width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff;">${(u.name||'?').charAt(0).toUpperCase()}</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--text);">${u.name}</div>
+          <div style="font-size:11px;color:var(--text-muted);">${owner ? '👑 Owner · Full Access' : (u.role||'Team Member')}</div>
+        </div>
+      </div>
+      ${owner ? '' : `<div style="display:flex;flex-wrap:wrap;gap:4px;">${(u.permissions||[]).map(p=>`<span style="background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);color:#3B82F6;border-radius:5px;padding:2px 8px;font-size:10px;font-weight:600;">${PERM_LABELS[p]||p}</span>`).join('')||'<span style="font-size:11px;color:var(--text-dim);">No permissions assigned</span>'}</div>`}
+    `;
+  }
+
+  // Sidebar actions
+  const acts = document.getElementById('sidebarActions');
+  if(!acts) return;
+  let html = '';
+
+  // Always available
+  html += `<button class="sb-action" onclick="closeSidebar();exportAllDrafts();">⬇&nbsp; Export Drafts</button>`;
+  html += `<button class="sb-action" onclick="closeSidebar();openImportModal();">⬆&nbsp; Import Drafts</button>`;
+
+  // Owner only actions
+  if(owner){
+    html += `<div class="sb-divider"></div>`;
+    html += `<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);padding:4px 12px 2px;">Owner Tools</div>`;
+    html += `<button class="sb-action owner-only" onclick="closeSidebar();openFixedContentEditor();">⚙️&nbsp; Edit Fixed Doc Defaults</button>`;
+    html += `<button class="sb-action owner-only" onclick="closeSidebar();showTeamSection();">🧑‍💻&nbsp; Team Management</button>`;
+    html += `<div class="sb-divider"></div>`;
+    // Owner guide note
+    html += `<div style="background:rgba(255,179,71,.06);border:1px solid rgba(255,179,71,.2);border-radius:9px;padding:10px 12px;margin:4px 4px 6px;font-size:11px;color:var(--text-muted);line-height:1.7;">
+      <strong style="color:var(--gold);">👑 Owner Tips</strong><br/>
+      · "Edit Fixed Doc Defaults" lets you override hardcoded values (inclusions, UPI, contact) per session.<br/>
+      · "Team Management" lets you add/delete members and set their permissions.
+    </div>`;
+  } else {
+    html += `<div class="sb-divider"></div>`;
+    // Member guide note
+    html += `<div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.18);border-radius:9px;padding:10px 12px;margin:4px 4px 6px;font-size:11px;color:var(--text-muted);line-height:1.7;">
+      <strong style="color:#3B82F6;">🧑‍💻 Your Access</strong><br/>
+      You have access to: Doc Generator + your assigned permissions only. Contact Raunak for access changes.
+    </div>`;
+  }
+
+  html += `<div class="sb-divider"></div>`;
+  html += `<button class="sb-action danger" onclick="doLogout();">🔒&nbsp; Lock / Logout</button>`;
+  acts.innerHTML = html;
+}
+
+const PERM_LABELS = {
+  'generate_docs':'📄 Generate Docs',
+  'save_drafts':'💾 Save Drafts',
+  'export':'⬇ Export/Import',
+  'view_team':'👥 View Team',
+  'view_tickets':'👁 View Tickets',
+  'edit_tickets':'✏️ Edit Tickets',
+  'create_tickets':'➕ Create',
+  'view_clients':'👥 Clients',
+  'view_finance':'💰 Finance'
+};
+
+function toggleSidebar(){
+  const drawer = document.getElementById('sidebarDrawer');
+  const overlay = document.getElementById('sidebarOverlay');
+  const isOpen = drawer.classList.contains('open');
+  if(isOpen){ closeSidebar(); } else {
+    drawer.style.display='flex';
+    overlay.style.display='block';
+    requestAnimationFrame(()=>drawer.classList.add('open'));
+  }
+}
+function closeSidebar(){
+  const drawer = document.getElementById('sidebarDrawer');
+  const overlay = document.getElementById('sidebarOverlay');
+  drawer.classList.remove('open');
+  overlay.style.display='none';
+  setTimeout(()=>{ if(!drawer.classList.contains('open')) drawer.style.display='none'; },240);
 }
 
 function doLogout(){
@@ -2484,6 +2662,372 @@ function resetFixedContent(){
     </div>
   </div>
 </div>
+
+<!-- ══════════════════════════════════════════════
+     TEAM MANAGEMENT SECTION — full page CRM style
+══════════════════════════════════════════════ -->
+<div id="teamSection" style="display:none;padding-top:20px;">
+<div class="team-section">
+
+  <!-- Back button -->
+  <div style="margin-bottom:18px;">
+    <button onclick="hideTeamSection()" style="background:var(--bg-raised);border:1px solid var(--border);border-radius:9px;padding:8px 16px;color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:6px;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-muted)'">← Back to Doc Generator</button>
+  </div>
+
+  <!-- Header -->
+  <div class="team-section-header">
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);">🧑‍💻 Team &amp; Access Management</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Add members, set passwords and permissions for Docs workspace access.</div>
+    </div>
+    <button class="mm-btn-save" onclick="openAddMemberModal()" style="padding:10px 20px;font-size:13px;background:linear-gradient(135deg,var(--accent),var(--accent-2));border:none;border-radius:10px;color:#fff;font-family:'Syne',sans-serif;font-weight:700;cursor:pointer;">+ Invite Member</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="team-stats-row">
+    <div class="team-stat"><div class="team-stat-label">Total Members</div><div class="team-stat-val" id="ts_total" style="color:var(--text);">0</div><div class="team-stat-sub">In workspace</div></div>
+    <div class="team-stat"><div class="team-stat-label">Active</div><div class="team-stat-val" id="ts_active" style="color:#22C55E;">0</div><div class="team-stat-sub">Can login now</div></div>
+    <div class="team-stat"><div class="team-stat-label">Suspended</div><div class="team-stat-val" id="ts_suspended" style="color:#EF4444;">0</div><div class="team-stat-sub">Access blocked</div></div>
+  </div>
+
+  <!-- Role reference (only owner sees this) -->
+  <div id="teamRoleRef" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+    <div style="background:rgba(255,179,71,.05);border:1px solid rgba(255,179,71,.2);border-radius:12px;padding:14px 16px;">
+      <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:800;color:var(--gold);margin-bottom:6px;">👑 Owner</div>
+      <div style="font-size:11px;color:var(--text-muted);line-height:1.8;">Full access · Add/remove members · Edit fixed doc defaults · All permissions</div>
+    </div>
+    <div style="background:rgba(59,130,246,.05);border:1px solid rgba(59,130,246,.18);border-radius:12px;padding:14px 16px;">
+      <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:800;color:#3B82F6;margin-bottom:6px;">🧑‍💻 Team Member</div>
+      <div style="font-size:11px;color:var(--text-muted);line-height:1.8;">Generate docs only · No team management · Access as per assigned permissions</div>
+    </div>
+  </div>
+
+  <!-- Owner guide note -->
+  <div style="background:rgba(255,179,71,.06);border:1px solid rgba(255,179,71,.2);border-radius:12px;padding:16px 18px;margin-bottom:20px;">
+    <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px;">📋 How to onboard a new member</div>
+    <div style="font-size:12px;color:var(--text-muted);line-height:1.9;">
+      1. Click <strong style="color:var(--text);">+ Invite Member</strong> → fill their name, role, email, WhatsApp, and set a unique password.<br/>
+      2. Assign permissions (what they can do in Docs).<br/>
+      3. Save. Then click <strong style="color:var(--text);">⬇ Config</strong> on their card → download the .txt file.<br/>
+      4. Open <code style="background:var(--bg-raised);padding:1px 6px;border-radius:4px;font-size:11px;">docs.html</code> in a text editor → find <code style="background:var(--bg-raised);padding:1px 6px;border-radius:4px;font-size:11px;">HARDCODED_MEMBERS</code> → paste their JSON → save and re-share the file.<br/>
+      5. Or use <strong style="color:var(--text);">📤 Export & Embed All</strong> to auto-patch and download the updated file in one click.
+    </div>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+      <button onclick="exportEmbedMembersDocs()" style="background:linear-gradient(135deg,#F59E0B,#D97706);border:none;border-radius:8px;padding:9px 16px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer;">📤 Export & Embed All Members</button>
+    </div>
+  </div>
+
+  <!-- Member list -->
+  <div id="teamMemberList" class="team-member-list"></div>
+
+</div>
+</div>
+
+<!-- ══════════ MODAL: ADD / EDIT MEMBER ══════════ -->
+<div class="member-modal-overlay" id="memberModal">
+  <div class="member-modal">
+    <div class="member-modal-header">
+      <div class="member-modal-title" id="memberModalTitle">➕ Invite Member</div>
+      <button onclick="closeMemberModal()" style="background:var(--bg-raised);border:1px solid var(--border);color:var(--text-muted);width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+    <div style="padding:20px 22px;">
+      <input type="hidden" id="memberModalEditIdx" value="-1"/>
+      <div class="mm-field-grid">
+        <div class="mm-field"><label>Full Name *</label><input id="mm_name" placeholder="e.g. Priya Sharma"/></div>
+        <div class="mm-field"><label>Designation / Role</label><input id="mm_role" placeholder="e.g. Designer, Manager"/></div>
+        <div class="mm-field"><label>Email</label><input id="mm_email" placeholder="priya@example.com" type="email"/></div>
+        <div class="mm-field"><label>WhatsApp</label><input id="mm_wa" placeholder="+91 98765 43210"/></div>
+        <div class="mm-field full"><label>Login Password * (min 6 chars, must be unique)</label><input id="mm_password" placeholder="e.g. Priya@2025" type="text"/></div>
+      </div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);padding:10px 0 8px;border-bottom:1px solid var(--border);margin-bottom:12px;">Permissions</div>
+      <div class="preset-bar">
+        <button class="preset-btn sel" id="pmPresetBasic" onclick="applyPermPreset('basic')">Basic</button>
+        <button class="preset-btn" id="pmPresetFull" onclick="applyPermPreset('full')">Full Access</button>
+        <button class="preset-btn" id="pmPresetView" onclick="applyPermPreset('view')">View Only</button>
+        <button class="preset-btn" id="pmPresetCustom" onclick="applyPermPreset('custom')">Custom</button>
+      </div>
+      <div class="perm-grid">
+        <label class="perm-check"><input type="checkbox" id="pm_generate_docs" checked/><span class="perm-check-label">📄 Generate Docs<br/><span style="font-size:10px;color:var(--text-dim);">Create & download documents</span></span></label>
+        <label class="perm-check"><input type="checkbox" id="pm_save_drafts"/><span class="perm-check-label">💾 Save Drafts<br/><span style="font-size:10px;color:var(--text-dim);">Save & manage draft templates</span></span></label>
+        <label class="perm-check"><input type="checkbox" id="pm_export"/><span class="perm-check-label">⬇ Export / Import<br/><span style="font-size:10px;color:var(--text-dim);">Export & import draft data</span></span></label>
+        <label class="perm-check"><input type="checkbox" id="pm_view_team"/><span class="perm-check-label">👥 View Team List<br/><span style="font-size:10px;color:var(--text-dim);">See members (read-only)</span></span></label>
+      </div>
+      <div style="background:rgba(255,107,53,.05);border:1px solid rgba(255,107,53,.15);border-radius:9px;padding:11px 13px;margin-top:12px;font-size:11px;color:var(--text-muted);line-height:1.7;">
+        ⚠️ After saving, click <strong style="color:var(--text);">⬇ Config</strong> on the member card and follow the steps to embed the password into the file so they can login from any device.
+      </div>
+    </div>
+    <div style="padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;">
+      <button onclick="closeMemberModal()" style="background:transparent;border:1px solid var(--border);border-radius:9px;padding:9px 18px;color:var(--text-muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;">Cancel</button>
+      <button onclick="saveMember()" style="background:linear-gradient(135deg,var(--accent),var(--accent-2));border:none;border-radius:9px;padding:10px 22px;color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">💾 Save Member</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════
+   TEAM MANAGEMENT JS
+════════════════════════════════════════════ */
+
+function isOwner(){ return window.DOCS_USER && window.DOCS_USER.role === 'owner'; }
+
+function saveMembers(m){ localStorage.setItem(AUTH_KEY, JSON.stringify(m)); }
+
+function showTeamSection(){
+  if(!isOwner()){
+    showToast('⛔ Only the owner can manage the team.');
+    return;
+  }
+  // Hide doc UI
+  ['hero','category-bar','doc-tabs-wrap','order-bar','guides-wrap','main','footer'].forEach(cls=>{
+    const el = document.querySelector('.'+cls);
+    if(el) el.style.display='none';
+  });
+  const drafts = document.getElementById('draftsSection');
+  if(drafts) drafts.style.display='none';
+  document.getElementById('teamSection').style.display='block';
+  renderTeamPage();
+  closeSidebar();
+}
+
+function hideTeamSection(){
+  document.getElementById('teamSection').style.display='none';
+  ['hero','category-bar','doc-tabs-wrap','order-bar','guides-wrap','main','footer'].forEach(cls=>{
+    const el = document.querySelector('.'+cls);
+    if(el) el.style.display='';
+  });
+}
+
+function renderTeamPage(){
+  const members = getMembers();
+  const list = document.getElementById('teamMemberList');
+  // Stats
+  document.getElementById('ts_total').textContent = members.length;
+  document.getElementById('ts_active').textContent = members.filter(m=>m.status==='active').length;
+  document.getElementById('ts_suspended').textContent = members.filter(m=>m.status==='suspended').length;
+
+  if(!members.length){
+    list.innerHTML = `<div class="team-empty"><div style="font-size:36px;margin-bottom:12px;">🧑‍💻</div><div style="font-size:14px;font-weight:600;color:var(--text-muted);margin-bottom:4px;">No team members yet</div><div style="font-size:12px;">Click "+ Invite Member" to add your first member.</div></div>`;
+    return;
+  }
+
+  list.innerHTML = members.map((m,i)=>{
+    const permTags = (m.permissions||[]).map(p=>`<span class="perm-tag">${PERM_LABELS[p]||p}</span>`).join('');
+    const active = m.status !== 'suspended';
+    return `<div class="team-card">
+      <div class="team-avatar">${(m.name||'?').charAt(0).toUpperCase()}</div>
+      <div class="team-card-info">
+        <div class="team-card-name">${m.name}</div>
+        <div class="team-card-role">${m.role||'Team Member'}</div>
+        <div class="team-card-meta">${[m.email, m.wa, m.addedAt?'Added '+m.addedAt:''].filter(Boolean).join(' · ')}</div>
+        <div class="team-card-perms">${permTags||'<span style="font-size:11px;color:var(--text-dim);">No permissions</span>'}</div>
+        <span class="status-badge ${active?'active':'suspended'}">${active?'● Active':'● Suspended'}</span>
+      </div>
+      <div class="team-card-actions">
+        <button class="t-btn t-btn-edit" onclick="openEditMemberModal(${i})">✏️ Edit</button>
+        <button class="t-btn ${active?'t-btn-suspend':'t-btn-activate'}" onclick="toggleMemberStatus(${i})">${active?'⛔ Suspend':'✅ Activate'}</button>
+        <button class="t-btn t-btn-config" onclick="downloadMemberConfig(${i})">⬇ Config</button>
+        <button class="t-btn t-btn-welcome" onclick="downloadWelcomeNote(${i})">📩 Welcome</button>
+        <button class="t-btn t-btn-del" onclick="deleteMember(${i})">🗑 Remove</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openAddMemberModal(){
+  document.getElementById('memberModalTitle').textContent = '➕ Invite Member';
+  document.getElementById('mm_name').value='';
+  document.getElementById('mm_role').value='';
+  document.getElementById('mm_email').value='';
+  document.getElementById('mm_wa').value='';
+  document.getElementById('mm_password').value='';
+  document.getElementById('memberModalEditIdx').value='-1';
+  applyPermPreset('basic');
+  document.getElementById('memberModal').classList.add('open');
+}
+
+function openEditMemberModal(idx){
+  const members = getMembers();
+  const m = members[idx];
+  if(!m) return;
+  document.getElementById('memberModalTitle').textContent = '✏️ Edit: '+m.name;
+  document.getElementById('mm_name').value=m.name||'';
+  document.getElementById('mm_role').value=m.role||'';
+  document.getElementById('mm_email').value=m.email||'';
+  document.getElementById('mm_wa').value=m.wa||'';
+  document.getElementById('mm_password').value=m.password||'';
+  document.getElementById('memberModalEditIdx').value=idx;
+  ['generate_docs','save_drafts','export','view_team'].forEach(p=>{
+    const cb = document.getElementById('pm_'+p);
+    if(cb) cb.checked = (m.permissions||[]).includes(p);
+  });
+  document.getElementById('memberModal').classList.add('open');
+}
+
+function closeMemberModal(){
+  document.getElementById('memberModal').classList.remove('open');
+}
+
+function applyPermPreset(preset){
+  const map = {
+    basic:  ['generate_docs','save_drafts'],
+    full:   ['generate_docs','save_drafts','export','view_team'],
+    view:   ['generate_docs'],
+    custom: []
+  };
+  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('sel'));
+  const btn = {basic:'pmPresetBasic',full:'pmPresetFull',view:'pmPresetView',custom:'pmPresetCustom'}[preset];
+  if(btn) document.getElementById(btn)?.classList.add('sel');
+  const perms = map[preset]||[];
+  ['generate_docs','save_drafts','export','view_team'].forEach(p=>{
+    const cb = document.getElementById('pm_'+p);
+    if(cb) cb.checked = perms.includes(p);
+  });
+}
+
+function saveMember(){
+  const name = document.getElementById('mm_name').value.trim();
+  const pwd  = document.getElementById('mm_password').value.trim();
+  if(!name){ alert('Name is required.'); return; }
+  if(!pwd || pwd.length<6){ alert('Password must be at least 6 characters.'); return; }
+  if(pwd==='RAUNAK@1'){ alert('Members cannot use the owner password.'); return; }
+
+  const perms = ['generate_docs','save_drafts','export','view_team'].filter(p=>{
+    const cb = document.getElementById('pm_'+p);
+    return cb && cb.checked;
+  });
+
+  const members = getMembers();
+  const editIdx = parseInt(document.getElementById('memberModalEditIdx').value);
+  const isDup = members.some((m,i)=>m.password===pwd && i!==editIdx);
+  if(isDup){ alert('This password is already used. Choose a unique one.'); return; }
+
+  const data = {
+    id: (editIdx>=0 && members[editIdx]) ? members[editIdx].id : ('mem_'+Date.now()),
+    name,
+    role: document.getElementById('mm_role').value.trim()||'Team Member',
+    email: document.getElementById('mm_email').value.trim(),
+    wa: document.getElementById('mm_wa').value.trim(),
+    password: pwd,
+    permissions: perms,
+    status: (editIdx>=0 && members[editIdx]) ? members[editIdx].status : 'active',
+    addedAt: (editIdx>=0 && members[editIdx]) ? members[editIdx].addedAt : new Date().toLocaleDateString('en-IN')
+  };
+
+  if(editIdx>=0 && members[editIdx]){ members[editIdx]=data; showToast('✅ Member updated!'); }
+  else { members.push(data); showToast('✅ Member added! Click Config to get embed instructions.'); }
+  saveMembers(members);
+  closeMemberModal();
+  renderTeamPage();
+}
+
+function toggleMemberStatus(idx){
+  const members = getMembers();
+  if(!members[idx]) return;
+  members[idx].status = members[idx].status==='active' ? 'suspended' : 'active';
+  saveMembers(members);
+  renderTeamPage();
+  showToast(members[idx].status==='active' ? '✅ Member activated.' : '⛔ Member suspended.');
+}
+
+function deleteMember(idx){
+  if(!confirm('Remove this member? They will lose access immediately.')) return;
+  const members = getMembers();
+  const name = members[idx]?.name;
+  members.splice(idx,1);
+  saveMembers(members);
+  renderTeamPage();
+  showToast('🗑 '+name+' removed.');
+}
+
+function downloadMemberConfig(idx){
+  const members = getMembers();
+  const m = members[idx];
+  if(!m){ showToast('Member not found.'); return; }
+  const json = JSON.stringify(m, null, 4);
+  const txt = `// SparkEdge Docs — Member Config: ${m.name}
+// Generated: ${new Date().toLocaleString('en-IN')}
+//
+// HOW TO EMBED (so member can login from any device):
+//   1. Open docs.html in Notepad / VS Code
+//   2. Press Ctrl+F → search: HARDCODED_MEMBERS
+//   3. Inside the [ ] array, paste the object below.
+//      If empty:  = [ <paste> ];
+//      If others: add comma after last }, then paste.
+//   4. Save docs.html and share the updated file.
+//   5. ${m.name} can now login with: ${m.password}
+// ═══════════════════════════════════════════════════
+
+${json}`;
+  const blob = new Blob([txt],{type:'text/plain'});
+  const a = document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='docs-config-'+m.name.replace(/\s+/g,'-').toLowerCase()+'.txt';
+  a.click();
+  showToast('✅ Config for '+m.name+' downloaded!');
+}
+
+function downloadWelcomeNote(idx){
+  const members = getMembers();
+  const m = members[idx];
+  if(!m){ showToast('Member not found.'); return; }
+  const permList = (m.permissions||[]).map(p=>`<li>${PERM_LABELS[p]||p}</li>`).join('');
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>Welcome — ${m.name}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>*{box-sizing:border-box;margin:0;padding:0;}body{background:#0A0A14;color:#E0E0F0;font-family:'DM Sans',sans-serif;padding:40px 20px;min-height:100vh;}
+  .wrap{max-width:580px;margin:0 auto;}.logo{display:flex;align-items:center;gap:10px;margin-bottom:28px;}
+  .li{width:38px;height:38px;background:linear-gradient(135deg,#FF6B35,#FF3CAC);border-radius:10px;display:flex;align-items:center;justify-content:center;}
+  .ln{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;background:linear-gradient(135deg,#FF6B35,#FF3CAC);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+  h1{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:6px;}
+  .card{background:#0E0E1A;border:1px solid #1E1E30;border-radius:14px;padding:20px;margin-bottom:16px;}
+  .ct{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#555570;margin-bottom:12px;}
+  .row{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid #141422;font-size:12px;}
+  .row:last-child{border:none;}.rl{color:#555570;min-width:100px;font-weight:600;}.rv{color:#E0E0F0;}
+  .pwd-box{background:linear-gradient(135deg,rgba(255,107,53,.08),rgba(255,60,172,.08));border:1px solid rgba(255,107,53,.3);border-radius:12px;padding:18px;margin-bottom:16px;text-align:center;}
+  .pwd{font-family:monospace;font-size:24px;font-weight:700;color:#FF6B35;letter-spacing:3px;margin-top:8px;}
+  ul{list-style:none;display:flex;flex-direction:column;gap:5px;}
+  li{font-size:12px;color:#A0A0C0;padding:7px 12px;background:#141422;border-radius:7px;border-left:3px solid rgba(59,130,246,.5);}
+  .footer{text-align:center;margin-top:24px;font-size:11px;color:#3A3A5A;}</style></head>
+  <body><div class="wrap">
+  <div class="logo"><div class="li"><svg width="18" height="18" viewBox="0 0 28 28" fill="none"><path d="M16 3L6 16H14L12 25L22 12H14L16 3Z" fill="white"/></svg></div><span class="ln">SparkEdge</span></div>
+  <h1>Welcome, ${m.name}! 🎉</h1>
+  <p style="font-size:13px;color:#7A7A9A;margin-bottom:20px;">You've been added to the SparkEdge Docs workspace.</p>
+  <div class="card"><div class="ct">Your Profile</div>
+  <div class="row"><span class="rl">Name</span><span class="rv">${m.name}</span></div>
+  <div class="row"><span class="rl">Designation</span><span class="rv">${m.role||'Team Member'}</span></div>
+  ${m.email?`<div class="row"><span class="rl">Email</span><span class="rv">${m.email}</span></div>`:''}
+  ${m.wa?`<div class="row"><span class="rl">WhatsApp</span><span class="rv">${m.wa}</span></div>`:''}
+  <div class="row"><span class="rl">Status</span><span class="rv" style="color:#22C55E;font-weight:700;">✅ Active</span></div></div>
+  <div class="pwd-box"><div style="font-size:12px;font-weight:700;color:#FF6B35;">🔐 Your Login Password — Keep Private</div><div class="pwd">${m.password}</div>
+  <div style="font-size:11px;color:#7A7A9A;margin-top:8px;">Open docs.html and enter this password to login.</div></div>
+  <div class="card"><div class="ct">Your Permissions</div>${permList?`<ul>${permList}</ul>`:'<p style="font-size:12px;color:#7A7A9A;">No specific permissions — contact owner.</p>'}</div>
+  <div class="footer">© ${new Date().getFullYear()} SparkEdge · Docs Workspace</div>
+  </div></body></html>`;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([html],{type:'text/html'}));
+  a.download = 'welcome-'+m.name.replace(/\s+/g,'-').toLowerCase()+'.html';
+  a.click();
+  showToast('📩 Welcome note for '+m.name+' downloaded!');
+}
+
+function exportEmbedMembersDocs(){
+  const members = getMembers();
+  const json = JSON.stringify(members, null, 2);
+  const newCode = `const HARDCODED_MEMBERS = ${json};`;
+  fetch(window.location.href)
+    .then(r=>r.text())
+    .then(src=>{
+      const patched = src.replace(/const HARDCODED_MEMBERS = \[[\s\S]*?\];/, newCode);
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([patched],{type:'text/html'}));
+      a.download = 'docs-with-team.html';
+      a.click();
+      showToast('✅ docs-with-team.html downloaded! Share this file.');
+    })
+    .catch(()=>{
+      alert('Auto-embed failed (local file:// protocol).\n\nManual: open docs.html → find HARDCODED_MEMBERS → replace [] with:\n'+json);
+    });
+}
+</script>
 
 </body>
 </html>
