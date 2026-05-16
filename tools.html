@@ -6,124 +6,99 @@
 <title>SparkEdge — Internal Tools Hub</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<!-- Lucide Icons CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.383.0/umd/lucide.min.js"></script>
 <style>
-/* ── DESIGN TOKENS (matches SparkEdge style.css exactly) ── */
 :root {
-  --bg:          #0A0A0F;
-  --bg-card:     #111118;
-  --bg-raised:   #16161F;
-  --border:      rgba(255,255,255,0.07);
-  --border-glow: rgba(255,107,53,0.25);
-  --accent:      #FF6B35;
-  --accent-2:    #FF3CAC;
-  --accent-fade: rgba(255,107,53,0.12);
-  --accent-fade2:rgba(255,107,53,0.06);
-  --text:        #F0F0F5;
-  --text-muted:  #7A7A9A;
-  --text-dim:    #4A4A6A;
-  --success:     #22C55E;
-  --warning:     #F59E0B;
-  --info:        #3B82F6;
-  --font-display:'Syne', sans-serif;
-  --font-body:   'DM Sans', sans-serif;
-  --font-mono:   'JetBrains Mono', monospace;
-  --radius:      12px;
-  --radius-lg:   18px;
-  --radius-sm:   8px;
-  --transition:  all 0.2s ease;
+  --bg:           #080810;
+  --bg-card:      #0E0E1A;
+  --bg-raised:    #141420;
+  --border:       rgba(255,255,255,0.07);
+  --border-glow:  rgba(255,107,53,0.3);
+  --accent:       #FF6B35;
+  --accent-2:     #FF3CAC;
+  --accent-fade:  rgba(255,107,53,0.12);
+  --text:         #F0F0F5;
+  --text-muted:   #7A7A9A;
+  --text-dim:     #4A4A6A;
+  --success:      #22C55E;
+  --warning:      #F59E0B;
+  --info:         #3B82F6;
+  --purple:       #8B5CF6;
+  --font-display: 'Syne', sans-serif;
+  --font-body:    'DM Sans', sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
+  --radius:       14px;
+  --radius-lg:    20px;
+  --radius-sm:    9px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
 body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:var(--font-body);
-  font-size:15px;
-  line-height:1.6;
-  min-height:100vh;
-  -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
+  background:var(--bg);color:var(--text);
+  font-family:var(--font-body);font-size:15px;line-height:1.6;
+  min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden;
 }
 
-/* ── ANIMATED BACKGROUND ── */
+/* ── BACKGROUND ── */
 .bg-grid{
   position:fixed;inset:0;pointer-events:none;z-index:0;
   background-image:
-    linear-gradient(rgba(255,107,53,0.035) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,107,53,0.035) 1px,transparent 1px);
-  background-size:52px 52px;
+    linear-gradient(rgba(255,107,53,0.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,107,53,0.03) 1px,transparent 1px);
+  background-size:60px 60px;
 }
-.bg-glow{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;}
-.glow-1{
-  width:600px;height:600px;opacity:0.18;
-  background:radial-gradient(circle,#FF6B35,transparent 70%);
-  top:-200px;right:-150px;
-  animation:float1 10s ease-in-out infinite;
-}
-.glow-2{
-  width:500px;height:500px;opacity:0.12;
-  background:radial-gradient(circle,#FF3CAC,transparent 70%);
-  bottom:-150px;left:-150px;
-  animation:float2 14s ease-in-out infinite;
-}
-.glow-3{
-  width:350px;height:350px;opacity:0.08;
-  background:radial-gradient(circle,#3B82F6,transparent 70%);
-  top:40%;left:40%;
-  animation:float1 18s ease-in-out infinite reverse;
-}
-@keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(-40px,35px)}}
-@keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(25px,-30px)}}
+.bg-glow{position:fixed;border-radius:50%;filter:blur(130px);pointer-events:none;z-index:0;}
+.glow-1{width:700px;height:700px;opacity:.16;background:radial-gradient(circle,#FF6B35,transparent 70%);top:-250px;right:-180px;animation:float1 12s ease-in-out infinite;}
+.glow-2{width:550px;height:550px;opacity:.10;background:radial-gradient(circle,#FF3CAC,transparent 70%);bottom:-180px;left:-180px;animation:float2 16s ease-in-out infinite;}
+.glow-3{width:400px;height:400px;opacity:.07;background:radial-gradient(circle,#3B82F6,transparent 70%);top:50%;left:45%;animation:float1 20s ease-in-out infinite reverse;}
+@keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(-45px,40px)}}
+@keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-35px)}}
 
 /* ── INTERNAL BANNER ── */
 .internal-banner{
   position:relative;z-index:10;
   display:flex;align-items:center;justify-content:center;gap:8px;
-  background:rgba(239,68,68,0.08);
-  border-bottom:1px solid rgba(239,68,68,0.18);
+  background:rgba(239,68,68,0.07);border-bottom:1px solid rgba(239,68,68,0.15);
   padding:8px 20px;
   font-family:var(--font-mono);font-size:11px;font-weight:500;
-  color:rgba(248,113,113,0.9);letter-spacing:0.08em;
+  color:rgba(248,113,113,0.85);letter-spacing:0.08em;
 }
-.internal-banner::before{
-  content:'';width:6px;height:6px;border-radius:50%;
-  background:#EF4444;flex-shrink:0;
-  animation:blink 2s ease infinite;
-}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.internal-banner::before{content:'';width:6px;height:6px;border-radius:50%;background:#EF4444;flex-shrink:0;animation:blink 2s ease infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
 
 /* ── NAVBAR ── */
 .navbar{
   position:sticky;top:0;z-index:100;
-  background:rgba(10,10,15,0.92);backdrop-filter:blur(24px);
+  background:rgba(8,8,16,0.92);backdrop-filter:blur(28px);
   border-bottom:1px solid var(--border);
-  padding:0 40px;height:66px;
+  padding:0 44px;height:66px;
   display:flex;align-items:center;justify-content:space-between;
 }
-.nav-brand{display:flex;align-items:center;gap:10px;}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
 .brand-icon{
   width:38px;height:38px;
   background:var(--accent-fade);border:1px solid var(--border-glow);
   border-radius:10px;display:flex;align-items:center;justify-content:center;
 }
-.brand-icon svg{width:20px;height:20px;}
 .brand-name{
   font-family:var(--font-display);font-weight:800;font-size:19px;letter-spacing:-0.4px;
   background:linear-gradient(135deg,#FF6B35,#FF3CAC);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
-.nav-right{display:flex;align-items:center;gap:12px;}
+.nav-right{display:flex;align-items:center;gap:10px;}
 .nav-pill{
   background:var(--accent-fade);border:1px solid var(--border-glow);
   color:var(--accent);font-family:var(--font-mono);font-size:10px;font-weight:600;
-  padding:5px 12px;border-radius:20px;letter-spacing:0.08em;text-transform:uppercase;
+  padding:5px 13px;border-radius:20px;letter-spacing:0.08em;text-transform:uppercase;
+  display:flex;align-items:center;gap:6px;
 }
 .nav-contact{
   display:flex;align-items:center;gap:6px;
   color:var(--text-muted);font-size:12px;
   background:var(--bg-raised);border:1px solid var(--border);
   padding:6px 14px;border-radius:var(--radius-sm);
-  text-decoration:none;transition:var(--transition);
+  text-decoration:none;transition:all .2s ease;
 }
 .nav-contact:hover{border-color:var(--border-glow);color:var(--text);}
 
@@ -131,8 +106,7 @@ body{
 .hero{
   position:relative;z-index:5;
   max-width:1100px;margin:0 auto;
-  padding:80px 40px 56px;
-  text-align:center;
+  padding:84px 44px 60px;text-align:center;
 }
 .hero-eyebrow{
   display:inline-flex;align-items:center;gap:8px;
@@ -142,401 +116,297 @@ body{
   padding:6px 16px;border-radius:20px;margin-bottom:28px;
 }
 .hero-title{
-  font-family:var(--font-display);font-size:clamp(32px,5vw,56px);
+  font-family:var(--font-display);font-size:clamp(34px,5vw,58px);
   font-weight:800;letter-spacing:-2px;line-height:1.05;margin-bottom:16px;
 }
 .hero-title .grad{
   background:linear-gradient(135deg,#FF6B35 30%,#FF3CAC 80%);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
-.hero-sub{
-  font-size:15px;color:var(--text-muted);max-width:520px;
-  margin:0 auto 48px;line-height:1.75;
-}
-.hero-meta{
-  display:flex;align-items:center;justify-content:center;
-  gap:24px;flex-wrap:wrap;
-}
-.hero-meta-item{
-  display:flex;align-items:center;gap:7px;
-  font-size:12px;color:var(--text-dim);font-family:var(--font-mono);
-}
+.hero-sub{font-size:15px;color:var(--text-muted);max-width:520px;margin:0 auto 48px;line-height:1.75;}
+.hero-meta{display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;}
+.hero-meta-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-dim);font-family:var(--font-mono);}
 .hero-meta-item span{color:var(--text-muted);}
 .meta-dot{width:3px;height:3px;border-radius:50%;background:var(--text-dim);}
 
-/* ── MAIN CONTENT ── */
-.main{
-  position:relative;z-index:5;
-  max-width:1100px;margin:0 auto;
-  padding:0 40px 100px;
-}
+/* ── MAIN ── */
+.main{position:relative;z-index:5;max-width:1100px;margin:0 auto;padding:0 44px 100px;}
 
 /* ── SECTION LABEL ── */
 .section-label{
   display:flex;align-items:center;gap:12px;
   font-family:var(--font-mono);font-size:10px;font-weight:600;
   letter-spacing:0.2em;text-transform:uppercase;color:var(--text-dim);
-  margin-bottom:20px;
+  margin-bottom:22px;
 }
-.section-label::after{
-  content:'';flex:1;height:1px;
-  background:linear-gradient(90deg,var(--border),transparent);
-}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
 .section-label .sl-num{
   background:var(--accent-fade);border:1px solid var(--border-glow);
   color:var(--accent);padding:2px 8px;border-radius:5px;
   font-size:9px;font-weight:700;letter-spacing:0.1em;
 }
 
-/* ── TOOLS GRID (3-column primary) ── */
-.tools-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:16px;
-  margin-bottom:52px;
-}
-.tools-grid-2{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:16px;
-  margin-bottom:52px;
-}
+/* ── GRIDS ── */
+.tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:56px;}
+.tools-grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:56px;}
+.tools-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:40px;}
 
-/* ── TOOL CARD ── */
+/* ══════════════════════════════════════
+   PREMIUM TOOL CARD
+══════════════════════════════════════ */
 .tool-card{
   position:relative;overflow:hidden;
   background:var(--bg-card);
   border:1px solid var(--border);
   border-radius:var(--radius-lg);
-  padding:28px;
-  cursor:pointer;
-  text-decoration:none;
-  display:flex;flex-direction:column;gap:0;
-  transition:border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
-  animation:cardIn 0.5s ease both;
+  padding:26px;
+  cursor:pointer;text-decoration:none;
+  display:flex;flex-direction:column;
+  transition:border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+  animation:cardIn .5s ease both;
 }
-.tool-card:nth-child(1){animation-delay:0.05s}
-.tool-card:nth-child(2){animation-delay:0.1s}
-.tool-card:nth-child(3){animation-delay:0.15s}
-.tool-card:nth-child(4){animation-delay:0.2s}
-.tool-card:nth-child(5){animation-delay:0.25s}
-@keyframes cardIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.tool-card:nth-child(1){animation-delay:.05s}
+.tool-card:nth-child(2){animation-delay:.10s}
+.tool-card:nth-child(3){animation-delay:.15s}
+.tool-card:nth-child(4){animation-delay:.20s}
+.tool-card:nth-child(5){animation-delay:.25s}
+@keyframes cardIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 
+/* Top accent line */
 .tool-card::before{
   content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  opacity:0;transition:opacity 0.25s ease;
+  opacity:0;transition:opacity .25s ease;border-radius:20px 20px 0 0;
 }
-.tool-card:hover{
-  border-color:var(--border-glow);
-  transform:translateY(-4px);
-  box-shadow:0 20px 60px rgba(0,0,0,0.5),0 0 0 1px rgba(255,107,53,0.1);
-}
+.tool-card:hover{transform:translateY(-5px);box-shadow:0 24px 64px rgba(0,0,0,.55),0 0 0 1px rgba(255,107,53,.08);}
 .tool-card:hover::before{opacity:1;}
-.tool-card:hover .card-arrow{transform:translate(3px,-3px);opacity:1;}
-.tool-card:hover .card-icon-wrap{border-color:var(--border-glow);}
+.tool-card:hover .card-arrow-icon{opacity:1;transform:translate(2px,-2px);}
+.tool-card:hover .card-icon-wrap{box-shadow:0 8px 24px var(--icon-glow,rgba(255,107,53,.2));}
 
-/* Card accent lines by color */
+/* Accent line colors */
 .card-orange::before{background:linear-gradient(90deg,#FF6B35,#FF3CAC);}
 .card-blue::before{background:linear-gradient(90deg,#3B82F6,#6366F1);}
 .card-green::before{background:linear-gradient(90deg,#22C55E,#10B981);}
 .card-purple::before{background:linear-gradient(90deg,#8B5CF6,#EC4899);}
 .card-gold::before{background:linear-gradient(90deg,#F59E0B,#EF4444);}
+.card-cyan::before{background:linear-gradient(90deg,#06B6D4,#3B82F6);}
 
-/* Card top row */
-.card-top{
-  display:flex;align-items:flex-start;justify-content:space-between;
-  margin-bottom:20px;
-}
+/* Hover border colors */
+.card-orange:hover{border-color:rgba(255,107,53,.35);}
+.card-blue:hover{border-color:rgba(59,130,246,.35);}
+.card-green:hover{border-color:rgba(34,197,94,.35);}
+.card-purple:hover{border-color:rgba(139,92,246,.35);}
+.card-gold:hover{border-color:rgba(245,158,11,.35);}
+.card-cyan:hover{border-color:rgba(6,182,212,.35);}
+
+/* ── CARD TOP ROW ── */
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;}
+
+/* Icon wrapper */
 .card-icon-wrap{
-  width:48px;height:48px;
-  border:1px solid var(--border);border-radius:12px;
-  background:var(--bg-raised);
+  width:52px;height:52px;border-radius:14px;
   display:flex;align-items:center;justify-content:center;
-  font-size:22px;flex-shrink:0;
-  transition:border-color 0.2s;
+  flex-shrink:0;transition:box-shadow .25s ease;
+  border:1px solid rgba(255,255,255,.06);
+  position:relative;
 }
-.card-arrow{
-  opacity:0.3;font-size:14px;color:var(--text-muted);
-  transition:transform 0.2s ease,opacity 0.2s ease;
-  margin-top:4px;
-}
+.card-icon-wrap svg{width:24px;height:24px;stroke-width:1.8;}
 
-/* Card body */
-.card-tag{
-  display:inline-block;
-  font-family:var(--font-mono);font-size:9px;font-weight:600;
-  letter-spacing:0.12em;text-transform:uppercase;
-  padding:3px 9px;border-radius:5px;margin-bottom:10px;
+/* Arrow icon top-right */
+.card-arrow-icon{
+  opacity:.2;transition:opacity .2s ease, transform .2s ease;
+  color:var(--text-muted);flex-shrink:0;
 }
-.tag-orange{background:rgba(255,107,53,0.1);color:#FF6B35;border:1px solid rgba(255,107,53,0.2);}
-.tag-blue{background:rgba(59,130,246,0.1);color:#3B82F6;border:1px solid rgba(59,130,246,0.2);}
-.tag-green{background:rgba(34,197,94,0.1);color:#22C55E;border:1px solid rgba(34,197,94,0.2);}
-.tag-purple{background:rgba(139,92,246,0.1);color:#8B5CF6;border:1px solid rgba(139,92,246,0.2);}
-.tag-gold{background:rgba(245,158,11,0.1);color:#F59E0B;border:1px solid rgba(245,158,11,0.2);}
+.card-arrow-icon svg{width:16px;height:16px;stroke-width:2;}
+
+/* ── CARD BODY ── */
+.card-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:var(--font-mono);font-size:9px;font-weight:700;
+  letter-spacing:0.14em;text-transform:uppercase;
+  padding:3px 10px;border-radius:6px;margin-bottom:10px;
+}
+.tag-orange{background:rgba(255,107,53,.1);color:#FF6B35;border:1px solid rgba(255,107,53,.22);}
+.tag-blue{background:rgba(59,130,246,.1);color:#3B82F6;border:1px solid rgba(59,130,246,.22);}
+.tag-green{background:rgba(34,197,94,.1);color:#22C55E;border:1px solid rgba(34,197,94,.22);}
+.tag-purple{background:rgba(139,92,246,.1);color:#8B5CF6;border:1px solid rgba(139,92,246,.22);}
+.tag-gold{background:rgba(245,158,11,.1);color:#F59E0B;border:1px solid rgba(245,158,11,.22);}
+.tag-cyan{background:rgba(6,182,212,.1);color:#06B6D4;border:1px solid rgba(6,182,212,.22);}
 
 .card-title{
   font-family:var(--font-display);font-size:17px;font-weight:800;
-  letter-spacing:-0.4px;line-height:1.2;margin-bottom:8px;
-  color:var(--text);
+  letter-spacing:-.4px;line-height:1.2;margin-bottom:8px;color:var(--text);
 }
-.card-desc{
-  font-size:13px;color:var(--text-muted);line-height:1.65;
-  margin-bottom:22px;flex:1;
-}
+.card-desc{font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:22px;flex:1;}
 
-/* Card footer */
+/* ── CARD FOOTER ── */
 .card-footer{
   display:flex;align-items:center;justify-content:space-between;
-  padding-top:18px;border-top:1px solid var(--border);
-  margin-top:auto;
+  padding-top:16px;border-top:1px solid var(--border);margin-top:auto;gap:10px;
 }
-.card-url{
-  font-family:var(--font-mono);font-size:10px;color:var(--text-dim);
-  word-break:break-all;line-height:1.4;max-width:80%;
-}
+.card-url{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);word-break:break-all;line-height:1.4;flex:1;}
 .card-open-btn{
   display:inline-flex;align-items:center;gap:5px;
+  padding:6px 14px;border-radius:20px;
   background:var(--accent-fade);border:1px solid var(--border-glow);
   color:var(--accent);font-size:11px;font-weight:600;font-family:var(--font-body);
-  padding:5px 12px;border-radius:20px;
-  text-decoration:none;white-space:nowrap;flex-shrink:0;
-  transition:var(--transition);
+  text-decoration:none;white-space:nowrap;flex-shrink:0;transition:all .2s ease;
 }
-.tool-card:hover .card-open-btn{
-  background:var(--accent);color:#fff;border-color:var(--accent);
-}
+.tool-card:hover .card-open-btn{background:var(--accent);color:#fff;border-color:var(--accent);}
 
-/* ── FEATURED CARD (full width) ── */
+/* Blue open btn override */
+.card-open-btn.blue{background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.3);color:#3B82F6;}
+.card-blue:hover .card-open-btn.blue{background:#3B82F6;color:#fff;border-color:#3B82F6;}
+.card-open-btn.green{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.3);color:#22C55E;}
+.card-green:hover .card-open-btn.green{background:#22C55E;color:#fff;border-color:#22C55E;}
+.card-open-btn.purple{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.3);color:#8B5CF6;}
+.card-purple:hover .card-open-btn.purple{background:#8B5CF6;color:#fff;border-color:#8B5CF6;}
+.card-open-btn.gold{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.35);color:#F59E0B;}
+.card-gold:hover .card-open-btn.gold{background:#F59E0B;color:#fff;border-color:#F59E0B;}
+
+/* ── FEATURED CARD (spans full width, horizontal layout) ── */
 .card-featured{
   grid-column:1/-1;
-  flex-direction:row;
-  align-items:center;
-  gap:28px;
-  padding:32px 36px;
+  flex-direction:row;align-items:center;gap:24px;
+  padding:30px 36px;
 }
 .card-featured .card-body{flex:1;}
-.card-featured .card-icon-wrap{
-  width:64px;height:64px;border-radius:16px;font-size:28px;
-  flex-shrink:0;
-}
-.card-featured .card-title{font-size:20px;}
-.card-featured .card-footer{
-  border-top:none;padding-top:0;margin-top:12px;justify-content:flex-start;gap:12px;
-}
+.card-featured .card-icon-wrap{width:64px;height:64px;border-radius:16px;}
+.card-featured .card-icon-wrap svg{width:30px;height:30px;}
+.card-featured .card-title{font-size:21px;}
+.card-featured .card-footer{border-top:none;padding-top:0;margin-top:12px;justify-content:flex-start;gap:12px;}
 .card-featured .card-desc{margin-bottom:0;}
+.card-featured .card-arrow-icon{align-self:flex-start;margin-top:0;}
 
-/* ── ADD NEW LINK SECTION ── */
-.add-section{
-  background:var(--bg-card);border:1px dashed rgba(255,107,53,0.25);
-  border-radius:var(--radius-lg);padding:36px;margin-bottom:52px;
-  position:relative;overflow:hidden;
+/* ── QUICK INFO CARD ── */
+.info-card{
+  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:22px 20px;
 }
-.add-section::before{
-  content:'HOW TO ADD';
-  position:absolute;top:24px;right:28px;
-  font-family:var(--font-mono);font-size:9px;font-weight:700;
-  letter-spacing:0.2em;color:var(--text-dim);
-}
-.add-section-title{
-  font-family:var(--font-display);font-size:18px;font-weight:800;
-  margin-bottom:6px;color:var(--text);
-}
-.add-section-sub{font-size:13px;color:var(--text-muted);margin-bottom:28px;line-height:1.6;}
-.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
-.step-box{
-  background:var(--bg-raised);border:1px solid var(--border);
-  border-radius:var(--radius);padding:18px 16px;
-}
-.step-num{
-  font-family:var(--font-display);font-size:22px;font-weight:800;
-  color:var(--accent);margin-bottom:10px;line-height:1;
-}
-.step-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:5px;}
-.step-desc{font-size:11px;color:var(--text-muted);line-height:1.6;}
-.step-code{
-  display:block;margin-top:8px;
-  font-family:var(--font-mono);font-size:10px;
-  background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.15);
-  color:#FF8C55;padding:5px 8px;border-radius:5px;word-break:break-all;
-  line-height:1.5;
-}
-
-/* Code block for the template */
-.code-block{
-  background:#0D0D16;border:1px solid var(--border);
-  border-radius:var(--radius);padding:20px 22px;margin-top:20px;
-  font-family:var(--font-mono);font-size:12px;line-height:2;
-  overflow-x:auto;position:relative;
-}
-.code-block .cb-label{
-  position:absolute;top:10px;right:14px;
-  font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;
-  color:var(--text-dim);
-}
-.c-key{color:#FF6B35;}
-.c-str{color:#22C55E;}
-.c-cmt{color:var(--text-dim);}
-.c-tag{color:#3B82F6;}
-.c-val{color:#F59E0B;}
-.copy-code-btn{
-  display:inline-flex;align-items:center;gap:5px;margin-top:14px;
-  background:var(--bg-raised);border:1px solid var(--border);
-  color:var(--text-muted);font-size:11px;font-weight:600;
-  padding:6px 14px;border-radius:7px;cursor:pointer;font-family:var(--font-body);
-  transition:var(--transition);
-}
-.copy-code-btn:hover{border-color:var(--border-glow);color:var(--accent);}
+.info-card-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;font-family:var(--font-mono);display:flex;align-items:center;gap:6px;}
+.info-card-label svg{width:12px;height:12px;}
 
 /* ── FOOTER ── */
 .footer{
-  position:relative;z-index:5;
-  border-top:1px solid var(--border);
-  padding:28px 40px;
-  display:flex;align-items:center;justify-content:space-between;
+  position:relative;z-index:5;border-top:1px solid var(--border);
+  padding:28px 44px;display:flex;align-items:center;justify-content:space-between;
   flex-wrap:wrap;gap:16px;
-  max-width:100%;
 }
 .footer-left{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
-.footer-brand{
-  font-family:var(--font-display);font-size:15px;font-weight:800;
-  background:linear-gradient(135deg,#FF6B35,#FF3CAC);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-}
+.footer-brand{font-family:var(--font-display);font-size:15px;font-weight:800;background:linear-gradient(135deg,#FF6B35,#FF3CAC);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .footer-sep{color:var(--text-dim);}
 .footer-info{font-size:12px;color:var(--text-dim);}
 .footer-info a{color:var(--text-muted);text-decoration:none;}
 .footer-info a:hover{color:var(--accent);}
-.footer-right{
-  font-family:var(--font-mono);font-size:10px;color:var(--text-dim);
-  letter-spacing:0.05em;
-}
-
-/* ── QUICK COPY TOAST ── */
-#copyToast{
-  position:fixed;bottom:28px;right:28px;z-index:999;
-  background:var(--bg-card);border:1px solid rgba(34,197,94,0.4);
-  color:var(--success);border-radius:10px;
-  padding:11px 20px;font-size:13px;font-weight:600;
-  box-shadow:0 8px 32px rgba(0,0,0,0.5);
-  transform:translateY(80px);opacity:0;transition:all 0.3s ease;
-  pointer-events:none;font-family:var(--font-body);
-}
-#copyToast.show{transform:translateY(0);opacity:1;}
+.footer-right{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:.05em;}
 
 /* ── RESPONSIVE ── */
-@media(max-width:900px){
-  .tools-grid{grid-template-columns:repeat(2,1fr);}
-  .steps-grid{grid-template-columns:repeat(2,1fr);}
-  .card-featured{flex-direction:column;}
-  .navbar{padding:0 20px;}
-  .hero{padding:60px 20px 40px;}
-  .main{padding:0 20px 80px;}
-  .footer{padding:24px 20px;}
-}
-@media(max-width:600px){
-  .tools-grid,.tools-grid-2{grid-template-columns:1fr;}
-  .steps-grid{grid-template-columns:1fr;}
-  .hero-title{font-size:28px;letter-spacing:-1px;}
-  .hero-meta{gap:12px;}
-}
+@media(max-width:960px){.tools-grid{grid-template-columns:repeat(2,1fr);}.tools-grid-4{grid-template-columns:repeat(2,1fr);}.card-featured{flex-direction:column;}.navbar{padding:0 20px;}.hero{padding:60px 20px 40px;}.main{padding:0 20px 80px;}.footer{padding:24px 20px;}}
+@media(max-width:600px){.tools-grid,.tools-grid-2,.tools-grid-4{grid-template-columns:1fr;}.hero-title{font-size:30px;letter-spacing:-1px;}.hero-meta{gap:12px;}}
 </style>
 </head>
 <body>
 
-<!-- ── BACKGROUND ── -->
 <div class="bg-grid"></div>
 <div class="bg-glow glow-1"></div>
 <div class="bg-glow glow-2"></div>
 <div class="bg-glow glow-3"></div>
 
-<!-- ── INTERNAL WARNING BANNER ── -->
+<!-- INTERNAL BANNER -->
 <div class="internal-banner">
   🔐 &nbsp;INTERNAL USE ONLY — SparkEdge Private Workspace &nbsp;·&nbsp; Not for client sharing &nbsp;·&nbsp; Confidential
 </div>
 
-<!-- ── NAVBAR ── -->
+<!-- NAVBAR -->
 <nav class="navbar">
-  <div class="nav-brand">
+  <a href="https://sparkedge555.github.io/sparkedgeagency/" target="_blank" class="nav-brand">
     <div class="brand-icon">
-      <svg viewBox="0 0 28 28" fill="none">
+      <svg viewBox="0 0 28 28" fill="none" width="20" height="20">
         <polygon points="14,2 26,20 2,20" fill="url(#ng)"/>
-        <defs>
-          <linearGradient id="ng" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style="stop-color:#FF6B35"/>
-            <stop offset="100%" style="stop-color:#FF3CAC"/>
-          </linearGradient>
-        </defs>
+        <defs><linearGradient id="ng" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#FF6B35"/><stop offset="100%" style="stop-color:#FF3CAC"/></linearGradient></defs>
       </svg>
     </div>
     <span class="brand-name">SparkEdge</span>
-  </div>
+  </a>
   <div class="nav-right">
-    <span class="nav-pill">⚡ Internal Workspace</span>
-    <a href="tel:+919142450715" class="nav-contact">📞 +91 91424 50715</a>
+    <a href="https://sparkedge555.github.io/sparkedgeagency/" target="_blank" class="nav-contact" style="color:#F59E0B;border-color:rgba(245,158,11,.2);">
+      <i data-lucide="globe" style="width:13px;height:13px;"></i> Website ↗
+    </a>
+    <span class="nav-pill"><i data-lucide="zap" style="width:11px;height:11px;"></i> Internal Workspace</span>
+    <a href="tel:+919142450715" class="nav-contact">
+      <i data-lucide="phone" style="width:13px;height:13px;"></i> +91 91424 50715
+    </a>
   </div>
 </nav>
 
-<!-- ── HERO ── -->
+<!-- HERO -->
 <section class="hero">
   <div class="hero-eyebrow">
-    <span>⚡</span> All Tools · One Place
+    <i data-lucide="zap" style="width:11px;height:11px;"></i> All Tools · One Place
   </div>
-  <h1 class="hero-title">
-    SparkEdge<br/><span class="grad">Tools Hub</span>
-  </h1>
-  <p class="hero-sub">
-    Every internal tool, portal and link — organised and accessible in one place. Stop hunting GitHub bookmarks.
-  </p>
+  <h1 class="hero-title">SparkEdge<br/><span class="grad">Tools Hub</span></h1>
+  <p class="hero-sub">Every internal tool, portal and link — organised and accessible in one place. Stop hunting GitHub bookmarks.</p>
   <div class="hero-meta">
-    <div class="hero-meta-item">
-      <span>Raunak Karn</span>
-    </div>
+    <div class="hero-meta-item"><span>Raunak Karn</span></div>
     <div class="meta-dot"></div>
-    <div class="hero-meta-item">
-      <span>sparkedge555@gmail.com</span>
-    </div>
+    <div class="hero-meta-item"><span>sparkedge555@gmail.com</span></div>
     <div class="meta-dot"></div>
-    <div class="hero-meta-item">
-      <span>raunakkarn555.github.io</span>
-    </div>
+    <div class="hero-meta-item"><span>raunakkarn555.github.io</span></div>
   </div>
 </section>
 
-<!-- ── MAIN TOOLS ── -->
+<!-- MAIN -->
 <div class="main">
 
-  <!-- ── CLIENT TOOLS ── -->
+  <!-- 01 · CLIENT-FACING PORTALS -->
   <div class="section-label">
     <span class="sl-num">01</span> Client-Facing Portals
   </div>
 
-  <div class="tools-grid" style="margin-bottom:52px;">
+  <div class="tools-grid-2" style="margin-bottom:56px;">
 
-    <!-- CLIENT PORTAL — featured -->
+    <!-- OFFICIAL WEBSITE -->
+    <a href="https://sparkedge555.github.io/sparkedgeagency/" target="_blank"
+       class="tool-card card-gold"
+       style="background:linear-gradient(135deg,rgba(245,158,11,.06),rgba(239,68,68,.02));border-color:rgba(245,158,11,.2);">
+      <div class="card-top">
+        <div class="card-icon-wrap"
+             style="background:rgba(245,158,11,.14);border-color:rgba(245,158,11,.32);--icon-glow:rgba(245,158,11,.3);">
+          <i data-lucide="globe" style="color:#F59E0B;"></i>
+        </div>
+        <div class="card-arrow-icon"><i data-lucide="arrow-up-right"></i></div>
+      </div>
+      <span class="card-tag tag-gold"><i data-lucide="star" style="width:9px;height:9px;"></i> Public · Official</span>
+      <div class="card-title">SparkEdge — Official Website</div>
+      <div class="card-desc">SparkEdge ki public-facing agency website. Clients, leads aur referrals yahan jaate hain portfolio dekhne, services samajhne aur contact karne ke liye. Share karo freely.</div>
+      <div class="card-footer">
+        <span class="card-url">sparkedge555.github.io/sparkedgeagency/</span>
+        <span class="card-open-btn gold"><i data-lucide="external-link" style="width:11px;height:11px;"></i> Visit</span>
+      </div>
+    </a>
+
+    <!-- CLIENT PORTAL -->
     <a href="https://raunakkarn555.github.io/sparkedge-client-portal/index.html"
-       target="_blank" class="tool-card card-orange card-featured">
-      <div class="card-icon-wrap" style="background:rgba(255,107,53,0.1);border-color:rgba(255,107,53,0.25);">
-        🎯
-      </div>
-      <div class="card-body">
-        <span class="card-tag tag-orange">Primary · Client View</span>
-        <div class="card-title">Client Portal — Login Page</div>
-        <div class="card-desc">
-          The main entry point for all clients. They enter their Ticket ID (e.g. SE-001) here to access their private project dashboard — progress, payments, files and timeline.
+       target="_blank" class="tool-card card-orange">
+      <div class="card-top">
+        <div class="card-icon-wrap"
+             style="background:rgba(255,107,53,.12);border-color:rgba(255,107,53,.28);--icon-glow:rgba(255,107,53,.3);">
+          <i data-lucide="layout-dashboard" style="color:#FF6B35;"></i>
         </div>
-        <div class="card-footer">
-          <span class="card-url">raunakkarn555.github.io/sparkedge-client-portal/index.html</span>
-          <span class="card-open-btn">Open ↗</span>
-        </div>
+        <div class="card-arrow-icon"><i data-lucide="arrow-up-right"></i></div>
       </div>
-      <div class="card-arrow">↗</div>
+      <span class="card-tag tag-orange"><i data-lucide="users" style="width:9px;height:9px;"></i> Primary · Client View</span>
+      <div class="card-title">Client Portal — Login Page</div>
+      <div class="card-desc">The main entry point for all clients. They enter their Ticket ID (e.g. SE-001) here to access their private project dashboard — progress, payments, files and timeline.</div>
+      <div class="card-footer">
+        <span class="card-url">raunakkarn555.github.io/…/index.html</span>
+        <span class="card-open-btn"><i data-lucide="external-link" style="width:11px;height:11px;"></i> Open</span>
+      </div>
     </a>
 
   </div>
 
-  <!-- ── ADMIN TOOLS ── -->
+  <!-- 02 · ADMIN & MANAGEMENT TOOLS -->
   <div class="section-label">
-    <span class="sl-num">02</span> Admin & Management Tools
+    <span class="sl-num">02</span> Admin &amp; Management Tools
   </div>
 
   <div class="tools-grid">
@@ -545,17 +415,17 @@ body{
     <a href="https://raunakkarn555.github.io/sparkedge-client-portal/admin.html"
        target="_blank" class="tool-card card-orange">
       <div class="card-top">
-        <div class="card-icon-wrap" style="background:rgba(255,107,53,0.1);border-color:rgba(255,107,53,0.2);">⚡</div>
-        <span class="card-arrow">↗</span>
+        <div class="card-icon-wrap" style="background:rgba(255,107,53,.12);border-color:rgba(255,107,53,.25);--icon-glow:rgba(255,107,53,.25);">
+          <i data-lucide="shield-check" style="color:#FF6B35;"></i>
+        </div>
+        <div class="card-arrow-icon"><i data-lucide="arrow-up-right"></i></div>
       </div>
-      <span class="card-tag tag-orange">Core Admin</span>
+      <span class="card-tag tag-orange"><i data-lucide="settings" style="width:9px;height:9px;"></i> Core Admin</span>
       <div class="card-title">Admin Panel</div>
-      <div class="card-desc">
-        Create and manage client tickets, set payment stages, track progress, handle referral vouchers, manage team members, generate and download ticket files.
-      </div>
+      <div class="card-desc">Create and manage client tickets, set payment stages, track progress, handle referral vouchers, manage team members, generate and download ticket files.</div>
       <div class="card-footer">
         <span class="card-url">…/admin.html</span>
-        <span class="card-open-btn">Open ↗</span>
+        <span class="card-open-btn"><i data-lucide="external-link" style="width:11px;height:11px;"></i> Open</span>
       </div>
     </a>
 
@@ -563,17 +433,17 @@ body{
     <a href="https://raunakkarn555.github.io/sparkedge-client-portal/docs.html"
        target="_blank" class="tool-card card-blue">
       <div class="card-top">
-        <div class="card-icon-wrap" style="background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.2);">📄</div>
-        <span class="card-arrow">↗</span>
+        <div class="card-icon-wrap" style="background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.25);--icon-glow:rgba(59,130,246,.25);">
+          <i data-lucide="file-text" style="color:#3B82F6;"></i>
+        </div>
+        <div class="card-arrow-icon"><i data-lucide="arrow-up-right"></i></div>
       </div>
-      <span class="card-tag tag-blue">Documents</span>
+      <span class="card-tag tag-blue"><i data-lucide="file-plus" style="width:9px;height:9px;"></i> Documents</span>
       <div class="card-title">Document Generator</div>
-      <div class="card-desc">
-        Generate all SparkEdge business documents — proposals, invoices, SOW, welcome packets, service agreements, billing handovers. Download as HTML, print as PDF.
-      </div>
+      <div class="card-desc">Generate all SparkEdge business documents — proposals, invoices, SOW, welcome packets, service agreements, billing handovers. Download as HTML, print as PDF.</div>
       <div class="card-footer">
         <span class="card-url">…/docs.html</span>
-        <span class="card-open-btn">Open ↗</span>
+        <span class="card-open-btn blue"><i data-lucide="external-link" style="width:11px;height:11px;"></i> Open</span>
       </div>
     </a>
 
@@ -581,25 +451,25 @@ body{
     <a href="https://raunakkarn555.github.io/sparkedge-client-portal/lead-management-crm.html"
        target="_blank" class="tool-card card-green">
       <div class="card-top">
-        <div class="card-icon-wrap" style="background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.2);">🎯</div>
-        <span class="card-arrow">↗</span>
+        <div class="card-icon-wrap" style="background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.25);--icon-glow:rgba(34,197,94,.25);">
+          <i data-lucide="target" style="color:#22C55E;"></i>
+        </div>
+        <div class="card-arrow-icon"><i data-lucide="arrow-up-right"></i></div>
       </div>
-      <span class="card-tag tag-green">Sales · CRM</span>
+      <span class="card-tag tag-green"><i data-lucide="trending-up" style="width:9px;height:9px;"></i> Sales · CRM</span>
       <div class="card-title">Lead Management CRM</div>
-      <div class="card-desc">
-        Track every lead from first contact to closed deal. Pipeline board, follow-up calendar, analytics, source tracking, won/lost reasons. Export & import for sync.
-      </div>
+      <div class="card-desc">Track every lead from first contact to closed deal. Pipeline board, follow-up calendar, analytics, source tracking, won/lost reasons. Export &amp; import for sync.</div>
       <div class="card-footer">
         <span class="card-url">…/lead-management-crm.html</span>
-        <span class="card-open-btn">Open ↗</span>
+        <span class="card-open-btn green"><i data-lucide="external-link" style="width:11px;height:11px;"></i> Open</span>
       </div>
     </a>
 
   </div>
 
-  <!-- ── GUIDES ── -->
+  <!-- 03 · GUIDES & REFERENCES -->
   <div class="section-label">
-    <span class="sl-num">03</span> Guides & References
+    <span class="sl-num">03</span> Guides &amp; References
   </div>
 
   <div class="tools-grid-2">
@@ -608,200 +478,135 @@ body{
     <a href="https://raunakkarn555.github.io/sparkedge-client-portal/client-management-guide.html"
        target="_blank" class="tool-card card-purple">
       <div class="card-top">
-        <div class="card-icon-wrap" style="background:rgba(139,92,246,0.1);border-color:rgba(139,92,246,0.2);">📘</div>
-        <span class="card-arrow">↗</span>
+        <div class="card-icon-wrap" style="background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.25);--icon-glow:rgba(139,92,246,.25);">
+          <i data-lucide="book-open" style="color:#8B5CF6;"></i>
+        </div>
+        <div class="card-arrow-icon"><i data-lucide="arrow-up-right"></i></div>
       </div>
-      <span class="card-tag tag-purple">Guide</span>
+      <span class="card-tag tag-purple"><i data-lucide="bookmark" style="width:9px;height:9px;"></i> Guide</span>
       <div class="card-title">Client Management Guide</div>
-      <div class="card-desc">
-        Complete step-by-step guide for managing clients end to end — onboarding, communication scripts, objection handling, follow-up sequences, scaling to ₹1L/month.
-      </div>
+      <div class="card-desc">Complete step-by-step guide for managing clients end to end — onboarding, communication scripts, objection handling, follow-up sequences, scaling to ₹1L/month.</div>
       <div class="card-footer">
         <span class="card-url">…/client-management-guide.html</span>
-        <span class="card-open-btn">Open ↗</span>
+        <span class="card-open-btn purple"><i data-lucide="external-link" style="width:11px;height:11px;"></i> Open</span>
       </div>
     </a>
 
-    <!-- QUICK REFERENCE placeholder — for new links -->
-    <div class="tool-card" style="border-style:dashed;border-color:rgba(255,107,53,0.2);cursor:default;opacity:0.6;">
+    <!--
+    ╔══════════════════════════════════════════════════════════════╗
+    ║  ➕  NAYA LINK ADD KARNA HAI? YAHAN COPY-PASTE KARO         ║
+    ╠══════════════════════════════════════════════════════════════╣
+    ║  STEP 1 — Neeche diya card block copy karo                  ║
+    ║  STEP 2 — Sahi grid section mein paste karo                 ║
+    ║  STEP 3 — href, icon name, title, desc, url text badlo      ║
+    ║  STEP 4 — git add . → git commit → git push                 ║
+    ║                                                              ║
+    ║  ICON: data-lucide="icon-name" — find icons at:             ║
+    ║  https://lucide.dev/icons/                                   ║
+    ║                                                              ║
+    ║  COLOR CLASSES:                                              ║
+    ║  card-orange + tag-orange → FF6B35 (admin/primary)          ║
+    ║  card-blue   + tag-blue   → 3B82F6 (docs/info)              ║
+    ║  card-green  + tag-green  → 22C55E (CRM/sales)              ║
+    ║  card-purple + tag-purple → 8B5CF6 (guides/resources)       ║
+    ║  card-gold   + tag-gold   → F59E0B (website/billing)        ║
+    ╚══════════════════════════════════════════════════════════════╝
+
+    TEMPLATE ↓
+    <a href="https://FULL-URL" target="_blank" class="tool-card card-orange">
       <div class="card-top">
-        <div class="card-icon-wrap" style="border-style:dashed;">➕</div>
-      </div>
-      <span class="card-tag" style="background:rgba(255,255,255,0.04);color:var(--text-dim);border-color:var(--border);">New Slot</span>
-      <div class="card-title" style="color:var(--text-muted);">Add New Link Here</div>
-      <div class="card-desc" style="font-size:12px;">
-        See the "How to Add a New Link" section below to add your next tool card here. Takes under 2 minutes.
-      </div>
-      <div class="card-footer">
-        <span class="card-url" style="color:var(--text-dim);">see instructions below ↓</span>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ── HOW TO ADD NEW LINKS ── -->
-  <div class="section-label">
-    <span class="sl-num">04</span> How to Add a New Link
-  </div>
-
-  <div class="add-section">
-    <div class="add-section-title">➕ Adding a new tool card — 4 steps</div>
-    <div class="add-section-sub">
-      Open <code style="background:var(--bg-raised);border:1px solid var(--border);padding:2px 8px;border-radius:5px;font-family:var(--font-mono);font-size:12px;color:#FF8C55;">tools.html</code> in VS Code, find the right grid section, duplicate a card block and fill in your details. Done in under 2 minutes.
-    </div>
-
-    <div class="steps-grid">
-      <div class="step-box">
-        <div class="step-num">01</div>
-        <div class="step-title">Open tools.html in VS Code</div>
-        <div class="step-desc">Find the section where you want to add — Client tools, Admin tools, or Guides.</div>
-      </div>
-      <div class="step-box">
-        <div class="step-num">02</div>
-        <div class="step-title">Copy a &lt;a&gt; card block</div>
-        <div class="step-desc">Select any existing <code class="step-code">&lt;a href="..." class="tool-card card-orange"&gt;</code> block and duplicate it.</div>
-      </div>
-      <div class="step-box">
-        <div class="step-num">03</div>
-        <div class="step-title">Fill in 4 things</div>
-        <div class="step-desc">Change: <code class="step-code">href</code> (URL), icon emoji, <code class="step-code">card-title</code>, <code class="step-code">card-desc</code>, and <code class="step-code">card-url</code> text.</div>
-      </div>
-      <div class="step-box">
-        <div class="step-num">04</div>
-        <div class="step-title">Push to GitHub</div>
-        <div class="step-desc">
-          In VS Code terminal:
-          <code class="step-code">git add .<br/>git commit -m "add [tool name]"<br/>git push</code>
-          Live in 60 seconds.
+        <div class="card-icon-wrap" style="background:rgba(255,107,53,.12);border-color:rgba(255,107,53,.25);--icon-glow:rgba(255,107,53,.25);">
+          <i data-lucide="tool" style="color:#FF6B35;"></i>
         </div>
+        <div class="card-arrow-icon"><i data-lucide="arrow-up-right"></i></div>
       </div>
-    </div>
+      <span class="card-tag tag-orange"><i data-lucide="tag" style="width:9px;height:9px;"></i> Category</span>
+      <div class="card-title">Tool Name</div>
+      <div class="card-desc">Description here.</div>
+      <div class="card-footer">
+        <span class="card-url">…/file.html</span>
+        <span class="card-open-btn"><i data-lucide="external-link" style="width:11px;height:11px;"></i> Open</span>
+      </div>
+    </a>
+    -->
 
-    <!-- Template code block -->
-    <div class="code-block">
-      <span class="cb-label">Copy this template</span>
-<pre><span class="c-cmt">&lt;!-- Paste inside any .tools-grid or .tools-grid-2 div --&gt;</span>
-<span class="c-tag">&lt;a</span> <span class="c-key">href</span>=<span class="c-str">"https://YOUR-FULL-URL-HERE"</span>
-   <span class="c-key">target</span>=<span class="c-str">"_blank"</span> <span class="c-key">class</span>=<span class="c-str">"tool-card card-orange"</span><span class="c-tag">&gt;</span>
-  <span class="c-tag">&lt;div</span> <span class="c-key">class</span>=<span class="c-str">"card-top"</span><span class="c-tag">&gt;</span>
-    <span class="c-tag">&lt;div</span> <span class="c-key">class</span>=<span class="c-str">"card-icon-wrap"</span> <span class="c-key">style</span>=<span class="c-str">"background:rgba(255,107,53,0.1)"</span><span class="c-tag">&gt;</span>🔧<span class="c-tag">&lt;/div&gt;</span>
-    <span class="c-tag">&lt;span</span> <span class="c-key">class</span>=<span class="c-str">"card-arrow"</span><span class="c-tag">&gt;</span>↗<span class="c-tag">&lt;/span&gt;</span>
-  <span class="c-tag">&lt;/div&gt;</span>
-  <span class="c-tag">&lt;span</span> <span class="c-key">class</span>=<span class="c-str">"card-tag tag-orange"</span><span class="c-tag">&gt;</span>Category Label<span class="c-tag">&lt;/span&gt;</span>
-  <span class="c-tag">&lt;div</span> <span class="c-key">class</span>=<span class="c-str">"card-title"</span><span class="c-tag">&gt;</span>Tool Name Here<span class="c-tag">&lt;/div&gt;</span>
-  <span class="c-tag">&lt;div</span> <span class="c-key">class</span>=<span class="c-str">"card-desc"</span><span class="c-tag">&gt;</span>
-    Short description of what this tool does and when to use it.
-  <span class="c-tag">&lt;/div&gt;</span>
-  <span class="c-tag">&lt;div</span> <span class="c-key">class</span>=<span class="c-str">"card-footer"</span><span class="c-tag">&gt;</span>
-    <span class="c-tag">&lt;span</span> <span class="c-key">class</span>=<span class="c-str">"card-url"</span><span class="c-tag">&gt;</span>…/short-path.html<span class="c-tag">&lt;/span&gt;</span>
-    <span class="c-tag">&lt;span</span> <span class="c-key">class</span>=<span class="c-str">"card-open-btn"</span><span class="c-tag">&gt;</span>Open ↗<span class="c-tag">&lt;/span&gt;</span>
-  <span class="c-tag">&lt;/div&gt;</span>
-<span class="c-tag">&lt;/a&gt;</span>
-
-<span class="c-cmt">&lt;!-- COLOR OPTIONS for class="tool-card card-???" --&gt;</span>
-<span class="c-cmt">&lt;!-- card-orange · card-blue · card-green · card-purple · card-gold --&gt;</span>
-<span class="c-cmt">&lt;!-- Match tag class too: tag-orange · tag-blue · tag-green · tag-purple · tag-gold --&gt;</span></pre>
-    </div>
-
-    <button class="copy-code-btn" onclick="copyTemplate()">
-      📋 Copy Template Code
-    </button>
   </div>
 
-  <!-- ── QUICK LINKS ROW ── -->
+  <!-- 04 · QUICK CONTACT & META -->
   <div class="section-label">
-    <span class="sl-num">05</span> Quick Contact & Meta
+    <span class="sl-num">04</span> Quick Contact &amp; Meta
   </div>
 
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:40px;">
-    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
-      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;font-family:var(--font-mono);">Agency</div>
-      <div style="font-family:var(--font-display);font-size:16px;font-weight:800;margin-bottom:4px;">SparkEdge</div>
+  <div class="tools-grid-4">
+
+    <!-- Agency -->
+    <div class="info-card">
+      <div class="info-card-label">
+        <i data-lucide="briefcase" style="width:12px;height:12px;color:var(--accent);"></i> Agency
+      </div>
+      <div style="font-family:var(--font-display);font-size:17px;font-weight:800;margin-bottom:4px;background:linear-gradient(135deg,#FF6B35,#FF3CAC);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">SparkEdge</div>
       <div style="font-size:12px;color:var(--text-muted);">Raunak Karn · IIT Patna</div>
     </div>
-    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
-      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;font-family:var(--font-mono);">Contact</div>
-      <a href="tel:+919142450715" style="display:block;font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--success);text-decoration:none;margin-bottom:4px;">📞 +91 91424 50715</a>
-      <a href="mailto:sparkedge555@gmail.com" style="font-size:12px;color:var(--text-muted);text-decoration:none;">sparkedge555@gmail.com</a>
-    </div>
-    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
-      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;font-family:var(--font-mono);">GitHub Repo</div>
-      <a href="https://github.com/raunakkarn555/sparkedge-client-portal" target="_blank"
-         style="display:block;font-size:12px;color:var(--accent);text-decoration:none;word-break:break-all;line-height:1.5;">
-        github.com/raunakkarn555/<br/>sparkedge-client-portal
+
+    <!-- Contact -->
+    <div class="info-card">
+      <div class="info-card-label">
+        <i data-lucide="contact" style="width:12px;height:12px;color:#22C55E;"></i> Contact
+      </div>
+      <a href="tel:+919142450715" style="display:flex;align-items:center;gap:7px;font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--success);text-decoration:none;margin-bottom:6px;">
+        <i data-lucide="phone" style="width:13px;height:13px;flex-shrink:0;"></i>+91 91424 50715
+      </a>
+      <a href="mailto:sparkedge555@gmail.com" style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-muted);text-decoration:none;">
+        <i data-lucide="mail" style="width:12px;height:12px;flex-shrink:0;"></i>sparkedge555@gmail.com
       </a>
     </div>
+
+    <!-- Official Website -->
+    <div class="info-card" style="border-color:rgba(245,158,11,.2);background:linear-gradient(135deg,rgba(245,158,11,.05),transparent);">
+      <div class="info-card-label">
+        <i data-lucide="globe" style="width:12px;height:12px;color:#F59E0B;"></i> Official Website
+      </div>
+      <a href="https://sparkedge555.github.io/sparkedgeagency/" target="_blank"
+         style="display:flex;align-items:center;gap:7px;font-family:var(--font-display);font-size:13px;font-weight:700;color:#F59E0B;text-decoration:none;margin-bottom:5px;">
+        <i data-lucide="external-link" style="width:12px;height:12px;flex-shrink:0;"></i>sparkedgeagency ↗
+      </a>
+      <div style="font-size:11px;color:var(--text-dim);">Public · Share freely</div>
+    </div>
+
+    <!-- GitHub -->
+    <div class="info-card">
+      <div class="info-card-label">
+        <i data-lucide="github" style="width:12px;height:12px;color:var(--text-muted);"></i> GitHub Repo
+      </div>
+      <a href="https://github.com/raunakkarn555/sparkedge-client-portal" target="_blank"
+         style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--accent);text-decoration:none;word-break:break-all;line-height:1.5;">
+        <i data-lucide="git-branch" style="width:12px;height:12px;flex-shrink:0;margin-top:2px;"></i>
+        <span>github.com/raunakkarn555/<br/>sparkedge-client-portal</span>
+      </a>
+    </div>
+
   </div>
 
-</div>
+</div><!-- /main -->
 
-<!-- ── FOOTER ── -->
+<!-- FOOTER -->
 <footer class="footer">
   <div class="footer-left">
     <span class="footer-brand">SparkEdge</span>
     <span class="footer-sep">·</span>
-    <span class="footer-info">
-      <a href="mailto:sparkedge555@gmail.com">sparkedge555@gmail.com</a>
-    </span>
+    <span class="footer-info"><a href="mailto:sparkedge555@gmail.com">sparkedge555@gmail.com</a></span>
     <span class="footer-sep">·</span>
-    <span class="footer-info">
-      <a href="tel:+919142450715">+91 91424 50715</a>
-    </span>
+    <span class="footer-info"><a href="tel:+919142450715">+91 91424 50715</a></span>
   </div>
-  <div class="footer-right">
-    🔐 INTERNAL TOOLS HUB · NOT FOR CLIENT DISTRIBUTION · © 2026 SPARKEDGE
-  </div>
+  <div class="footer-right" id="footerRight"></div>
 </footer>
 
-<!-- ── COPY TOAST ── -->
-<div id="copyToast">✅ Template copied to clipboard!</div>
-
 <script>
-/* ── Copy template code ── */
-const TEMPLATE_CODE = `<!-- Paste inside any .tools-grid or .tools-grid-2 div -->
-<a href="https://YOUR-FULL-URL-HERE"
-   target="_blank" class="tool-card card-orange">
-  <div class="card-top">
-    <div class="card-icon-wrap" style="background:rgba(255,107,53,0.1)">🔧</div>
-    <span class="card-arrow">↗</span>
-  </div>
-  <span class="card-tag tag-orange">Category Label</span>
-  <div class="card-title">Tool Name Here</div>
-  <div class="card-desc">
-    Short description of what this tool does and when to use it.
-  </div>
-  <div class="card-footer">
-    <span class="card-url">…/short-path.html</span>
-    <span class="card-open-btn">Open ↗</span>
-  </div>
-</a>
+// Init Lucide icons
+lucide.createIcons();
 
-<!-- COLOR OPTIONS for class="tool-card card-???" -->
-<!-- card-orange · card-blue · card-green · card-purple · card-gold -->
-<!-- Match tag class too: tag-orange · tag-blue · tag-green · tag-purple · tag-gold -->`;
-
-function copyTemplate() {
-  navigator.clipboard.writeText(TEMPLATE_CODE)
-    .then(() => showToast())
-    .catch(() => {
-      const el = document.createElement('textarea');
-      el.value = TEMPLATE_CODE;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand('copy');
-      document.body.removeChild(el);
-      showToast();
-    });
-}
-
-function showToast() {
-  const t = document.getElementById('copyToast');
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
-}
-
-/* ── Update footer year ── */
-document.querySelector('.footer-right').innerHTML =
+// Footer year
+document.getElementById('footerRight').textContent =
   `🔐 INTERNAL TOOLS HUB · NOT FOR CLIENT DISTRIBUTION · © ${new Date().getFullYear()} SPARKEDGE`;
 </script>
 </body>
