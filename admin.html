@@ -159,11 +159,26 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 /* ── STAGE BUILDER ── */
 .stages-list{display:flex;flex-direction:column;gap:8px;}
-.stage-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;}
-.stage-row input,.stage-row select{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;}
+.stage-row{background:var(--bg-raised);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0;overflow:hidden;transition:border-color .15s;}
+.stage-row:hover{border-color:var(--border-bright);}
+.stage-row-top{display:grid;grid-template-columns:auto 1fr auto auto auto;align-items:center;gap:10px;padding:12px 14px;}
+.stage-row-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.stage-row-dot.paid{background:#22C55E;}
+.stage-row-dot.pending{background:#F59E0B;}
+.stage-row-dot.upcoming{background:#3A3A5A;}
+.stage-row input,.stage-row select{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;}
 .stage-row input:focus,.stage-row select:focus{border-color:rgba(255,107,53,.4);}
-.stage-row .sr-name{flex:1;}
-.stage-status-select{font-size:11px;padding:5px 8px;}
+.stage-row .sr-name{min-width:0;}
+.stage-status-select{font-size:11px;padding:6px 8px;min-width:100px;}
+.stage-status-select option[value="paid"]{color:#22C55E;}
+.stage-status-select option[value="pending"]{color:#F59E0B;}
+.stage-status-select option[value="upcoming"]{color:#7A7A9A;}
+.stage-row-note-row{padding:0 14px 10px;display:flex;gap:8px;align-items:center;}
+.stage-row-note-row input{flex:1;font-size:11px;padding:5px 10px;color:var(--text-muted);}
+.stage-status-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap;}
+.stage-status-pill.paid{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#22C55E;}
+.stage-status-pill.pending{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:#F59E0B;}
+.stage-status-pill.upcoming{background:rgba(122,122,154,.1);border:1px solid rgba(122,122,154,.2);color:#7A7A9A;}
 .btn-remove{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#EF4444;border-radius:6px;padding:5px 8px;cursor:pointer;font-size:12px;transition:background .15s;}
 .btn-remove:hover{background:rgba(239,68,68,.2);}
 .btn-add-row{display:flex;align-items:center;gap:6px;background:none;border:1px dashed var(--border);border-radius:var(--radius-sm);padding:9px 14px;font-size:12px;color:var(--text-muted);cursor:pointer;width:100%;transition:all .15s;}
@@ -762,7 +777,16 @@ function toggleSidebar(){
               <label>Total Project Value (₹)</label>
               <input id="e_payTotal" placeholder="45000" oninput="recalcDiscountedTotal()"/>
             </div>
-            <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;">Payment Stages</div>
+            <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">
+              <span>Payment Stages</span>
+              <span style="font-size:10px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--text-muted);">Each stage = one milestone payment</span>
+            </div>
+            <!-- Stage format guide -->
+            <div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.15);border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:11px;color:var(--text-muted);line-height:1.7;">
+              <strong style="color:#3B82F6;">How to fill stages:</strong> Add one row per payment milestone (e.g. Advance, Mid-point, Final). Enter the <strong style="color:var(--text);">stage name</strong>, <strong style="color:var(--text);">amount in ₹</strong>, and set the <strong style="color:var(--text);">status</strong>:<br>
+              <span style="color:#22C55E;">✓ Paid</span> = client has paid &nbsp;·&nbsp; <span style="color:#F59E0B;">⏳ Pending</span> = due now &nbsp;·&nbsp; <span style="color:#7A7A9A;">🔒 Upcoming</span> = future milestone.<br>
+              Optionally add a note (e.g. "Received via GPay on 10 May"). The client sees these exact rows on their portal.
+            </div>
             <div class="stages-list" id="stagesList"></div>
             <button class="btn-add-row" style="margin-top:8px;" onclick="addStage()">+ Add Stage</button>
 
@@ -1271,6 +1295,91 @@ function toggleSidebar(){
         <span style="color:var(--accent);font-weight:700;">2nd</span><span style="color:var(--text);">Invoice</span><span style="color:var(--text-muted);">After advance payment received</span>
         <span style="color:var(--accent);font-weight:700;">3rd</span><span style="color:var(--text);">SOW / Agreement</span><span style="color:var(--text-muted);">Same day as invoice — before work begins</span>
         <span style="color:var(--accent);font-weight:700;">4th</span><span style="color:var(--text);">Welcome Packet</span><span style="color:var(--text-muted);">On kickoff day — with portal link</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         PAYMENT STAGES GUIDE
+    ══════════════════════════════════════════════════════ -->
+    <div style="margin-top:32px;">
+      <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin-bottom:6px;color:var(--text);">💰 Payment Stages — How to Fill & Use</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">A guide to the Payment Stages section in the ticket editor — what each field means and how it shows on the client portal.</div>
+
+      <div class="workflow-step">
+        <div class="wf-num" style="font-size:13px;">1</div>
+        <div>
+          <div class="wf-title">What is a Payment Stage?</div>
+          <div class="wf-desc">
+            Each stage = one milestone payment in your project. A typical project has 2–3 stages: <strong style="color:var(--text);">Advance → Mid-point → Final delivery</strong>. The client sees all stages on their portal with status badges. Fill one row per stage.
+          </div>
+        </div>
+      </div>
+
+      <div class="workflow-step">
+        <div class="wf-num" style="font-size:13px;">2</div>
+        <div>
+          <div class="wf-title">Fields in Each Stage Row</div>
+          <div class="wf-desc">
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:8px 16px;margin-top:8px;font-size:12px;">
+              <strong style="color:var(--accent);">Stage Name</strong><span>Label shown on client portal. Example: <code style="font-family:monospace;color:var(--accent);font-size:11px;">Advance (50%)</code>, <code style="font-family:monospace;color:var(--accent);font-size:11px;">Mid-point</code>, <code style="font-family:monospace;color:var(--accent);font-size:11px;">Final Delivery</code></span>
+              <strong style="color:var(--accent);">Amount ₹</strong><span>The rupee amount for this stage. Should ideally add up to the total project value (after discounts).</span>
+              <strong style="color:#22C55E;">✓ Paid</strong><span>Client has already paid this stage. Portal shows a green checkmark badge.</span>
+              <strong style="color:#F59E0B;">⏳ Pending</strong><span>Due now — client hasn't paid yet. Portal shows an amber badge. The "Balance Due" amount is calculated from all pending stages.</span>
+              <strong style="color:#7A7A9A;">🔒 Upcoming</strong><span>Future milestone — not due yet. Portal shows a grey locked badge.</span>
+              <strong style="color:var(--accent);">📝 Note</strong><span>Internal/client note for this stage. E.g. <em>"Received via GPay on 10 May"</em> or <em>"Due on project approval"</em>. Shows below the stage name on the portal.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="workflow-step">
+        <div class="wf-num" style="font-size:13px;">3</div>
+        <div>
+          <div class="wf-title">How the Bill Math Works</div>
+          <div class="wf-desc">
+            The portal auto-calculates everything from your entries:<br><br>
+            <strong style="color:var(--text);">Grand Total</strong> = Project Value − Situational Discount − Referral Discount<br>
+            <strong style="color:#22C55E);">Amount Paid</strong> = Sum of all <strong style="color:#22C55E;">✓ Paid</strong> stages<br>
+            <strong style="color:#F59E0B);">Balance Due</strong> = Grand Total − Amount Paid<br><br>
+            The Swiggy-style Bill Details box on the portal shows each deduction line by line, with a "Your total savings" strip at the bottom. The Pay Now button shows exactly the Balance Due amount, and the UPI deep link pre-loads that amount when the client taps it.
+          </div>
+          <div class="wf-timing">💡 Example: Project ₹45,000 · Referral saves ₹4,500 · Grand Total = ₹40,500 · Advance paid ₹20,000 → Balance Due = ₹20,500</div>
+        </div>
+      </div>
+
+      <div class="workflow-step">
+        <div class="wf-num" style="font-size:13px;">4</div>
+        <div>
+          <div class="wf-title">Workflow: Updating Stages Over Time</div>
+          <div class="wf-desc">
+            As the project progresses, come back to the editor and update stages:<br><br>
+            • Client pays the advance → change <strong style="color:#F59E0B;">Pending</strong> to <strong style="color:#22C55E;">Paid</strong> for that stage, add a note with payment date<br>
+            • Next milestone approaches → change <strong style="color:#7A7A9A;">Upcoming</strong> to <strong style="color:#F59E0B;">Pending</strong><br>
+            • Project done → all stages should be <strong style="color:#22C55E;">Paid</strong>, progress = 100%, status = Completed<br><br>
+            After each update: click <strong style="color:var(--text);">💾 Save</strong> then <strong style="color:var(--text);">⬇ Generate & Download File</strong> → push to GitHub → client sees updated portal in ~60 seconds.
+          </div>
+        </div>
+      </div>
+
+      <div style="background:rgba(255,107,53,.06);border:1px solid rgba(255,107,53,.2);border-radius:var(--radius);padding:16px 20px;margin-top:4px;">
+        <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--accent);margin-bottom:8px;">⚡ Quick Reference — Stage Status Cheatsheet</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:12px;">
+          <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:16px;margin-bottom:4px;">✓</div>
+            <div style="font-weight:700;color:#22C55E;">Paid</div>
+            <div style="color:var(--text-muted);font-size:11px;margin-top:3px;">Money received. Update immediately after client pays.</div>
+          </div>
+          <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:16px;margin-bottom:4px;">⏳</div>
+            <div style="font-weight:700;color:#F59E0B;">Pending</div>
+            <div style="color:var(--text-muted);font-size:11px;margin-top:3px;">Due now. Client sees "Pay Now" button for this amount.</div>
+          </div>
+          <div style="background:rgba(122,122,154,.08);border:1px solid rgba(122,122,154,.2);border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:16px;margin-bottom:4px;">🔒</div>
+            <div style="font-weight:700;color:#7A7A9A;">Upcoming</div>
+            <div style="color:var(--text-muted);font-size:11px;margin-top:3px;">Future milestone. Not included in Balance Due yet.</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -2001,24 +2110,37 @@ function renderStages(stages) {
   list.innerHTML = stages.map((s,i) => stageRowHTML(s,i)).join('');
 }
 function stageRowHTML(s,i) {
+  const st = s.status || 'pending';
+  const statusLabel = st==='paid' ? '✓ Paid' : st==='pending' ? '⏳ Pending' : '🔒 Upcoming';
   return `<div class="stage-row" id="stage_${i}">
-    <input class="sr-name" placeholder="Stage name e.g. Advance (50%)" value="${esc(s.name||'')}"/>
-    <input style="width:100px;" placeholder="Amount ₹" value="${s.amount||''}"/>
-    <select class="stage-status-select">
-      <option ${s.status==='paid'?'selected':''}>paid</option>
-      <option ${s.status==='pending'?'selected':''}>pending</option>
-      <option ${s.status==='upcoming'?'selected':''}>upcoming</option>
-    </select>
-    <button class="btn-remove" onclick="this.closest('.stage-row').remove()">✕</button>
+    <div class="stage-row-top">
+      <div class="stage-row-dot ${st}"></div>
+      <input class="sr-name" placeholder="Stage name e.g. Advance (50%)" value="${esc(s.name||'')}"/>
+      <input style="width:96px;" placeholder="Amount ₹" value="${s.amount||''}"/>
+      <select class="stage-status-select" onchange="updateStageDot(this)">
+        <option value="paid" ${st==='paid'?'selected':''}>✓ Paid</option>
+        <option value="pending" ${st==='pending'?'selected':''}>⏳ Pending</option>
+        <option value="upcoming" ${st==='upcoming'?'selected':''}>🔒 Upcoming</option>
+      </select>
+      <button class="btn-remove" onclick="this.closest('.stage-row').remove()" title="Remove stage">✕</button>
+    </div>
+    <div class="stage-row-note-row">
+      <span style="font-size:10px;color:var(--text-dim);white-space:nowrap;">📝 Note:</span>
+      <input placeholder="Optional note e.g. Received via GPay on 10 May" value="${esc(s.note||'')}"/>
+    </div>
   </div>`;
+}
+function updateStageDot(selectEl) {
+  const dot = selectEl.closest('.stage-row').querySelector('.stage-row-dot');
+  if(!dot) return;
+  dot.className = 'stage-row-dot ' + selectEl.value;
 }
 function addStage() {
   const list = document.getElementById('stagesList');
   const div = document.createElement('div');
   const i = Date.now();
-  div.className='stage-row';div.id='stage_'+i;
-  div.innerHTML = stageRowHTML({name:'',amount:'',status:'pending'},i);
-  list.appendChild(div);
+  div.innerHTML = stageRowHTML({name:'',amount:'',status:'pending',note:''},i);
+  list.appendChild(div.firstElementChild);
 }
 
 /* ── FILES ── */
@@ -2093,7 +2215,20 @@ function collectFormData() {
   const stages = [...document.querySelectorAll('#stagesList .stage-row')].map(row => {
     const inputs = row.querySelectorAll('input');
     const sel = row.querySelector('select');
-    return { name:inputs[0].value.trim(), amount:parseInt(inputs[1].value)||0, status:sel.value };
+    const note = inputs[1] ? inputs[1].value.trim() : '';
+    return { name:inputs[0].value.trim(), amount:parseInt(inputs[1]?.previousElementSibling?.value||inputs[0].value)||0, status:sel.value, note };
+  });
+  // Re-collect properly: top row inputs vs note row input
+  const stagesFinal = [...document.querySelectorAll('#stagesList .stage-row')].map(row => {
+    const topInputs = row.querySelectorAll('.stage-row-top input');
+    const noteInput = row.querySelector('.stage-row-note-row input');
+    const sel = row.querySelector('select');
+    return {
+      name: topInputs[0]?.value.trim() || '',
+      amount: parseInt(topInputs[1]?.value) || 0,
+      status: sel?.value || 'pending',
+      note: noteInput?.value.trim() || ''
+    };
   });
   const files = [...document.querySelectorAll('#filesList .file-row')].map(row => {
     const inputs = row.querySelectorAll('input');
@@ -2120,7 +2255,7 @@ function collectFormData() {
     progress: parseInt(document.getElementById('e_progress').value)||0,
     whatsapp: document.getElementById('e_whatsapp').value.trim(),
     clientEmail: document.getElementById('e_clientEmail').value.trim(),
-    payment: { total: parseInt(document.getElementById('e_payTotal').value)||0, stages },
+    payment: { total: parseInt(document.getElementById('e_payTotal').value)||0, stages: stagesFinal },
     discount: collectDiscount(),
     files, deliverables:delivs, timeline,
     managerNote: document.getElementById('e_managerNote').value.trim(),
@@ -2253,16 +2388,17 @@ function buildClientHTML(t) {
   <link rel="stylesheet" href="style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
   <style>
-    .pay-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:999;align-items:center;justify-content:center;padding:20px;}
+    .pay-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
     .pay-modal-overlay.open{display:flex;}
-    .pay-modal{background:#0E0E1A;border:1px solid #1E1E30;border-radius:16px;width:100%;max-width:420px;overflow:hidden;animation:pmIn .2s ease;}
-    @keyframes pmIn{from{transform:scale(.94);opacity:0;}to{transform:scale(1);opacity:1;}}
-    .pay-modal-hdr{padding:18px 22px;border-bottom:1px solid #1E1E30;display:flex;align-items:center;justify-content:space-between;}
+    .pay-modal{background:#0E0E1A;border:1px solid #2A2A40;border-radius:18px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;overflow-x:hidden;animation:pmIn .22s ease;box-shadow:0 24px 80px rgba(0,0,0,.7);}
+    .pay-modal::-webkit-scrollbar{width:4px;}.pay-modal::-webkit-scrollbar-track{background:transparent;}.pay-modal::-webkit-scrollbar-thumb{background:#2A2A40;border-radius:4px;}
+    @keyframes pmIn{from{transform:scale(.94) translateY(12px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
+    .pay-modal-hdr{padding:18px 22px;border-bottom:1px solid rgba(255,107,53,.2);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;background:#0E0E1A;}
     .pay-modal-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#F0F0FA;}
-    .pay-modal-close{background:none;border:none;color:#7A7A9A;font-size:20px;cursor:pointer;padding:2px 6px;border-radius:6px;}
+    .pay-modal-close{background:rgba(255,255,255,.06);border:1px solid #2A2A40;color:#7A7A9A;font-size:18px;cursor:pointer;padding:4px 9px;border-radius:8px;line-height:1;transition:all .15s;}
     .pay-modal-close:hover{background:#141422;color:#F0F0FA;}
-    .pay-modal-body{padding:20px;display:flex;flex-direction:column;gap:14px;}
-    .pay-modal-footer{padding:14px 22px;border-top:1px solid #1E1E30;display:flex;justify-content:flex-end;}
+    .pay-modal-body{display:flex;flex-direction:column;}
+    .pay-modal-footer{padding:14px 22px;border-top:1px solid #1E1E30;display:flex;justify-content:flex-end;position:sticky;bottom:0;background:#080810;}
   </style>
 </head>
 <body class="dashboard-page">
