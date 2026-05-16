@@ -1,4 +1,4 @@
-GIT <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -24,8 +24,8 @@ GIT <!DOCTYPE html>
 
   <!-- Premium Payment Modal -->
   <div class="pay-modal-overlay" id="payModal">
-    <div class="pay-modal" style="max-width:480px;">
-      <div class="pay-modal-hdr" style="background:linear-gradient(135deg,rgba(255,107,53,.12),rgba(255,60,172,.08));border-bottom:1px solid rgba(255,107,53,.2);">
+    <div class="pay-modal" style="max-width:480px;max-height:90vh;overflow-y:auto;">
+      <div class="pay-modal-hdr" style="background:linear-gradient(135deg,rgba(255,107,53,.12),rgba(255,60,172,.08));border-bottom:1px solid rgba(255,107,53,.2);position:sticky;top:0;z-index:2;">
         <div style="display:flex;align-items:center;gap:10px;">
           <div style="width:36px;height:36px;background:linear-gradient(135deg,#FF6B35,#FF3CAC);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">💳</div>
           <div>
@@ -38,18 +38,17 @@ GIT <!DOCTYPE html>
       <div class="pay-modal-body" style="gap:0;padding:0;">
 
         <!-- BILL SECTION -->
-        <div id="payBillSection" style="padding:20px 22px;border-bottom:1px solid #1E1E30;">
-          <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#7A7A9A;margin-bottom:14px;">🧾 Payment Summary</div>
-          <div id="payBillRows" style="display:flex;flex-direction:column;gap:0;"></div>
-          <div id="payBillTotal" style="margin-top:0;"></div>
+        <div style="padding:20px 22px;border-bottom:1px solid #1E1E30;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#7A7A9A;margin-bottom:4px;">🧾 Bill Summary</div>
+          <div id="payBillRows"></div>
+          <div id="payBillTotal"></div>
         </div>
 
         <!-- UPI SECTION -->
         <div style="padding:20px 22px;border-bottom:1px solid #1E1E30;">
           <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#7A7A9A;margin-bottom:12px;">📲 Pay via UPI</div>
-          <button onclick="doUpiPay()" id="upiPayBtn" style="background:linear-gradient(135deg,#FF6B35,#FF3CAC);border:none;border-radius:12px;padding:15px 28px;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 24px rgba(255,107,53,.35);letter-spacing:.3px;transition:opacity .15s;">
-            <span style="font-size:20px;">📲</span>
-            <span>Pay Now via UPI App</span>
+          <button onclick="doUpiPay()" id="upiPayBtn" style="background:linear-gradient(135deg,#FF6B35,#FF3CAC);border:none;border-radius:12px;padding:15px 28px;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 24px rgba(255,107,53,.35);">
+            <span style="font-size:20px;">📲</span><span>Pay via UPI App</span>
           </button>
           <div style="margin-top:10px;background:#141422;border:1px solid #1E1E30;border-radius:8px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
             <div>
@@ -58,7 +57,7 @@ GIT <!DOCTYPE html>
             </div>
             <button onclick="copyUpiId()" style="background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.2);border-radius:6px;color:#FF6B35;cursor:pointer;font-size:11px;padding:5px 10px;font-weight:600;">📋 Copy</button>
           </div>
-          <div style="display:flex;gap:8px;margin-top:10px;justify-content:center;">
+          <div style="display:flex;gap:6px;margin-top:10px;justify-content:center;flex-wrap:wrap;">
             <span style="font-size:10px;color:#3A3A5A;background:#0E0E1A;border:1px solid #1E1E30;border-radius:20px;padding:3px 10px;">GPay</span>
             <span style="font-size:10px;color:#3A3A5A;background:#0E0E1A;border:1px solid #1E1E30;border-radius:20px;padding:3px 10px;">PhonePe</span>
             <span style="font-size:10px;color:#3A3A5A;background:#0E0E1A;border:1px solid #1E1E30;border-radius:20px;padding:3px 10px;">Paytm</span>
@@ -81,9 +80,9 @@ GIT <!DOCTYPE html>
         </div>
 
         <!-- AFTER PAY NOTE -->
-        <div style="padding:14px 22px;background:rgba(34,197,94,.04);">
+        <div style="padding:14px 22px;">
           <div style="font-size:11px;color:#7A7A9A;line-height:1.7;text-align:center;">
-            After paying, please share the <strong style="color:#22C55E;">screenshot</strong> on WhatsApp or email to <strong style="color:#9A9ABA;">sparkedge555@gmail.com</strong>
+            After paying, share the <strong style="color:#22C55E;">screenshot</strong> on WhatsApp or email <strong style="color:#9A9ABA;">sparkedge555@gmail.com</strong>
           </div>
         </div>
       </div>
@@ -95,7 +94,7 @@ GIT <!DOCTYPE html>
 
   <script src="portal.js"></script>
   <script>
-    /* Generated by SparkEdge Admin Panel — 5/16/2026, 9:14:25 AM */
+    /* Generated by SparkEdge Admin Panel — 5/16/2026, 9:33:02 AM */
     const clientData = {
   "ticketId": "SE-001",
   "clientName": "Rohan Mehta (Dummy)",
@@ -125,6 +124,11 @@ GIT <!DOCTYPE html>
     ]
   },
   "discount": null,
+  "referralDiscount": {
+    "code": "SE-REF-001",
+    "discount": 4500,
+    "appliedAt": "15/5/2026"
+  },
   "files": [
     {
       "name": "Brand Brief Document",
@@ -192,146 +196,52 @@ GIT <!DOCTYPE html>
   ],
   "managerNote": "Hi Rohan! Please review the v2 logo concepts and drop feedback by Feb 10. Reach us at <a href=\"mailto:sparkedge555@gmail.com\">sparkedge555@gmail.com</a> 🚀"
 };
+    window._clientData = clientData; // used by openPayModal() in portal.js
 
-    // Inject referral banners after render
+    // Inject referral rewards banners (referrer side only) after render
     const _origRender = window.renderDashboard;
     window.renderDashboard = function(d) {
       if(_origRender) _origRender(d);
       setTimeout(()=>{
         const stagesList = document.querySelector('.stages-list');
         if(stagesList && (`
-  <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
-    <span style="font-size:20px;">🎟</span>
-    <div>
-      <div style="font-size:13px;font-weight:700;color:#22C55E;">Referral Discount Applied!</div>
-      <div style="font-size:12px;color:#7A7A9A;margin-top:2px;">Code <strong style="color:#F0F0FA;">SE-REF-001</strong> — You saved <strong style="color:#22C55E;">₹4,500</strong> · Applied 15/5/2026</div>
-    </div>
-  </div>
   <div style="background:rgba(255,179,71,.06);border:1px solid rgba(255,179,71,.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;">
     <div style="font-size:12px;font-weight:700;color:#FFB347;margin-bottom:10px;">🎁 Your Referral Rewards</div>
     <div style="font-size:12px;color:#7A7A9A;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);">Code <strong style="color:#F0F0FA;">SE-REF-001</strong> used by client SE-001 on 15/5/2026 — Reward: <strong style="color:#FFB347;">₹500 credit on next project</strong></div>
   </div>`).trim()) {
           const banner = document.createElement('div');
           banner.innerHTML = `
-  <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
-    <span style="font-size:20px;">🎟</span>
-    <div>
-      <div style="font-size:13px;font-weight:700;color:#22C55E;">Referral Discount Applied!</div>
-      <div style="font-size:12px;color:#7A7A9A;margin-top:2px;">Code <strong style="color:#F0F0FA;">SE-REF-001</strong> — You saved <strong style="color:#22C55E;">₹4,500</strong> · Applied 15/5/2026</div>
-    </div>
-  </div>
   <div style="background:rgba(255,179,71,.06);border:1px solid rgba(255,179,71,.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;">
     <div style="font-size:12px;font-weight:700;color:#FFB347;margin-bottom:10px;">🎁 Your Referral Rewards</div>
     <div style="font-size:12px;color:#7A7A9A;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);">Code <strong style="color:#F0F0FA;">SE-REF-001</strong> used by client SE-001 on 15/5/2026 — Reward: <strong style="color:#FFB347;">₹500 credit on next project</strong></div>
   </div>`;
           stagesList.parentNode.insertBefore(banner, stagesList);
         }
-        // Patch pay button
-        document.querySelectorAll('button, a').forEach(el=>{
-          const t = (el.textContent||'').toLowerCase();
-          if(t.includes('pay online')||t.includes('pay now')) {
-            el.addEventListener('click', e=>{ e.preventDefault(); e.stopPropagation(); openPayModal(); });
-          }
-        });
       }, 400);
     };
 
     renderDashboard(clientData);
 
-    /* ── Build bill rows in modal ── */
-    function openPayModal() {
-      const data = clientData;
-      const total = data.payment.total || 0;
-      const disc  = data.discount || null;
-      const refD  = data.referralDiscount || null;
-
-      // Compute amounts
-      let sitDiscAmt = 0;
-      if(disc && disc.type && disc.type !== 'none' && disc.value) {
-        sitDiscAmt = disc.type === 'flat' ? disc.value : Math.round(total * disc.value / 100);
-      }
-      let refDiscAmt = refD ? (refD.discount || 0) : 0;
-      const totalDiscount = sitDiscAmt + refDiscAmt;
-      const finalTotal    = total - totalDiscount;
-      const paidAmt       = (data.payment.stages||[]).filter(s=>s.status==='paid').reduce((a,s)=>a+s.amount,0);
-      const pendingAmt    = Math.max(0, finalTotal - paidAmt);
-
-      const fmt = n => '₹' + Number(n).toLocaleString('en-IN');
-
-      // Bill rows HTML
-      let rows = '';
-      const row = (label, value, color, strike) =>
-        `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);">
-          <span style="font-size:13px;color:#9A9ABA;">${label}</span>
-          <span style="font-size:13px;font-weight:600;${color?';color:'+color:''}">${strike?'<s style=\"color:#3A3A5A;\">'+value+'</s>':value}</span>
-        </div>`;
-
-      rows += row('Original Amount', fmt(total), '#F0F0FA');
-      if(sitDiscAmt > 0) {
-        const label = disc.reason ? `Discount — ${disc.reason}` : (disc.type==='percent' ? `Discount (${disc.value}%)` : 'Flat Discount');
-        rows += row(label, '– '+fmt(sitDiscAmt), '#22C55E');
-      }
-      if(refDiscAmt > 0) {
-        rows += row(`Referral Code (${refD.code})`, '– '+fmt(refDiscAmt), '#22C55E');
-      }
-      if(totalDiscount > 0) {
-        rows += `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(34,197,94,.04);border-radius:6px;margin:4px -8px;padding-left:8px;padding-right:8px;">
-          <span style="font-size:12px;font-weight:700;color:#22C55E;">💚 Total Savings</span>
-          <span style="font-size:13px;font-weight:700;color:#22C55E;">– ${fmt(totalDiscount)}</span>
-        </div>`;
-      }
-
-      // Final total row
-      const billTotalHTML = `
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0 10px;margin-top:4px;">
-          <span style="font-size:14px;font-weight:700;color:#F0F0FA;">Project Total</span>
-          <div style="text-align:right;">
-            ${totalDiscount>0 ? '<div style=\"font-size:11px;color:#3A3A5A;text-decoration:line-through;margin-bottom:2px;\">'+fmt(total)+'</div>' : ''}
-            <span style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#FF6B35;">${fmt(finalTotal)}</span>
-          </div>
-        </div>
-        <div style="display:flex;gap:10px;margin-top:4px;padding-top:12px;border-top:1px solid rgba(255,255,255,.06);">
-          <div style="flex:1;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:8px;padding:10px;text-align:center;">
-            <div style="font-size:10px;font-weight:700;color:#22C55E;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">💚 Paid</div>
-            <div style="font-size:16px;font-weight:800;font-family:'Syne',sans-serif;color:#22C55E;">${fmt(paidAmt)}</div>
-          </div>
-          <div style="flex:1;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:10px;text-align:center;">
-            <div style="font-size:10px;font-weight:700;color:#F59E0B;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">🟡 Due Now</div>
-            <div style="font-size:16px;font-weight:800;font-family:'Syne',sans-serif;color:#F59E0B;">${fmt(pendingAmt)}</div>
-          </div>
-        </div>`;
-
-      document.getElementById('payBillRows').innerHTML = rows;
-      document.getElementById('payBillTotal').innerHTML = billTotalHTML;
-
-      // Update UPI button label
-      const upiBtn = document.getElementById('upiPayBtn');
-      if(upiBtn && pendingAmt > 0) {
-        upiBtn.innerHTML = `<span style="font-size:20px;">📲</span><span>Pay ${fmt(pendingAmt)} via UPI App</span>`;
-      }
-      window._pendingPayAmt = pendingAmt;
-      document.getElementById('payModal').classList.add('open');
-    }
-
     function doUpiPay() {
-      const upiId   = 'raunakkarn555-2@okhdfcbank';
-      const name    = encodeURIComponent('Raunak Kumar');
-      const note    = encodeURIComponent('SparkEdge Payment');
-      const amt     = window._pendingPayAmt || 0;
-      // Build UPI deep link with amount pre-loaded
-      let upiLink = `upi://pay?pa=${upiId}&pn=${name}&tn=${note}&cu=INR`;
-      if(amt > 0) upiLink += `&am=${amt}`;
-      window.location.href = upiLink;
+      const upiId = 'raunakkarn555-2@okhdfcbank';
+      const amt   = window._pendingPayAmt || 0;
+      let link = `upi://pay?pa=${upiId}&pn=Raunak%20Kumar&tn=SparkEdge%20Payment&cu=INR`;
+      if (amt > 0) link += `&am=${amt}`;
+      window.location.href = link;
       setTimeout(() => {
-        if(document.hasFocus()) alert('Open GPay / PhonePe / Paytm manually and pay to:\n\nraunakkarn555-2@okhdfcbank\n\nAmount: ₹' + Number(amt).toLocaleString('en-IN'));
+        if (document.hasFocus()) alert('Open GPay / PhonePe / Paytm manually and pay to:\n\nraunakkarn555-2@okhdfcbank\n\nAmount: ₹' + Number(amt).toLocaleString('en-IN'));
       }, 1500);
     }
     function copyUpiId() {
-      navigator.clipboard.writeText('raunakkarn555-2@okhdfcbank').then(()=>alert('UPI ID copied!')).catch(()=>{const e=document.createElement('textarea');e.value='raunakkarn555-2@okhdfcbank';document.body.appendChild(e);e.select();document.execCommand('copy');document.body.removeChild(e);alert('Copied!');});
+      navigator.clipboard.writeText('raunakkarn555-2@okhdfcbank')
+        .then(() => alert('UPI ID copied!'))
+        .catch(() => { const e=document.createElement('textarea');e.value='raunakkarn555-2@okhdfcbank';document.body.appendChild(e);e.select();document.execCommand('copy');document.body.removeChild(e);alert('Copied!'); });
     }
     function copyBank() {
-      const d='Account Holder: Raunak Kumar\nBank: Canara Bank, Samastipur\nAccount Number: 110281513266\nIFSC: CNRB0017535';
-      navigator.clipboard.writeText(d).then(()=>alert('Bank details copied!')).catch(()=>{const e=document.createElement('textarea');e.value=d;document.body.appendChild(e);e.select();document.execCommand('copy');document.body.removeChild(e);alert('Copied!');});
+      const d = 'Account Holder: Raunak Kumar\nBank: Canara Bank, Samastipur\nAccount Number: 110281513266\nIFSC: CNRB0017535';
+      navigator.clipboard.writeText(d)
+        .then(() => alert('Bank details copied!'))
+        .catch(() => { const e=document.createElement('textarea');e.value=d;document.body.appendChild(e);e.select();document.execCommand('copy');document.body.removeChild(e);alert('Copied!'); });
     }
   </script>
 </body>
